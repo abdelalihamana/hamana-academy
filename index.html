@@ -1562,14 +1562,16 @@ window.startNewJourney = () => {
             if (!window.isRegistering) {
                 window.toggleAuthMode();
             }
-            switchScreen('auth-screen');
+            // تغيير الرابط بدلاً من استدعاء switchScreen المباشر
+            window.location.hash = 'auth-screen'; 
         };
 
         window.openExistingAccount = () => {
             if (window.isRegistering) {
                 window.toggleAuthMode();
             }
-            switchScreen('auth-screen');
+            // تغيير الرابط بدلاً من استدعاء switchScreen المباشر
+            window.location.hash = 'auth-screen'; 
         };
         window.toggleAuthMode = () => {
             window.isRegistering = !window.isRegistering;
