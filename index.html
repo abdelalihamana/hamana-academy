@@ -151,6 +151,9 @@
                 </div>
 
                 <button onclick="saveSettingsData()" aria-label="حفظ التغييرات" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-xl transition btn-modern mt-2 shadow-lg shadow-blue-500/30 text-xl flex items-center justify-center gap-2"><i class="ph-bold ph-floppy-disk"></i> حفظ التغييرات</button>
+                                <!-- زر تسجيل الخروج (مدمج في الإعدادات) -->
+                <button id="student-logout-btn" onclick="logout()" aria-label="تسجيل الخروج" class="w-full bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-black py-4 rounded-xl transition border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/50 shadow-sm text-xl flex items-center justify-center gap-2 mt-4"><i class="ph-bold ph-sign-out"></i> تسجيل الخروج</button>
+
             </div>
         </div>
     </div>
@@ -552,8 +555,6 @@
                         <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border border-white dark:border-slate-800 shadow-sm hidden animate-bounce">0</span>
                     </button>
 
-
-                    <button id="student-logout-btn" onclick="logout()" aria-label="تسجيل الخروج" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-5 py-3 rounded-2xl font-black hover:bg-red-100 dark:hover:bg-red-900/50 transition btn-modern border border-red-100 dark:border-red-800 shadow-sm flex items-center gap-2 text-lg">خروج <i class="ph-bold ph-sign-out"></i></button>
                 </div>
             </header>
 
