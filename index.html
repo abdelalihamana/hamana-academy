@@ -578,10 +578,10 @@
                 <input type="text" id="lesson-search" aria-label="البحث عن الدروس والتمارين" onkeyup="executeStudentSearch()" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 shadow-sm" placeholder="ابحث عن درس، تمرين، أو وحدة...">
             </div>
 
-            <!-- سطر مؤقت بومودورو ونقاط الخبرة -->
+                        <!-- سطر مؤقت بومودورو ونقاط الخبرة -->
             <div class="flex flex-col lg:flex-row gap-6 mb-8 items-stretch">
-                <!-- مؤقت بومودورو -->
-                <div class="w-full lg:w-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 rounded-[2rem] shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
+                <!-- مؤقت بومودورو (75%) -->
+                <div class="w-full lg:w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 rounded-[2rem] shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
                     <div class="flex items-center gap-3 relative z-10 w-full sm:w-auto">
                         <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-3xl shadow-inner backdrop-blur-md shrink-0">
@@ -606,26 +606,26 @@
                     </div>
                 </div>
 
-                <!-- نقاط الخبرة (XP) -->
-                <div class="w-full lg:w-1/2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-4 interactive-card">
-                    <div class="flex items-center gap-3 w-full sm:w-auto">
-                        <div class="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center text-3xl shadow-inner shrink-0"><i class="ph-fill ph-shooting-star"></i></div>
-                        <div class="flex-1">
-                            <h3 class="font-black text-slate-700 dark:text-slate-300 text-base">نقاط الخبرة (XP)</h3>
-                            <div class="w-full sm:w-32 xl:w-40 bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 mt-2 overflow-hidden shadow-inner">
-                                <div id="progress-bar-fill" class="bg-gradient-to-l from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-1000 w-0"></div>
+                <!-- نقاط الخبرة (XP) (25%) - تصميم عمودي مدمج -->
+                <div class="w-full lg:w-1/4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center gap-3 interactive-card text-center">
+                    <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center text-2xl shadow-inner"><i class="ph-fill ph-shooting-star"></i></div>
+                    
+                    <div class="w-full px-2">
+                        <div class="flex justify-between items-end mb-1.5">
+                            <h3 class="font-black text-slate-700 dark:text-slate-300 text-xs">التقدم</h3>
+                            <div class="flex items-baseline gap-1">
+                                <span id="progress-text-xp" class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0</span>
+                                <span class="text-[10px] font-bold text-slate-400">XP</span>
                             </div>
                         </div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2 overflow-hidden shadow-inner">
+                            <div id="progress-bar-fill" class="bg-gradient-to-l from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-1000 w-0"></div>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-end">
-                        <div class="flex items-center justify-center gap-1 bg-orange-50 dark:bg-orange-900/30 px-3 py-1.5 rounded-xl border border-orange-200 dark:border-orange-800 shadow-sm" title="أيام الدخول المتتالية">
-                            <span id="student-streak-count" class="text-lg font-black text-orange-600 dark:text-orange-400">0</span>
-                            <i class="ph-fill ph-fire text-xl text-orange-500 animate-pulse"></i>
-                        </div>
-                        <div class="flex items-baseline gap-1">
-                            <span id="progress-text-xp" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0</span>
-                            <span class="text-sm font-bold text-slate-400">XP</span>
-                        </div>
+
+                    <div class="flex items-center justify-center gap-1.5 bg-orange-50 dark:bg-orange-900/30 px-3 py-1.5 rounded-xl border border-orange-200 dark:border-orange-800 shadow-sm w-full mt-1">
+                        <i class="ph-fill ph-fire text-lg text-orange-500 animate-pulse"></i>
+                        <span class="text-xs font-black text-orange-600 dark:text-orange-400">شعلة الحماس: <span id="student-streak-count" class="text-sm">0</span></span>
                     </div>
                 </div>
             </div>
