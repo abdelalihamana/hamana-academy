@@ -141,9 +141,10 @@
                     <input type="text" id="settings-username" aria-label="اسم المستخدم" autocomplete="username" disabled class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 font-black outline-none cursor-not-allowed shadow-inner text-lg">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-lock-key"></i> كلمة المرور الجديدة</label>
-                    <input type="text" id="settings-new-password" aria-label="كلمة المرور الجديدة" autocomplete="new-password" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-lg text-slate-800 dark:text-white" placeholder="اتركه فارغاً إذا لم ترد تغييره">
+                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-lock-key"></i> كلمة المرور الحالية</label>
+                    <input type="text" id="settings-current-password" aria-label="كلمة المرور الحالية" disabled class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 font-black outline-none cursor-not-allowed shadow-inner text-lg">
                 </div>
+
                 <div id="settings-phone-container">
                     <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-device-mobile"></i> هاتف ولي الأمر</label>
                     <input type="tel" id="settings-new-phone" aria-label="رقم الهاتف" autocomplete="tel" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-left tracking-[0.2em] text-lg text-slate-800 dark:text-white" dir="auto" placeholder="05/06/07...">
@@ -1604,8 +1605,7 @@
 
         window.openSettings = () => {
             document.getElementById('settings-username').value = window.currentUserRecord.username;
-            document.getElementById('settings-new-password').value = '';
-            
+            document.getElementById('settings-current-password').value = window.currentUserRecord.password || 'غير متوفرة';            
             const phoneContainer = document.getElementById('settings-phone-container');
             const phoneInput = document.getElementById('settings-new-phone');
             
@@ -1627,52 +1627,32 @@
             setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
         };
 
-        window.saveSettingsData = async () => {
-            const newPass = document.getElementById('settings-new-password').value.trim();
+                window.saveSettingsData = async () => {
             const phoneInput = document.getElementById('settings-new-phone');
             let updates = {};
-            
-            if(newPass) {
-                try {
-                    if(auth.currentUser) {
-                        await updatePassword(auth.currentUser, newPass);
-                    }
-                    updates.password = newPass; 
-                } catch(e) {
-                    console.error("Password update error", e);
-                    if (e.code === 'auth/requires-recent-login' && window.currentUserRecord.password) {
-                        // حل مشكلة تغيير كلمة المرور بإعادة المصادقة التلقائية
-                        try {
-                            const credential = EmailAuthProvider.credential(auth.currentUser.email, window.currentUserRecord.password);
-                            await reauthenticateWithCredential(auth.currentUser, credential);
-                            await updatePassword(auth.currentUser, newPass);
-                            updates.password = newPass;
-                        } catch (reauthErr) {
-                            return showToast("يرجى تسجيل الخروج والدخول مجدداً لتغيير كلمة المرور", "error");
-                        }
-                    } else {
-                        return showToast("حدث خطأ أثناء تغيير كلمة المرور في نظام الحماية", "error");
-                    }
-                }
-            }
 
             if(window.currentUserRecord.role !== 'admin') {
                 const newPhone = phoneInput.value.trim();
                 const phoneRegex = /^(05|06|07)\d{8}$/;
+                
                 if(newPhone && !phoneRegex.test(newPhone)) return showToast("رقم الهاتف غير صحيح! يجب أن يبدأ بـ 05، 06، أو 07", "error");
-                if(newPhone) updates.phoneNumber = newPhone;
+                if(newPhone && newPhone !== window.currentUserRecord.phoneNumber) updates.phoneNumber = newPhone;
+            }
+
+            if (Object.keys(updates).length === 0) {
+                closeSettings();
+                return showToast("لم تقم بإجراء أي تغييرات", "success");
             }
 
             try {
-                if (Object.keys(updates).length > 0) {
-                    await updateDoc(doc(usersCol, window.currentUserRecord.username), updates);
-                }
-                if(updates.password) window.currentUserRecord.password = updates.password;
+                await updateDoc(doc(usersCol, window.currentUserRecord.username), updates);
                 if(updates.phoneNumber) window.currentUserRecord.phoneNumber = updates.phoneNumber;
                 
-                showToast("تم تحديث الإعدادات بنجاح 💾");
+                showToast("تم تحديث رقم الهاتف بنجاح 💾");
                 closeSettings();
-            } catch(e) { showToast("حدث خطأ أثناء الحفظ", "error"); }
+            } catch(e) { 
+                showToast("حدث خطأ أثناء الحفظ", "error"); 
+            }
         };
 
         window.openBroadcastModal = () => {
