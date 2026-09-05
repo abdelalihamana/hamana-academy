@@ -1573,6 +1573,7 @@
         };
 
         window.logout = async () => {
+            if (typeof closeSettings === 'function') closeSettings();
             if(await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
                 try {
                     await signOut(auth);
