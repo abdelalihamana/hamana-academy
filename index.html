@@ -578,57 +578,50 @@
                 <input type="text" id="lesson-search" aria-label="البحث عن الدروس والتمارين" onkeyup="executeStudentSearch()" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 shadow-sm" placeholder="ابحث عن درس، تمرين، أو وحدة...">
             </div>
 
-                        <!-- سطر مؤقت بومودورو ونقاط الخبرة -->
-            <div class="flex flex-col lg:flex-row gap-6 mb-8 items-stretch">
-                <!-- مؤقت بومودورو (75%) -->
-                <div class="w-full lg:w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 rounded-[2rem] shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
+                    <!-- سطر مؤقت بومودورو ونقاط الخبرة (مدمج) -->
+            <div class="flex flex-col lg:flex-row gap-4 mb-8 items-stretch">
+                <!-- مؤقت بومودورو (75%) - تصميم صغير -->
+                <div class="w-full lg:w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-[2rem] shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-                    <div class="flex items-center gap-3 relative z-10 w-full sm:w-auto">
-                        <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-3xl shadow-inner backdrop-blur-md shrink-0">
+                    
+                    <div class="flex items-center gap-4 relative z-10 w-full sm:w-auto">
+                        <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl shadow-inner backdrop-blur-md shrink-0">
                             <i class="ph-fill ph-timer"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg font-black tracking-wide" id="pomodoro-status-title">وقت التركيز</h3>
-                            <p class="text-blue-100 font-bold text-xs mt-0.5">45 دراسة / 15 راحة</p>
+                            <h3 class="text-base font-black tracking-wide" id="pomodoro-status-title">وقت التركيز</h3>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-3 relative z-10 flex-wrap justify-center sm:justify-end w-full sm:w-auto">
+                    <div class="flex items-center gap-4 relative z-10 flex-wrap justify-center sm:justify-end w-full sm:w-auto">
                         <div class="text-3xl font-black tracking-widest font-mono bg-black/20 px-4 py-2 rounded-xl shadow-inner border border-white/10" id="pomodoro-timer-display">45:00</div>
                         <div class="flex gap-2">
-                            <button onclick="togglePomodoro()" id="pomodoro-toggle-btn" class="bg-white text-blue-700 hover:bg-blue-50 px-4 py-2 rounded-xl font-black text-sm transition shadow-md flex items-center gap-1 shrink-0">
-                                <i class="ph-fill ph-play"></i> بدء
+                            <!-- زر التشغيل/الإيقاف (أيقونة فقط) -->
+                            <button onclick="togglePomodoro()" id="pomodoro-toggle-btn" class="w-12 h-12 bg-white text-blue-700 hover:bg-blue-50 rounded-xl text-xl transition shadow-sm flex items-center justify-center shrink-0" title="تشغيل / إيقاف">
+                                <i class="ph-fill ph-play"></i>
                             </button>
-                            <button onclick="resetPomodoro()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-2 rounded-xl font-black text-sm transition shadow-md shrink-0" title="إعادة ضبط">
+                            <!-- زر إعادة الضبط -->
+                            <button onclick="resetPomodoro()" class="w-12 h-12 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xl transition shadow-sm flex items-center justify-center shrink-0" title="إعادة ضبط">
                                 <i class="ph-bold ph-arrow-counter-clockwise"></i>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- نقاط الخبرة (XP) (25%) - تصميم عمودي مدمج -->
-                <div class="w-full lg:w-1/4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center gap-3 interactive-card text-center">
-                    <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center text-2xl shadow-inner"><i class="ph-fill ph-shooting-star"></i></div>
-                    
-                    <div class="w-full px-2">
-                        <div class="flex justify-between items-end mb-1.5">
-                            <h3 class="font-black text-slate-700 dark:text-slate-300 text-xs">التقدم</h3>
-                            <div class="flex items-baseline gap-1">
-                                <span id="progress-text-xp" class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0</span>
-                                <span class="text-[10px] font-bold text-slate-400">XP</span>
-                            </div>
-                        </div>
+                <!-- نقاط الخبرة (25%) - بدون شعلة الحماس -->
+                <div class="w-full lg:w-1/4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center gap-1 interactive-card text-center">
+                    <div class="flex items-baseline gap-1">
+                        <span id="progress-text-xp" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0</span>
+                        <span class="text-xs font-bold text-slate-400">XP</span>
+                    </div>
+                    <div class="w-full px-2 mt-1">
                         <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2 overflow-hidden shadow-inner">
                             <div id="progress-bar-fill" class="bg-gradient-to-l from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-1000 w-0"></div>
                         </div>
                     </div>
-
-                    <div class="flex items-center justify-center gap-1.5 bg-orange-50 dark:bg-orange-900/30 px-3 py-1.5 rounded-xl border border-orange-200 dark:border-orange-800 shadow-sm w-full mt-1">
-                        <i class="ph-fill ph-fire text-lg text-orange-500 animate-pulse"></i>
-                        <span class="text-xs font-black text-orange-600 dark:text-orange-400">شعلة الحماس: <span id="student-streak-count" class="text-sm">0</span></span>
-                    </div>
                 </div>
             </div>
+
 
         <div id="student-program-view" class="pb-20"></div>
         </div>
@@ -756,7 +749,7 @@
             localStorage.setItem(`pomodoro_${user}`, JSON.stringify(state));
         };
 
-        window.updatePomodoroUI = () => {
+                window.updatePomodoroUI = () => {
             const minutes = Math.floor(pomodoroTime / 60);
             const seconds = pomodoroTime % 60;
             const displayStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
@@ -765,19 +758,20 @@
             if (timerEl) timerEl.innerText = displayStr;
 
             const titleEl = document.getElementById('pomodoro-status-title');
-            if (titleEl) titleEl.innerText = isStudySession ? "وقت التركيز والدراسة" : "وقت الراحة والاسترخاء";
+            if (titleEl) titleEl.innerText = isStudySession ? "وقت التركيز" : "وقت الراحة";
 
             const btn = document.getElementById('pomodoro-toggle-btn');
             if (btn) {
                 if (isPomodoroRunning) {
-                    btn.innerHTML = '<i class="ph-fill ph-pause"></i> إيقاف مؤقت';
-                    btn.className = "bg-amber-400 text-slate-900 hover:bg-amber-500 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
+                    btn.innerHTML = '<i class="ph-fill ph-pause"></i>';
+                    btn.className = "w-12 h-12 bg-amber-400 text-slate-900 hover:bg-amber-500 rounded-xl text-xl transition shadow-sm flex items-center justify-center shrink-0";
                 } else {
-                    btn.innerHTML = pomodoroTime === (isStudySession ? 45*60 : 15*60) ? '<i class="ph-fill ph-play"></i> بدء' : '<i class="ph-fill ph-play"></i> استئناف';
-                    btn.className = "bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
+                    btn.innerHTML = '<i class="ph-fill ph-play"></i>';
+                    btn.className = "w-12 h-12 bg-white text-blue-700 hover:bg-blue-50 rounded-xl text-xl transition shadow-sm flex items-center justify-center shrink-0";
                 }
             }
         };
+
 
         window.startPomodoroTick = () => {
             if (pomodoroInterval) clearInterval(pomodoroInterval);
