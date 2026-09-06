@@ -1489,18 +1489,12 @@
                         }
                     }
                 } catch(e) { console.error("OnAuthState Error:", e); }
-            } else {
-                const currentHash = window.location.hash.substring(1);
-                if (currentHash === 'auth-screen') {
-                    switchScreen('auth-screen');
-            } else {
+                    } else {
                 switchScreen('auth-screen');
                 document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
             }
         });
 
-
-       
         window.toggleAuthMode = () => {
             window.isRegistering = !window.isRegistering;
             document.getElementById('auth-title').innerText = window.isRegistering ? "حساب جديد" : "منصة المجتهد";
