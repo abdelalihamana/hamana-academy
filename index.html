@@ -276,10 +276,10 @@
 
                 <!-- أزرار الدخول -->
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-                    <button onclick="startNewJourney()" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-black text-xl transition-all shadow-[0_10px_20px_-10px_rgba(37,99,235,0.6)] hover:-translate-y-1 flex items-center justify-center gap-3">
+                                       <button onclick="document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('auth-screen').classList.add('active'); if(window.isRegistering !== true) window.toggleAuthMode();" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-black text-xl transition-all shadow-[0_10px_20px_-10px_rgba(37,99,235,0.6)] hover:-translate-y-1 flex items-center justify-center gap-3">
                         <i class="ph-bold ph-rocket-launch text-2xl"></i> ابدأ رحلتك معنا
                     </button>
-                    <button onclick="openExistingAccount()" class="w-full sm:w-auto px-10 py-4 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl font-black text-xl transition-all shadow-sm hover:-translate-y-1 flex items-center justify-center gap-3">
+                    <button onclick="document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('auth-screen').classList.add('active'); if(window.isRegistering === true) window.toggleAuthMode();" class="w-full sm:w-auto px-10 py-4 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl font-black text-xl transition-all shadow-sm hover:-translate-y-1 flex items-center justify-center gap-3">
                         <i class="ph-bold ph-sign-in text-2xl"></i> لدي حساب مسبقاً
                     </button>
                 </div>
