@@ -580,16 +580,35 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 }
             }
         };
-window.resolvePasswordReset = async (username) => {
+  window.resolvePasswordReset = async (username) => {
             try {
                 const userRef = doc(usersCol, username);
                 const userSnap = await getDoc(userRef);
+                
                 if(userSnap.exists()) {
-                    const pass = userSnap.data().password || "غير متوفرة";
-                    // إظهار كلمة المرور للأستاذ وسؤاله عن إخفاء الإشعار
-                    if(await confirmAction(`🔑 كلمة المرور الحالية للتلميذ (${username}) هي:\n\n[ ${pass} ]\n\nهل قمت بحل المشكلة وتريد إخفاء هذا الإشعار؟`)) {
+                    const data = userSnap.data();
+                    const pass = data.password || "غير متوفرة";
+                    const phone = data.phoneNumber; // استخراج رقم هاتف الولي
+                    
+                    // تحويل الاسم ليعرض بمسافات طبيعية بدلاً من الشرطة السفلية
+                    const displayName = username.replace(/_/g, ' ');
+
+                    // إظهار كلمة المرور للأستاذ وسؤاله عن إرسالها
+                    if(await confirmAction(`🔑 كلمة المرور للتلميذ (${displayName}) هي:\n\n[ ${pass} ]\n\nهل تريد إرسالها لولي التلميذ عبر الواتساب وإخفاء هذا الإشعار؟`)) {
+                        
+                        // 1. إخفاء الإشعار الأحمر من قاعدة البيانات فوراً
                         await updateDoc(userRef, { passwordResetRequest: false });
-                        showToast("تم إخفاء الإشعار بنجاح", "success");
+                        showToast("تم إخفاء الإشعار، وتجهيز رسالة الواتساب للولي!", "success");
+
+                        // 2. إعداد وإرسال رسالة الواتساب إذا كان الرقم متوفراً
+                        if(phone) {
+                            // إزالة الصفر الأول من الرقم وإضافة مفتاح الجزائر 213
+                            const waPhone = `213${phone.substring(1)}`;
+                            const waMessage = encodeURIComponent(`السلام عليكم.\nبناءً على طلبكم، هذه بيانات الدخول الخاصة بالتلميذ(ة) ${displayName} في منصة المجتهد للعلوم الفيزيائية:\n\nالاسم واللقب: ${displayName}\nكلمة المرور: ${pass}\n\nبالتوفيق!`);
+                            window.open(`https://wa.me/${waPhone}?text=${waMessage}`, '_blank');
+                        } else {
+                            showToast("لا يوجد رقم هاتف مسجل لهذا التلميذ!", "error");
+                        }
                     }
                 }
             } catch(e) {
