@@ -1749,28 +1749,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             }
         };
 
-        const startAdminListeners = () => {
-            // جلب الإحصائيات عند الدخول
+                const startAdminListeners = () => {
+            // 1. جلب الإحصائيات
             window.loadAdminStats();
- const resetQuery = query(usersCol, where('passwordResetRequest', '==', true));
-            if (window.unsubscribeResetRequests) window.unsubscribeResetRequests();
-            window.unsubscribeResetRequests = onSnapshot(resetQuery, (snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === "added") {
-                        const studentName = change.doc.id.replace(/_/g, ' ');
-                        
-                        // إظهار تنبيه مرئي أحمر للأستاذ في أي مكان كان في المنصة
-                        showToast(`🚨 تنبيه: التلميذ (${studentName}) نسي كلمة المرور ويطلب إرسالها!`, 'error');
-                        
-                        // تحديث الزر الأحمر في القائمة فوراً
-                        const userIndex = window.adminUsersList.findIndex(u => u.id === change.doc.id);
-                        if(userIndex !== -1) {
-                            window.adminUsersList[userIndex].data.passwordResetRequest = true;
-                            if (typeof renderAdminTable === 'function') renderAdminTable();
-                        }
-                    }
-                });
-            });
+
+            // 2. مستمع المنهج الدراسي
             unsubscribeProgram = onSnapshot(programCol, (snapshot) => {
                 let mid = null, hi = null, meta = null;
                 snapshot.forEach(d => {
@@ -1792,39 +1775,52 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 }
             });
 
-            // تم إيقاف onSnapshot لكل المستخدمين (usersCol) للحماية من تكلفة Firebase
+            // --- نظام الإشعارات الموحد للأستاذ (دردشة + كلمات مرور) ---
+            window.adminAlerts = { chats: {}, resets: {} };
 
-            if(unsubscribeChatMeta) unsubscribeChatMeta();
-            const unreadQuery = query(collection(db, chatsPath), where('unreadAdmin', '>', 0));
-unsubscribeChatMeta = onSnapshot(unreadQuery, (snapshot) => {
-
-                window.adminChatsData = {}; 
+            window.renderAdminAlerts = () => {
                 let totalUnread = 0;
                 let notifHtml = '';
 
-                snapshot.forEach(d => { 
-                    let data = d.data();
-                    window.adminChatsData[d.id] = data; 
-                    if(data.unreadAdmin > 0) {
-                        totalUnread += data.unreadAdmin;
-                        notifHtml += `
-                            <button onclick="openChat('${d.id}')" class="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/40 transition border border-amber-100 dark:border-amber-800/50 group text-right w-full">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xl shadow-inner"><i class="ph-fill ph-user"></i></div>
-                                    <div>
-                                        <div class="font-black text-slate-800 dark:text-white text-sm group-hover:text-amber-600 transition">${d.id}</div>
-                                        <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">لديك ${data.unreadAdmin} رسالة/إشعار</div>
-                                    </div>
+                // 1. إشعارات طلبات كلمات المرور (تظهر أولاً بلون أحمر)
+                for (let username of Object.keys(window.adminAlerts.resets)) {
+                    totalUnread++;
+                    let studentName = username.replace(/_/g, ' ');
+                    notifHtml += `
+                        <button onclick="openAdminSection('accounts'); document.getElementById('admin-student-search').value='${studentName}'; window.loadAdminPage('init');" class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition border border-red-100 dark:border-red-800/50 group text-right w-full mb-2 shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-red-200 dark:bg-red-800 text-red-700 dark:text-red-300 flex items-center justify-center text-xl shadow-inner animate-pulse"><i class="ph-fill ph-key"></i></div>
+                                <div>
+                                    <div class="font-black text-slate-800 dark:text-white text-sm group-hover:text-red-600 transition">${studentName}</div>
+                                    <div class="text-xs text-red-500 dark:text-red-400 font-bold mt-0.5">طلب استرجاع كلمة المرور!</div>
                                 </div>
-                                <i class="ph-bold ph-chat-circle-dots text-amber-500 text-xl group-hover:scale-110 transition"></i>
-                            </button>
-                        `;
-                    }
-                }); 
-                renderAdminTable(); 
-                
+                            </div>
+                            <i class="ph-bold ph-arrow-left text-red-500 text-xl group-hover:-translate-x-1 transition"></i>
+                        </button>
+                    `;
+                }
+
+                // 2. إشعارات الدردشة (لون برتقالي)
+                for (let [username, data] of Object.entries(window.adminAlerts.chats)) {
+                    totalUnread += data.unreadAdmin;
+                    let studentName = username.replace(/_/g, ' ');
+                    notifHtml += `
+                        <button onclick="openChat('${username}')" class="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/40 transition border border-amber-100 dark:border-amber-800/50 group text-right w-full mb-2 shadow-sm">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xl shadow-inner"><i class="ph-fill ph-user"></i></div>
+                                <div>
+                                    <div class="font-black text-slate-800 dark:text-white text-sm group-hover:text-amber-600 transition">${studentName}</div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400 font-bold mt-0.5">لديك ${data.unreadAdmin} رسالة/إشعار</div>
+                                </div>
+                            </div>
+                            <i class="ph-bold ph-chat-circle-dots text-amber-500 text-xl group-hover:scale-110 transition"></i>
+                        </button>
+                    `;
+                }
+
                 const globalBadge = document.getElementById('admin-global-badge');
                 const notifContainer = document.getElementById('admin-notifications-container');
+                
                 if (globalBadge) {
                     if (totalUnread > 0) {
                         globalBadge.innerText = totalUnread > 99 ? '99+' : totalUnread;
@@ -1832,11 +1828,48 @@ unsubscribeChatMeta = onSnapshot(unreadQuery, (snapshot) => {
                         if(notifContainer) notifContainer.innerHTML = notifHtml;
                     } else {
                         globalBadge.classList.add('hidden');
-                        if(notifContainer) notifContainer.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-4">لا توجد إشعارات جديدة</div>';
+                        if(notifContainer) notifContainer.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-4 opacity-70"><i class="ph-fill ph-bell-slash text-4xl mb-2"></i><br>لا توجد إشعارات جديدة</div>';
                     }
                 }
+            };
+
+            // 3. التقاط طلبات الدردشة
+            if(unsubscribeChatMeta) unsubscribeChatMeta();
+            const unreadQuery = query(collection(db, chatsPath), where('unreadAdmin', '>', 0));
+            unsubscribeChatMeta = onSnapshot(unreadQuery, (snapshot) => {
+                window.adminAlerts.chats = {}; 
+                window.adminChatsData = {}; 
+                snapshot.forEach(d => { 
+                    let data = d.data();
+                    window.adminChatsData[d.id] = data; 
+                    if(data.unreadAdmin > 0) {
+                        window.adminAlerts.chats[d.id] = data;
+                    }
+                }); 
+                renderAdminTable(); 
+                if (typeof window.renderAdminAlerts === 'function') window.renderAdminAlerts();
+            });
+
+            // 4. التقاط طلبات كلمات المرور (بدون نافذة منبثقة)
+            const resetQuery = query(usersCol, where('passwordResetRequest', '==', true));
+            if (window.unsubscribeResetRequests) window.unsubscribeResetRequests();
+            window.unsubscribeResetRequests = onSnapshot(resetQuery, (snapshot) => {
+                window.adminAlerts.resets = {}; 
+                
+                snapshot.forEach((doc) => {
+                    window.adminAlerts.resets[doc.id] = doc.data();
+                    // تحديث الزر الأحمر في القائمة فوراً
+                    const userIndex = window.adminUsersList.findIndex(u => u.id === doc.id);
+                    if(userIndex !== -1) {
+                        window.adminUsersList[userIndex].data.passwordResetRequest = true;
+                    }
+                });
+                
+                if (typeof renderAdminTable === 'function') renderAdminTable();
+                if (typeof window.renderAdminAlerts === 'function') window.renderAdminAlerts();
             });
         };
+
 
         // دالة جلب الإحصائيات الفعالة (بدون تكلفة باهظة)
         window.loadAdminStats = async () => {
