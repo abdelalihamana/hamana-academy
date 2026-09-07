@@ -551,28 +551,25 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             btn.disabled = false; btn.innerHTML = originalHTML;
         };
 
-          window.requestPasswordReset = async () => {
+           window.requestPasswordReset = async () => {
             const usernameInput = document.getElementById('login-username').value.trim();
             
             if (!usernameInput) return showToast("يرجى كتابة الاسم واللقب أولاً في حقل الدخول لطلب استرجاع كلمة المرور", "error");
 
-            if(!await confirmAction(`هل أنت متأكد أنك تريد إرسال طلب استرجاع كلمة مرور لحساب "${usernameInput}" للأستاذ؟`)) return;
-
-            // تحويل الاسم ليتطابق تماماً مع قاعدة البيانات (شرطة سفلية بدلاً من الفراغات)
+            // تحويل الاسم ليتطابق تماماً مع قاعدة البيانات
             const username = usernameInput.replace(/\s+/g, '_').toLowerCase(); 
+
+            // 🛡️ الحماية: منع إرسال طلب باسم الإدارة
+            if (username === 'admin') return showToast("عذراً، لا يمكن إرسال طلب لحساب الإدارة", "error");
+
+            if(!await confirmAction(`هل أنت متأكد أنك تريد إرسال طلب استرجاع كلمة مرور لحساب "${usernameInput}" للأستاذ؟`)) return;
 
             try {
                 const userRef = doc(usersCol, username);
-                
-                // نحاول وضع الإشعار. إذا لم يكن الحساب موجوداً، ستفشل العملية تلقائياً
                 await updateDoc(userRef, { passwordResetRequest: true });
-                
                 showToast("تم إرسال الطلب للأستاذ بنجاح! سيتم مراجعة طلبك وإخبارك.", "success");
-                
             } catch (error) {
                 console.error("Error:", error);
-                
-                // إذا فشل التحديث لأن الحساب غير موجود (أو تم رفضه أمنياً لأنه مجهول)
                 if (error.code === 'not-found' || error.code === 'permission-denied') {
                     showToast("أنت غير مسجل . قم بالتسجيل في المنصة أولا", "error");
                 } else {
@@ -1782,12 +1779,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 let totalUnread = 0;
                 let notifHtml = '';
 
-                // 1. إشعارات طلبات كلمات المرور (تظهر أولاً بلون أحمر)
+                // 1. إشعارات طلبات كلمات المرور
                 for (let username of Object.keys(window.adminAlerts.resets)) {
                     totalUnread++;
                     let studentName = username.replace(/_/g, ' ');
                     notifHtml += `
-                        <button onclick="openAdminSection('accounts'); document.getElementById('admin-student-search').value='${studentName}'; window.loadAdminPage('init');" class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition border border-red-100 dark:border-red-800/50 group text-right w-full mb-2 shadow-sm">
+                        <button onclick="openAdminSection('accounts'); document.getElementById('admin-student-search').value='${username}'; window.loadAdminPage('init');" class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition border border-red-100 dark:border-red-800/50 group text-right w-full mb-2 shadow-sm">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-full bg-red-200 dark:bg-red-800 text-red-700 dark:text-red-300 flex items-center justify-center text-xl shadow-inner animate-pulse"><i class="ph-fill ph-key"></i></div>
                                 <div>
@@ -1800,7 +1797,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     `;
                 }
 
-                // 2. إشعارات الدردشة (لون برتقالي)
+                // 2. إشعارات الدردشة
                 for (let [username, data] of Object.entries(window.adminAlerts.chats)) {
                     totalUnread += data.unreadAdmin;
                     let studentName = username.replace(/_/g, ' ');
@@ -1832,7 +1829,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     }
                 }
             };
-
             // 3. التقاط طلبات الدردشة
             if(unsubscribeChatMeta) unsubscribeChatMeta();
             const unreadQuery = query(collection(db, chatsPath), where('unreadAdmin', '>', 0));
