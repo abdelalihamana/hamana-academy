@@ -551,16 +551,48 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             btn.disabled = false; btn.innerHTML = originalHTML;
         };
 
-        window.requestPasswordReset = async () => {
-            const username = document.getElementById('login-username').value.trim();
-            if (!username) return showToast("يرجى إدخال الإسم واللقب أولاً لتتمكن من مراسلة الأستاذ", "error");
+         window.requestPasswordReset = async () => {
+            const usernameInput = document.getElementById('login-username').value.trim();
+            const username = usernameInput.replace(/\s+/g, ' ').toLowerCase(); 
+            
+            if (!username) return showToast("يرجى كتابة الاسم واللقب أولاً في حقل الدخول لطلب استرجاع كلمة المرور", "error");
 
-            if(await confirmAction(`هل تريد مراسلة الأستاذ عبر الواتساب لاسترجاع كلمة المرور الخاصة بحساب "${username}"؟`)) {
-                const message = encodeURIComponent(`السلام عليكم أستاذ، لقد نسيت كلمة المرور الخاصة بحسابي في منصة المجتهد.\nاسم المستخدم: ${username}`);
-                window.open(`https://wa.me/213699271555?text=${message}`, '_blank');
+            if(!await confirmAction(`هل أنت متأكد أنك تريد إرسال طلب استرجاع كلمة مرور لحساب "${username}" للأستاذ؟`)) return;
+
+            try {
+                const userRef = doc(usersCol, username);
+                const userSnap = await getDoc(userRef);
+
+                // التحقق الصارم: هل التلميذ مسجل فعلاً؟
+                if (!userSnap.exists()) {
+                    return showToast("هذا الحساب غير مسجل في المنصة! تأكد من كتابة الاسم واللقب بشكل صحيح.", "error");
+                }
+
+                // إضافة علامة (طلب استرجاع) في قاعدة بيانات التلميذ
+                await updateDoc(userRef, { passwordResetRequest: true });
+                showToast("تم إرسال الطلب للأستاذ بنجاح! سيتم مراجعة طلبك وإخبارك.", "success");
+                
+            } catch (error) {
+                console.error("Error:", error);
+                showToast("حدث خطأ أثناء الاتصال. يرجى المحاولة لاحقاً.", "error");
             }
         };
-
+window.resolvePasswordReset = async (username) => {
+            try {
+                const userRef = doc(usersCol, username);
+                const userSnap = await getDoc(userRef);
+                if(userSnap.exists()) {
+                    const pass = userSnap.data().password || "غير متوفرة";
+                    // إظهار كلمة المرور للأستاذ وسؤاله عن إخفاء الإشعار
+                    if(await confirmAction(`🔑 كلمة المرور الحالية للتلميذ (${username}) هي:\n\n[ ${pass} ]\n\nهل قمت بحل المشكلة وتريد إخفاء هذا الإشعار؟`)) {
+                        await updateDoc(userRef, { passwordResetRequest: false });
+                        showToast("تم إخفاء الإشعار بنجاح", "success");
+                    }
+                }
+            } catch(e) {
+                showToast("حدث خطأ في جلب البيانات", "error");
+            }
+        };
          window.handleAuth = async () => {
             if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
             
@@ -1572,12 +1604,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${d.id}. نعلمكم من منصة المجتهد للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
                 let waProgLink = data.phoneNumber ? `https://wa.me/213${data.phoneNumber.substring(1)}?text=${waProgMsg}` : '#';
 
-                let parentInfo = data.parentName ? 
-                    `<div class="flex items-center gap-2">
+                               let parentInfo = data.parentName ? 
+                    `<div class="flex items-center flex-wrap gap-2">
                         <span class="font-black text-slate-800 dark:text-slate-200">${data.parentName}</span>
                         ${data.phoneNumber ? `<a href="${waProgLink}" target="_blank" class="text-[#25D366] hover:text-[#128C7E] transition hover:scale-110" title="إعلام بالتقدم عبر الواتساب"><i class="ph-fill ph-whatsapp-logo text-2xl drop-shadow-sm"></i></a>` : ''}
+                        
+                        <!-- زر إشعار نسيان كلمة المرور -->
+                        ${data.passwordResetRequest ? `<button onclick="resolvePasswordReset('${d.id}')" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded-lg text-xs font-black animate-pulse border border-red-200 dark:border-red-800 flex items-center gap-1 hover:bg-red-100 transition-colors" title="التلميذ يطلب كلمة المرور"><i class="ph-bold ph-key"></i> إظهار الكلمة</button>` : ''}
                     </div>` 
                     : '<div class="text-sm text-slate-400 dark:text-slate-500 font-bold">غير متوفر</div>';
+
 
                 let unreadCount = window.adminChatsData[d.id]?.unreadAdmin || 0;
                 let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full animate-bounce shadow-md border border-white">${unreadCount}</span>` : '';
