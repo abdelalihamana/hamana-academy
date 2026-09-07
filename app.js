@@ -580,7 +580,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 }
             }
         };
-  window.resolvePasswordReset = async (username) => {
+ 
+        window.resolvePasswordReset = async (username) => {
             try {
                 const userRef = doc(usersCol, username);
                 const userSnap = await getDoc(userRef);
@@ -588,21 +589,23 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 if(userSnap.exists()) {
                     const data = userSnap.data();
                     const pass = data.password || "غير متوفرة";
-                    const phone = data.phoneNumber; // استخراج رقم هاتف الولي
-                    
-                    // تحويل الاسم ليعرض بمسافات طبيعية بدلاً من الشرطة السفلية
+                    const phone = data.phoneNumber; 
                     const displayName = username.replace(/_/g, ' ');
 
-                    // إظهار كلمة المرور للأستاذ وسؤاله عن إرسالها
                     if(await confirmAction(`🔑 كلمة المرور للتلميذ (${displayName}) هي:\n\n[ ${pass} ]\n\nهل تريد إرسالها لولي التلميذ عبر الواتساب وإخفاء هذا الإشعار؟`)) {
                         
-                        // 1. إخفاء الإشعار الأحمر من قاعدة البيانات فوراً
                         await updateDoc(userRef, { passwordResetRequest: false });
+                        
+                        // الإخفاء الفوري من الواجهة دون الحاجة لتحديث الصفحة
+                        const userIndex = window.adminUsersList.findIndex(u => u.id === username);
+                        if(userIndex !== -1) {
+                            window.adminUsersList[userIndex].data.passwordResetRequest = false;
+                        }
+                        if (typeof renderAdminTable === 'function') renderAdminTable();
+
                         showToast("تم إخفاء الإشعار، وتجهيز رسالة الواتساب للولي!", "success");
 
-                        // 2. إعداد وإرسال رسالة الواتساب إذا كان الرقم متوفراً
                         if(phone) {
-                            // إزالة الصفر الأول من الرقم وإضافة مفتاح الجزائر 213
                             const waPhone = `213${phone.substring(1)}`;
                             const waMessage = encodeURIComponent(`السلام عليكم.\nبناءً على طلبكم، هذه بيانات الدخول الخاصة بالتلميذ(ة) ${displayName} في منصة المجتهد للعلوم الفيزيائية:\n\nالاسم واللقب: ${displayName}\nكلمة المرور: ${pass}\n\nبالتوفيق!`);
                             window.open(`https://wa.me/${waPhone}?text=${waMessage}`, '_blank');
@@ -1749,7 +1752,25 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         const startAdminListeners = () => {
             // جلب الإحصائيات عند الدخول
             window.loadAdminStats();
-
+ const resetQuery = query(usersCol, where('passwordResetRequest', '==', true));
+            if (window.unsubscribeResetRequests) window.unsubscribeResetRequests();
+            window.unsubscribeResetRequests = onSnapshot(resetQuery, (snapshot) => {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        const studentName = change.doc.id.replace(/_/g, ' ');
+                        
+                        // إظهار تنبيه مرئي أحمر للأستاذ في أي مكان كان في المنصة
+                        showToast(`🚨 تنبيه: التلميذ (${studentName}) نسي كلمة المرور ويطلب إرسالها!`, 'error');
+                        
+                        // تحديث الزر الأحمر في القائمة فوراً
+                        const userIndex = window.adminUsersList.findIndex(u => u.id === change.doc.id);
+                        if(userIndex !== -1) {
+                            window.adminUsersList[userIndex].data.passwordResetRequest = true;
+                            if (typeof renderAdminTable === 'function') renderAdminTable();
+                        }
+                    }
+                });
+            });
             unsubscribeProgram = onSnapshot(programCol, (snapshot) => {
                 let mid = null, hi = null, meta = null;
                 snapshot.forEach(d => {
