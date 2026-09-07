@@ -1788,40 +1788,17 @@ window.markStudentNotificationsAsRead = () => {
 };
 
 // --- 1. الدالة السحرية لتوجيه التلميذ نحو الدرس ---
-        window.goToUpdate = (branchTitle, updateId) => {
-            // أ. إضافة الإشعار لقائمة "المقروءة" لكي لا يظهر كجديد مرة أخرى
+              window.goToUpdate = (branchTitle, updateId) => {
+            // أ. إضافة الإشعار لقائمة "المخفية" لكي يُمسح من الشاشة للأبد
             if (window.currentUserRecord) {
-                let seenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
-                if (!seenUpdates.includes(updateId)) {
-                    seenUpdates.push(updateId);
-                    localStorage.setItem(`seen_updates_${window.currentUserRecord.username}`, JSON.stringify(seenUpdates));
-                    
-                    // ب. إخفاء اللون الأزرق/الأحمر من الإشعار في نفس اللحظة
-                    const notifEl = document.getElementById(`notif-${updateId}`);
-                    if (notifEl) {
-                        notifEl.classList.remove('bg-blue-50', 'dark:bg-blue-900/20', 'border-blue-200', 'dark:border-blue-800');
-                        notifEl.classList.add('bg-slate-50', 'dark:bg-slate-800/50', 'border-slate-100', 'dark:border-slate-700');
-                        const iconEl = notifEl.querySelector('.notif-icon');
-                        if(iconEl) {
-                            iconEl.classList.remove('text-blue-600', 'dark:text-blue-400');
-                            iconEl.classList.add('text-slate-400', 'dark:text-slate-500');
-                        }
-                    }
-                    
-                    // ج. إنقاص العداد الأحمر الموجود فوق أيقونة الجرس
-                    const badge = document.getElementById('student-global-badge');
-                    if (badge) {
-                        let count = parseInt(badge.innerText) || 0;
-                        if (count > 1) {
-                            badge.innerText = count - 1;
-                        } else {
-                            badge.classList.add('hidden'); // إخفاء العداد إذا انتهت الإشعارات
-                        }
-                    }
+                let hiddenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+                if (!hiddenUpdates.includes(updateId)) {
+                    hiddenUpdates.push(updateId);
+                    localStorage.setItem(`seen_updates_${window.currentUserRecord.username}`, JSON.stringify(hiddenUpdates));
                 }
             }
 
-            // د. البحث عن الـ (ID) الخاص بالوحدة المطلوبة
+            // ب. البحث عن الـ (ID) الخاص بالوحدة المطلوبة
             let targetBranchId = null;
             if (window.currentSections) {
                 window.currentSections.forEach(p => p.years.forEach(y => {
@@ -1833,16 +1810,71 @@ window.markStudentNotificationsAsRead = () => {
                 }));
             }
 
-            // هـ. التوجيه المباشر للدرس والنزول للأسفل بنعومة
+            // ج. التوجيه المباشر للدرس، وإعادة رسم الإشعارات (ليختفي الإشعار المقروء فوراً)
             if (targetBranchId) {
+                // فتح تفاصيل الوحدة
                 window.studentActiveBranchTab = targetBranchId; 
                 window.studentViewMode = 'details'; 
                 window.renderProgramUI(window.currentSections, 'student-program-view', false);
                 
+                // إعادة رسم الإشعارات لكي يختفي الإشعار الذي تم الضغط عليه وتحديث العداد
+                let metaUpdates = window.currentUpdates || [];
+                let myUpdates = metaUpdates.filter(u => u.level === window.currentUserRecord.level);
+                let hidden = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+                window.renderStudentNotifications(myUpdates, hidden);
+                
+                // النزول بنعومة نحو الدروس
                 setTimeout(() => {
                     const targetView = document.getElementById('student-program-view');
                     if(targetView) targetView.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 200);
+            }
+        };
+
+        // --- 2. دالة رسم الإشعارات (المحدثة لإخفاء المقروء تماماً) ---
+        window.renderStudentNotifications = (myUpdates, hiddenUpdates) => {
+            let notifHtml = '';
+            
+            // الفلترة الذكية: لا تقم برسم الإشعارات التي ضغط عليها التلميذ سابقاً (إخفاء تام)
+            let visibleUpdates = myUpdates.filter(u => !hiddenUpdates.includes(u.id));
+            let sortedUpdates = [...visibleUpdates].sort((a, b) => b.timestamp - a.timestamp);
+
+            sortedUpdates.forEach(update => {
+                notifHtml += `
+                    <button id="notif-${update.id}" onclick="goToUpdate('${update.branch}', '${update.id}')" class="w-full text-right flex items-start gap-3 p-3 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 transition shadow-sm hover:shadow-md hover:scale-[1.02] mb-2 last:mb-0">
+                        <div class="notif-icon w-8 h-8 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center flex-shrink-0 shadow-sm text-blue-600 dark:text-blue-400 animate-pulse">
+                            <i class="ph-bold ph-bell-ringing"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-black text-sm text-slate-800 dark:text-white leading-tight mb-1">${update.title}</div>
+                            <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400">في وحدة: ${update.branch}</div>
+                        </div>
+                        <div class="self-center flex-shrink-0 bg-blue-100 dark:bg-blue-900/50 rounded-lg px-2 py-1">
+                            <span class="text-[10px] font-black text-blue-600 dark:text-blue-400">تصفح <i class="ph-bold ph-arrow-left"></i></span>
+                        </div>
+                    </button>`;
+            });
+
+            const badge = document.getElementById('student-global-badge');
+            const container = document.getElementById('student-notifications-container');
+
+            // تحديث العداد الأحمر بناءً على الإشعارات المتبقية (غير المقروءة)
+            if (badge) {
+                if (sortedUpdates.length > 0) {
+                    badge.innerText = sortedUpdates.length > 9 ? '9+' : sortedUpdates.length;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+
+            // عرض الإشعارات أو عرض رسالة "لا توجد إشعارات" إذا تم مسحها كلها
+            if (container) {
+                if (sortedUpdates.length > 0) {
+                    container.innerHTML = notifHtml;
+                } else {
+                    container.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-6 opacity-70"><i class="ph-fill ph-bell-slash text-5xl mb-3"></i><br>لا توجد دروس أو إشعارات جديدة</div>';
+                }
             }
         };
 
