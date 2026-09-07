@@ -266,10 +266,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             document.body.style.overflow = ''; 
         };
 
-        window.updateLiveStreamUI = (url) => {
+         window.updateLiveStreamUI = (url, target = 'all') => {
             const studentBanner = document.getElementById('student-live-banner');
             const adminStatus = document.getElementById('admin-live-status-text');
             const adminInput = document.getElementById('admin-live-url');
+            const adminSelect = document.getElementById('admin-live-level');
 
             if (url && url.trim() !== "") {
                 if (studentBanner) {
@@ -277,9 +278,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     studentBanner.classList.add('flex');
                 }
                 if (adminStatus) {
-                    adminStatus.innerHTML = '<span class="text-red-500 font-black flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span> البث شغال حالياً</span>';
+                    let targetName = target === 'all' ? 'جميع المستويات' : (levelNames[target] || target);
+                    adminStatus.innerHTML = `<span class="text-red-500 font-black flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span> البث شغال حالياً (${targetName})</span>`;
                 }
                 if (adminInput) adminInput.value = url;
+                if (adminSelect) adminSelect.value = target;
             } else {
                 if (studentBanner) {
                     studentBanner.classList.add('hidden');
@@ -289,18 +292,25 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     adminStatus.innerText = 'لا يوجد بث حالياً';
                 }
                 if (adminInput) adminInput.value = "";
+                if (adminSelect) adminSelect.value = "all";
             }
         };
 
-        // تم التعديل: تحديث البث المباشر في مستند meta
         window.startLiveStream = async () => {
             const url = document.getElementById('admin-live-url').value.trim();
+            const targetSelect = document.getElementById('admin-live-level');
+            const targetLevel = targetSelect ? targetSelect.value : 'all';
+
             if (!url) return showToast("يرجى إدخال رابط البث أولاً", "error");
             if (!url.startsWith('http')) return showToast("الرابط غير صحيح، تأكد أنه يبدأ بـ http", "error");
             
             try {
-                await updateDoc(doc(programCol, 'meta'), { liveStreamUrl: url });
-                showToast("تم إطلاق البث بنجاح! سيظهر الزر للتلاميذ الآن 🔴", "success");
+                await updateDoc(doc(programCol, 'meta'), { 
+                    liveStreamUrl: url,
+                    liveStreamTarget: targetLevel 
+                });
+                let targetName = targetLevel === 'all' ? 'لجميع المستويات' : `لمستوى ${levelNames[targetLevel]}`;
+                showToast(`تم إطلاق البث بنجاح ${targetName}! 🔴`, "success");
             } catch (e) {
                 console.error(e);
                 showToast("حدث خطأ أثناء إطلاق البث", "error");
@@ -308,10 +318,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         };
 
         window.stopLiveStream = async () => {
-            if (!window.currentLiveUrl) return;
             if(await confirmAction("هل أنت متأكد من إنهاء البث وإخفاء الزر عن التلاميذ؟")) {
                 try {
-                    await updateDoc(doc(programCol, 'meta'), { liveStreamUrl: "" });
+                    await updateDoc(doc(programCol, 'meta'), { liveStreamUrl: "", liveStreamTarget: "all" });
                     showToast("تم إنهاء البث وإخفاء الزر بنجاح", "success");
                 } catch (e) {
                     console.error(e);
@@ -1757,13 +1766,26 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             window.loadAdminStats();
 
             // 2. مستمع المنهج الدراسي
-            unsubscribeProgram = onSnapshot(programCol, (snapshot) => {
+           unsubscribeProgram = onSnapshot(programCol, (snapshot) => {
                 let mid = null, hi = null, meta = null;
                 snapshot.forEach(d => {
                     if(d.id === 'part_middle') mid = d.data();
                     if(d.id === 'part_high') hi = d.data();
                     if(d.id === 'meta') meta = d.data();
                 });
+                
+                if(mid && hi && meta) {
+                    window.currentSections = [mid, hi];
+                    window.currentUpdates = meta.latestUpdates || [];
+                    if (meta.liveStreamUrl !== undefined) {
+                        window.currentLiveUrl = meta.liveStreamUrl;
+                        window.updateLiveStreamUI(meta.liveStreamUrl, meta.liveStreamTarget);
+                    }
+                    if (!document.getElementById('admin-content-section').classList.contains('hidden')) {
+                        window.renderProgramUI(window.currentSections, 'admin-program-view', true);
+                    }
+                }
+            });
                 
                 if(mid && hi && meta) {
                     window.currentSections = [mid, hi];
@@ -1925,38 +1947,51 @@ unsubscribeProgram = onSnapshot(progQuery, (snapshot) => {
 
     if(loadedSections.length > 0 && meta) {
         window.currentSections = loadedSections;
+        window.currentUpdates = meta.latestUpdates || [];
 
-                    window.currentUpdates = meta.latestUpdates || [];
+        // --- التعديل الذكي: التحقق من مستوى التلميذ قبل إظهار البث ---
+        let shouldShowLive = false;
+        if (meta.liveStreamUrl && meta.liveStreamUrl.trim() !== "") {
+            let target = meta.liveStreamTarget || 'all';
+            if (target === 'all' || target === window.currentUserRecord.level) {
+                shouldShowLive = true;
+            }
+        }
 
-                    if (meta.liveStreamUrl !== undefined) {
-                        window.currentLiveUrl = meta.liveStreamUrl;
-                        window.updateLiveStreamUI(meta.liveStreamUrl);
+        if (shouldShowLive) {
+            window.currentLiveUrl = meta.liveStreamUrl;
+            window.updateLiveStreamUI(meta.liveStreamUrl);
+        } else {
+            window.currentLiveUrl = "";
+            window.updateLiveStreamUI("");
+        }
+        // -------------------------------------------------------------
+
+        if(document.getElementById('lesson-search').value.trim() === '') { 
+            window.renderProgramUI(window.currentSections, 'student-program-view', false); 
+        }
+        updateProgressUI(window.currentSections); 
+
+        if (window.currentUserRecord && window.currentUserRecord.role === 'student') {
+            let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
+            let seenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+
+            if (!isInitialProgramLoad) {
+                myUpdates.forEach(u => {
+                    if (!seenUpdates.includes(u.id) && (Date.now() - u.timestamp < 15000)) {
+                        showToast(`محتوى جديد متاح: ${u.title}`, 'success');
                     }
-
-                    if(document.getElementById('lesson-search').value.trim() === '') { 
-                        window.renderProgramUI(window.currentSections, 'student-program-view', false); 
-                    }
-                    updateProgressUI(window.currentSections); 
-
-                    if (window.currentUserRecord && window.currentUserRecord.role === 'student') {
-                        let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
-                        let seenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
-
-                        if (!isInitialProgramLoad) {
-                            myUpdates.forEach(u => {
-                                if (!seenUpdates.includes(u.id) && (Date.now() - u.timestamp < 15000)) {
-                                    showToast(`محتوى جديد متاح: ${u.title}`, 'success');
-                                }
-                            });
-                        }
-                        
-                        renderStudentNotifications(myUpdates, seenUpdates);
-                    }
-                    
-                    isInitialProgramLoad = false;
-                }
-            });
+                });
+            }
             
+            renderStudentNotifications(myUpdates, seenUpdates);
+        }
+        
+        isInitialProgramLoad = false;
+    }
+});
+
+   
             // تم التعديل: التلميذ يستمع لمستنده الخاص فقط لمنع قراءة كل المستخدمين
             if(unsubscribeStudentData) unsubscribeStudentData();
             unsubscribeStudentData = onSnapshot(doc(usersCol, window.currentUserRecord.username), (docSnap) => {
