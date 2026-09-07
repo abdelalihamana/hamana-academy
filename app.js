@@ -37,7 +37,9 @@ window.currentSections = [];
 window.currentUpdates = []; 
 window.currentLiveUrl = "";
 window.currentEditParams = null; 
+window.highlightedLessonTitle = null; // متغير لحفظ اسم الدرس المراد تظليله
 
+// حالات الإدارة والتلميذ
 window.adminContentStep = 'parts'; 
 window.adminActivePart = null;
 window.adminActiveYear = {}; 
@@ -54,6 +56,7 @@ window.tempAdminCode = null;
 window.tempAdminData = null;
 window.tempAdminUsername = null;
 
+// متغيرات الترحيل والتصفح الخاص بالأدمن (Pagination)
 window.adminCurrentPage = 1;
 window.adminPageCursors = [];
 window.adminLastVisible = null;
@@ -1497,7 +1500,6 @@ const startAdminListeners = () => {
         let totalUnread = 0;
         let notifHtml = '';
 
-        // 1. إشعارات طلبات كلمات المرور (أحمر)
         for (let username of Object.keys(window.adminAlerts.resets)) {
             totalUnread++;
             let studentName = username.replace(/_/g, ' ');
@@ -1515,7 +1517,6 @@ const startAdminListeners = () => {
             `;
         }
 
-        // 2. إشعارات تسجيل التلاميذ الجدد (أخضر زمردي)
         for (let username of Object.keys(window.adminAlerts.pending)) {
             totalUnread++;
             let studentName = username.replace(/_/g, ' ');
@@ -1533,7 +1534,6 @@ const startAdminListeners = () => {
             `;
         }
 
-        // 3. إشعارات الدردشة (برتقالي)
         for (let [username, data] of Object.entries(window.adminAlerts.chats)) {
             totalUnread += data.unreadAdmin;
             let studentName = username.replace(/_/g, ' ');
@@ -1566,11 +1566,11 @@ const startAdminListeners = () => {
         }
     };
 
-    // التقاط إشعارات الدردشة
     if(unsubscribeChatMeta) unsubscribeChatMeta();
     const unreadQuery = query(collection(db, chatsPath), where('unreadAdmin', '>', 0));
     unsubscribeChatMeta = onSnapshot(unreadQuery, (snapshot) => {
         window.adminAlerts.chats = {}; 
+        window.adminChatsData = {}; 
         snapshot.forEach(d => { 
             let data = d.data();
             window.adminChatsData[d.id] = data; 
@@ -1582,7 +1582,6 @@ const startAdminListeners = () => {
         if (typeof window.renderAdminAlerts === 'function') window.renderAdminAlerts();
     });
 
-    // التقاط طلبات كلمات المرور (بدون نافذة منبثقة)
     const resetQuery = query(usersCol, where('passwordResetRequest', '==', true));
     if (window.unsubscribeResetRequests) window.unsubscribeResetRequests();
     window.unsubscribeResetRequests = onSnapshot(resetQuery, (snapshot) => {
@@ -1590,13 +1589,14 @@ const startAdminListeners = () => {
         snapshot.forEach((doc) => {
             window.adminAlerts.resets[doc.id] = doc.data();
             const userIndex = window.adminUsersList.findIndex(u => u.id === doc.id);
-            if(userIndex !== -1) window.adminUsersList[userIndex].data.passwordResetRequest = true;
+            if(userIndex !== -1) {
+                window.adminUsersList[userIndex].data.passwordResetRequest = true;
+            }
         });
         if (typeof renderAdminTable === 'function') renderAdminTable();
         if (typeof window.renderAdminAlerts === 'function') window.renderAdminAlerts();
     });
 
-    // التقاط التسجيلات الجديدة (الحسابات غير المفعلة) للرادار الأخضر
     const pendingQuery = query(usersCol, where('approved', '==', false), where('role', '==', 'student'));
     if (window.unsubscribePendingUsers) window.unsubscribePendingUsers();
     window.unsubscribePendingUsers = onSnapshot(pendingQuery, (snapshot) => {
@@ -1788,32 +1788,19 @@ window.sendChatMessage = async () => {
 };
 
 window.markStudentNotificationsAsRead = () => {
-    if (!window.currentUpdates || !window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
-    let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
-    let seenUpdates = myUpdates.map(u => u.id);
-    localStorage.setItem(`seen_updates_${window.currentUserRecord.username}`, JSON.stringify(seenUpdates));
-
-    const badge = document.getElementById('student-global-badge');
-    if (badge) badge.classList.add('hidden');
-
-    document.querySelectorAll('#student-notifications-container .bg-blue-50').forEach(el => {
-        el.classList.remove('bg-blue-50', 'dark:bg-blue-900/20', 'border-blue-200', 'dark:border-blue-800');
-        el.classList.add('bg-slate-50', 'dark:bg-slate-800/50', 'border-slate-100', 'dark:border-slate-700');
-    });
-    document.querySelectorAll('#student-notifications-container .text-blue-600').forEach(el => {
-        el.classList.remove('text-blue-600', 'dark:text-blue-400');
-        el.classList.add('text-slate-400', 'dark:text-slate-500');
-    });
+    // 🛑 تم إفراغ هذه الدالة القديمة لكي لا تختفي جميع الإشعارات معاً 🛑
+    // الإخفاء أصبح يتم بشكل فردي ذكي عند الضغط على كل إشعار
 };
 
-window.goToUpdate = (branchTitle, updateId) => {
-    if (window.currentUserRecord) {
-        let hiddenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+// --- 1. الدالة السحرية لتوجيه التلميذ نحو الدرس ---
+              window.goToUpdate = (branchTitle, updateId) => {
         if (!hiddenUpdates.includes(updateId)) {
             hiddenUpdates.push(updateId);
             localStorage.setItem(`seen_updates_${window.currentUserRecord.username}`, JSON.stringify(hiddenUpdates));
         }
     }
+
+    window.highlightedLessonTitle = updateTitle;
 
     let targetBranchId = null;
     if (window.currentSections) {
@@ -1843,21 +1830,15 @@ window.goToUpdate = (branchTitle, updateId) => {
     }
 };
 
-window.renderStudentNotifications = (myUpdates, seenUpdates) => {
-    let unreadCount = 0;
+window.renderStudentNotifications = (myUpdates, hiddenUpdates) => {
     let notifHtml = '';
     
-    let sortedUpdates = [...myUpdates].sort((a, b) => b.timestamp - a.timestamp);
+    let visibleUpdates = myUpdates.filter(u => !hiddenUpdates.includes(u.id));
+    let sortedUpdates = [...visibleUpdates].sort((a, b) => b.timestamp - a.timestamp);
 
     sortedUpdates.forEach(update => {
-        let isNew = !seenUpdates.includes(update.id);
-        if (isNew) unreadCount++;
-
-        // لا نظهر الإشعارات المقروءة للحفاظ على نظافة القائمة (اختفاء تام)
-        if (!isNew) return; 
-
         notifHtml += `
-            <button id="notif-${update.id}" onclick="goToUpdate('${update.branch}', '${update.id}')" class="w-full text-right flex items-start gap-3 p-3 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 transition shadow-sm hover:shadow-md hover:scale-[1.02] mb-2 last:mb-0">
+            <button id="notif-${update.id}" onclick="goToUpdate('${escapeHtml(update.branch)}', '${update.id}', '${escapeHtml(update.title).replace(/'/g, "\\'")}')" class="w-full text-right flex items-start gap-3 p-3 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 transition shadow-sm hover:shadow-md hover:scale-[1.02] mb-2 last:mb-0">
                 <div class="notif-icon w-8 h-8 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center flex-shrink-0 shadow-sm text-blue-600 dark:text-blue-400 animate-pulse">
                     <i class="ph-bold ph-bell-ringing"></i>
                 </div>
@@ -1875,8 +1856,8 @@ window.renderStudentNotifications = (myUpdates, seenUpdates) => {
     const container = document.getElementById('student-notifications-container');
 
     if (badge) {
-        if (unreadCount > 0) {
-            badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
+        if (sortedUpdates.length > 0) {
+            badge.innerText = sortedUpdates.length > 9 ? '9+' : sortedUpdates.length;
             badge.classList.remove('hidden');
         } else {
             badge.classList.add('hidden');
@@ -1884,7 +1865,7 @@ window.renderStudentNotifications = (myUpdates, seenUpdates) => {
     }
 
     if (container) {
-        if (notifHtml !== '') {
+        if (sortedUpdates.length > 0) {
             container.innerHTML = notifHtml;
         } else {
             container.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-6 opacity-70"><i class="ph-fill ph-bell-slash text-5xl mb-3"></i><br>لا توجد دروس أو إشعارات جديدة</div>';
@@ -1937,6 +1918,12 @@ const updateProgressUI = (sections) => {
 
 window.trackLinkClick = async (branchId, cat, lIdx, url) => {
     window.openEmbedModal(url);
+    
+    window.highlightedLessonTitle = null;
+    let btnEl = document.getElementById(`lesson-btn-${branchId}-${cat}-${lIdx}`);
+    if (btnEl) {
+        btnEl.classList.remove('ring-4', 'ring-yellow-400', 'bg-yellow-50', 'dark:bg-yellow-900/30', 'shadow-lg', 'animate-pulse', 'z-10', 'scale-[1.02]', 'border-yellow-300');
+    }
     
     if (window.currentUserRecord && window.currentUserRecord.role !== 'admin') {
         if (window.originalAdminRecord) {
@@ -2303,16 +2290,22 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                                 let linkId = `${branch.id}_${cat}_${lIdx}`; 
                                 let isRead = clickedLinks.includes(linkId);
 
+                                // تمييز الدرس القادم من الإشعار
+                                let isHighlighted = window.highlightedLessonTitle && lnk.title.trim() === window.highlightedLessonTitle.trim();
                                 let btnClass = isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm bg-emerald-50/20' : 'border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-md hover:border-blue-300';
+                                
+                                if (isHighlighted) {
+                                    btnClass = ' ring-4 ring-yellow-400 bg-yellow-50 dark:bg-yellow-900/30 shadow-lg animate-pulse z-10 scale-[1.02] border-yellow-300 ';
+                                }
 
-                                return `<button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="w-full flex items-center justify-between gap-3 p-4 rounded-2xl border transition-all duration-200 group/link relative overflow-hidden text-right mb-3 ${btnClass}">
+                                return `<button id="lesson-btn-${branch.id}-${cat}-${lIdx}" onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="w-full flex items-center justify-between gap-3 p-4 rounded-2xl border transition-all duration-200 group/link relative overflow-hidden text-right mb-3 ${btnClass}">
                                     <div class="flex items-start sm:items-center gap-4 flex-1 w-full">
                                         <div class="w-12 h-12 flex-shrink-0 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl group-hover/link:bg-blue-600 group-hover/link:text-white transition-colors shadow-inner mt-1 sm:mt-0 border border-blue-100 dark:border-blue-800">
                                             <i class="ph-bold ph-play-circle"></i>
                                         </div>
                                         <span class="${conf.text} font-bold text-base flex-1 leading-relaxed text-right group-hover/link:underline decoration-2 underline-offset-4 break-words" style="word-break: break-word; white-space: normal;">${lnk.title}</span>
                                     </div>
-                                    ${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-xs font-black px-3 py-1.5 rounded-lg flex items-center flex-shrink-0 gap-1 ml-1 border border-emerald-200 dark:border-emerald-800"><i class="ph-bold ph-check"></i> مكتمل</span>` : ''}
+                                    ${isRead && !isHighlighted ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-xs font-black px-3 py-1.5 rounded-lg flex items-center flex-shrink-0 gap-1 ml-1 border border-emerald-200 dark:border-emerald-800"><i class="ph-bold ph-check"></i> مكتمل</span>` : ''}
                                 </button>`;
                             }).join('') : getEmptyStateHTML(conf.title);
                             
