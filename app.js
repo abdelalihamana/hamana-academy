@@ -561,30 +561,46 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             }
         };
 
-            window.handleAuth = async () => {
+                  window.handleAuth = async () => {
             if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
             
-            // --- 1. استخراج الاسم حسب حالة الواجهة ---
             let username = "";
+            let pseudoEmail = "";
+            
             if (window.isRegistering) {
-                const fName = document.getElementById('reg-firstname').value.trim();
-                const lName = document.getElementById('reg-lastname').value.trim();
+                const fNameEl = document.getElementById('reg-firstname');
+                const lNameEl = document.getElementById('reg-lastname');
+                if(!fNameEl || !lNameEl) return showToast("حدث خطأ في الواجهة، يرجى تحديث الصفحة", "error");
+                
+                const fName = fNameEl.value.trim();
+                const lName = lNameEl.value.trim();
+                
                 if (fName && lName) {
-                    // دمج الاسم واللقب
                     username = `${fName} ${lName}`.replace(/\s+/g, ' ').toLowerCase();
                 } else {
                     return showToast("يرجى كتابة الاسم واللقب", "error");
                 }
             } else {
-                username = document.getElementById('login-username').value.trim().replace(/\s+/g, ' ').toLowerCase();
+                const loginUserEl = document.getElementById('login-username');
+                if(!loginUserEl) {
+                    const oldUserEl = document.getElementById('username');
+                    if(oldUserEl) {
+                        username = oldUserEl.value.trim().replace(/\s+/g, ' ').toLowerCase();
+                    } else {
+                        return showToast("حدث خطأ في الواجهة، يرجى تحديث الصفحة", "error");
+                    }
+                } else {
+                    username = loginUserEl.value.trim().replace(/\s+/g, ' ').toLowerCase();
+                }
             }
 
-            const password = document.getElementById('password').value.trim();
-            const level = document.getElementById('user-level').value;
-            const parentName = document.getElementById('parent-name').value.trim();
-            const phoneNumber = document.getElementById('phone-number').value.trim();
+            const password = document.getElementById('password')?.value.trim() || "";
+            const level = document.getElementById('user-level')?.value || "";
+            const parentName = document.getElementById('parent-name')?.value.trim() || "";
+            const phoneNumber = document.getElementById('phone-number')?.value.trim() || "";
 
             if (!username || !password) return showToast("يرجى ملء جميع البيانات المطلوبة", "error");
+            
             if (window.isRegistering) {
                 if (!level || !parentName || !phoneNumber) return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
                 const phoneRegex = /^(05|06|07)\d{8}$/;
@@ -595,11 +611,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             const originalHTML = btn.innerHTML;
             btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-2xl"></i> جاري التحقق...';
 
-            // --- 2. الحل السحري لمشكلة فايربيز ---
-            // استبدال المسافات بشرطة سفلية لكي يقبله فايربيز كإيميل صالح
-            const emailSafeUsername = username.replace(/\s+/g, '_');
-            const pseudoEmail = `${emailSafeUsername}@almojtahid.com`;
-            // نحتفظ بالاسم الحقيقي لقاعدة البيانات (للعرض)
+            // الإعداد الآمن للإيميل (مسح المسافات لكي يقبله فايربيز دون مشاكل)
+            const emailSafeUsername = username.replace(/\s+/g, '');
+            pseudoEmail = `${emailSafeUsername}@almojtahid.com`;
             const userRef = doc(usersCol, username); 
 
             try {
@@ -621,9 +635,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     
                     document.getElementById('registration-success-modal').classList.remove('hidden');
                     document.getElementById('registration-success-modal').classList.add('flex');
-                    document.getElementById('reg-firstname').value = ''; 
-                    document.getElementById('reg-lastname').value = ''; 
-                    document.getElementById('password').value = '';
+                    if(document.getElementById('reg-firstname')) document.getElementById('reg-firstname').value = ''; 
+                    if(document.getElementById('reg-lastname')) document.getElementById('reg-lastname').value = ''; 
+                    if(document.getElementById('password')) document.getElementById('password').value = '';
                     await signOut(auth); 
                     
                 } else {
@@ -677,9 +691,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                             if (typeof window.initPomodoro === 'function') {
                                 window.initPomodoro();
                             }
-                            // مسح حقول الدخول للترتيب
-                            document.getElementById('login-username').value = '';
-                            document.getElementById('password').value = '';
+                            // مسح حقول الدخول
+                            if(document.getElementById('login-username')) document.getElementById('login-username').value = '';
+                            if(document.getElementById('password')) document.getElementById('password').value = '';
                         }
                     }
                 }
@@ -690,7 +704,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
                     showToast("بيانات الدخول غير صحيحة", "error");
                 } else if (err.code === 'auth/email-already-in-use') {
-                    showToast("الاسم واللقب مستخدم مسبقاً، يرجى إضافة اسم الأب (مثال: محمد علي أحمد).", "error");
+                    showToast("الاسم واللقب مستخدم مسبقاً، يرجى إضافة اسم الأب.", "error");
                 } else if (err.code === 'auth/network-request-failed') {
                     showToast("ضعف في الاتصال بالإنترنت، يرجى المحاولة مرة أخرى.", "error");
                 } else {
@@ -908,32 +922,43 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 
         window.toggleAuthMode = () => {
             window.isRegistering = !window.isRegistering;
-            document.getElementById('auth-title').innerText = window.isRegistering ? "حساب جديد" : "منصة المجتهد";
-            document.getElementById('auth-action-btn').innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
-            document.getElementById('switch-mode-text').innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
+            
+            const titleEl = document.getElementById('auth-title');
+            if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "منصة المجتهد";
+            
+            const btnEl = document.getElementById('auth-action-btn');
+            if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
+            
+            const switchEl = document.getElementById('switch-mode-text');
+            if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
+            
             const loginNameCont = document.getElementById('login-name-container');
             const regNamesCont = document.getElementById('register-names-container');
             const levelSelect = document.getElementById('user-level'); 
-
-            const levelSelect = document.getElementById('user-level'); const levelIcon = document.getElementById('level-icon');
-            const parentNameCont = document.getElementById('parent-name-container'); const phoneNumCont = document.getElementById('phone-number-container');
+            const levelIcon = document.getElementById('level-icon');
+            const parentNameCont = document.getElementById('parent-name-container'); 
+            const phoneNumCont = document.getElementById('phone-number-container');
             const forgotPassCont = document.getElementById('forgot-password-container');
             
             if(window.isRegistering) {
-                loginNameCont.classList.add('hidden');
-                regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex');
-
-                levelSelect.classList.remove('hidden'); levelIcon.classList.remove('hidden');
-                parentNameCont.classList.remove('hidden'); phoneNumCont.classList.remove('hidden');
-                forgotPassCont.classList.add('hidden');
+                if(loginNameCont) loginNameCont.classList.add('hidden');
+                if(regNamesCont) { regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex'); }
+                if(levelSelect) levelSelect.classList.remove('hidden'); 
+                if(levelIcon) levelIcon.classList.remove('hidden');
+                if(parentNameCont) parentNameCont.classList.remove('hidden'); 
+                if(phoneNumCont) phoneNumCont.classList.remove('hidden');
+                if(forgotPassCont) forgotPassCont.classList.add('hidden');
             } else {
-                loginNameCont.classList.remove('hidden');
-                regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex');
-                levelSelect.classList.add('hidden'); levelIcon.classList.add('hidden');
-                parentNameCont.classList.add('hidden'); phoneNumCont.classList.add('hidden');
-                forgotPassCont.classList.remove('hidden');
+                if(loginNameCont) loginNameCont.classList.remove('hidden');
+                if(regNamesCont) { regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex'); }
+                if(levelSelect) levelSelect.classList.add('hidden'); 
+                if(levelIcon) levelIcon.classList.add('hidden');
+                if(parentNameCont) parentNameCont.classList.add('hidden'); 
+                if(phoneNumCont) phoneNumCont.classList.add('hidden');
+                if(forgotPassCont) forgotPassCont.classList.remove('hidden');
             }
         };
+
 
         window.closeWelcomeScreen = () => {
             const screen = document.getElementById('welcome-quote-screen');
