@@ -551,30 +551,33 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             btn.disabled = false; btn.innerHTML = originalHTML;
         };
 
-         window.requestPasswordReset = async () => {
+          window.requestPasswordReset = async () => {
             const usernameInput = document.getElementById('login-username').value.trim();
-            const username = usernameInput.replace(/\s+/g, ' ').toLowerCase(); 
             
-            if (!username) return showToast("يرجى كتابة الاسم واللقب أولاً في حقل الدخول لطلب استرجاع كلمة المرور", "error");
+            if (!usernameInput) return showToast("يرجى كتابة الاسم واللقب أولاً في حقل الدخول لطلب استرجاع كلمة المرور", "error");
 
-            if(!await confirmAction(`هل أنت متأكد أنك تريد إرسال طلب استرجاع كلمة مرور لحساب "${username}" للأستاذ؟`)) return;
+            if(!await confirmAction(`هل أنت متأكد أنك تريد إرسال طلب استرجاع كلمة مرور لحساب "${usernameInput}" للأستاذ؟`)) return;
+
+            // تحويل الاسم ليتطابق تماماً مع قاعدة البيانات (شرطة سفلية بدلاً من الفراغات)
+            const username = usernameInput.replace(/\s+/g, '_').toLowerCase(); 
 
             try {
                 const userRef = doc(usersCol, username);
-                const userSnap = await getDoc(userRef);
-
-                // التحقق الصارم: هل التلميذ مسجل فعلاً؟
-                if (!userSnap.exists()) {
-                    return showToast("هذا الحساب غير مسجل في المنصة! تأكد من كتابة الاسم واللقب بشكل صحيح.", "error");
-                }
-
-                // إضافة علامة (طلب استرجاع) في قاعدة بيانات التلميذ
+                
+                // نحاول وضع الإشعار. إذا لم يكن الحساب موجوداً، ستفشل العملية تلقائياً
                 await updateDoc(userRef, { passwordResetRequest: true });
+                
                 showToast("تم إرسال الطلب للأستاذ بنجاح! سيتم مراجعة طلبك وإخبارك.", "success");
                 
             } catch (error) {
                 console.error("Error:", error);
-                showToast("حدث خطأ أثناء الاتصال. يرجى المحاولة لاحقاً.", "error");
+                
+                // إذا فشل التحديث لأن الحساب غير موجود (أو تم رفضه أمنياً لأنه مجهول)
+                if (error.code === 'not-found' || error.code === 'permission-denied') {
+                    showToast("أنت غير مسجل . قم بالتسجيل في المنصة أولا", "error");
+                } else {
+                    showToast("حدث خطأ في الاتصال بالإنترنت، حاول مرة أخرى.", "error");
+                }
             }
         };
 window.resolvePasswordReset = async (username) => {
