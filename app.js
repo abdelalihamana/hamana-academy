@@ -1787,52 +1787,115 @@ window.markStudentNotificationsAsRead = () => {
     });
 };
 
-window.renderStudentNotifications = (myUpdates, seenUpdates) => {
-    let unreadCount = 0;
-    let notifHtml = '';
-    
-    let sortedUpdates = [...myUpdates].sort((a, b) => b.timestamp - a.timestamp);
+// --- 1. الدالة السحرية لتوجيه التلميذ نحو الدرس ---
+        window.goToUpdate = (branchTitle, updateId) => {
+            // أ. إضافة الإشعار لقائمة "المقروءة" لكي لا يظهر كجديد مرة أخرى
+            if (window.currentUserRecord) {
+                let seenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+                if (!seenUpdates.includes(updateId)) {
+                    seenUpdates.push(updateId);
+                    localStorage.setItem(`seen_updates_${window.currentUserRecord.username}`, JSON.stringify(seenUpdates));
+                    
+                    // ب. إخفاء اللون الأزرق/الأحمر من الإشعار في نفس اللحظة
+                    const notifEl = document.getElementById(`notif-${updateId}`);
+                    if (notifEl) {
+                        notifEl.classList.remove('bg-blue-50', 'dark:bg-blue-900/20', 'border-blue-200', 'dark:border-blue-800');
+                        notifEl.classList.add('bg-slate-50', 'dark:bg-slate-800/50', 'border-slate-100', 'dark:border-slate-700');
+                        const iconEl = notifEl.querySelector('.notif-icon');
+                        if(iconEl) {
+                            iconEl.classList.remove('text-blue-600', 'dark:text-blue-400');
+                            iconEl.classList.add('text-slate-400', 'dark:text-slate-500');
+                        }
+                    }
+                    
+                    // ج. إنقاص العداد الأحمر الموجود فوق أيقونة الجرس
+                    const badge = document.getElementById('student-global-badge');
+                    if (badge) {
+                        let count = parseInt(badge.innerText) || 0;
+                        if (count > 1) {
+                            badge.innerText = count - 1;
+                        } else {
+                            badge.classList.add('hidden'); // إخفاء العداد إذا انتهت الإشعارات
+                        }
+                    }
+                }
+            }
 
-    sortedUpdates.forEach(update => {
-        let isNew = !seenUpdates.includes(update.id);
-        if (isNew) unreadCount++;
+            // د. البحث عن الـ (ID) الخاص بالوحدة المطلوبة
+            let targetBranchId = null;
+            if (window.currentSections) {
+                window.currentSections.forEach(p => p.years.forEach(y => {
+                    if(y.id === window.currentUserRecord.level) {
+                        y.branches.forEach(b => {
+                            if (b.title === branchTitle) targetBranchId = b.id;
+                        });
+                    }
+                }));
+            }
 
-        let bgClass = isNew ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700';
-        let iconColor = isNew ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500';
+            // هـ. التوجيه المباشر للدرس والنزول للأسفل بنعومة
+            if (targetBranchId) {
+                window.studentActiveBranchTab = targetBranchId; 
+                window.studentViewMode = 'details'; 
+                window.renderProgramUI(window.currentSections, 'student-program-view', false);
+                
+                setTimeout(() => {
+                    const targetView = document.getElementById('student-program-view');
+                    if(targetView) targetView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 200);
+            }
+        };
 
-        notifHtml += `
-            <div class="flex items-start gap-3 p-3 rounded-xl border ${bgClass} transition shadow-sm">
-                <div class="w-8 h-8 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center flex-shrink-0 shadow-sm ${iconColor}">
-                    <i class="ph-bold ph-bell-ringing"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="font-black text-sm text-slate-800 dark:text-white leading-tight mb-1">${update.title}</div>
-                    <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400">في وحدة: ${update.branch}</div>
-                </div>
-            </div>`;
-    });
+        // --- 2. دالة رسم الإشعارات (المعدلة لتعمل كأزرار) ---
+        window.renderStudentNotifications = (myUpdates, seenUpdates) => {
+            let unreadCount = 0;
+            let notifHtml = '';
+            
+            let sortedUpdates = [...myUpdates].sort((a, b) => b.timestamp - a.timestamp);
 
-    const badge = document.getElementById('student-global-badge');
-    const container = document.getElementById('student-notifications-container');
+            sortedUpdates.forEach(update => {
+                let isNew = !seenUpdates.includes(update.id);
+                if (isNew) unreadCount++;
 
-    if (badge) {
-        if (unreadCount > 0) {
-            badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
-            badge.classList.remove('hidden');
-        } else {
-            badge.classList.add('hidden');
-        }
-    }
+                let bgClass = isNew ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700';
+                let iconColor = isNew ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500';
 
-    if (container) {
-        if (sortedUpdates.length > 0) {
-            container.innerHTML = notifHtml;
-        } else {
-            container.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-4 opacity-70"><i class="ph-fill ph-bell-slash text-4xl mb-2"></i><br>لا توجد إشعارات جديدة</div>';
-        }
-    }
-};
+                // التغيير هنا: استخدمنا <button> بدلاً من <div> وأضفنا onclick للتوجه للدرس
+                notifHtml += `
+                    <button id="notif-${update.id}" onclick="goToUpdate('${update.branch}', '${update.id}')" class="w-full text-right flex items-start gap-3 p-3 rounded-xl border ${bgClass} transition shadow-sm hover:shadow-md hover:scale-[1.02]">
+                        <div class="notif-icon w-8 h-8 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center flex-shrink-0 shadow-sm ${iconColor}">
+                            <i class="ph-bold ph-bell-ringing"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-black text-sm text-slate-800 dark:text-white leading-tight mb-1">${update.title}</div>
+                            <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400">في وحدة: ${update.branch}</div>
+                        </div>
+                        <div class="self-center flex-shrink-0">
+                            <i class="ph-bold ph-caret-left text-slate-400 text-lg"></i>
+                        </div>
+                    </button>`;
+            });
 
+            const badge = document.getElementById('student-global-badge');
+            const container = document.getElementById('student-notifications-container');
+
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+
+            if (container) {
+                if (sortedUpdates.length > 0) {
+                    container.innerHTML = notifHtml;
+                } else {
+                    container.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-4 opacity-70"><i class="ph-fill ph-bell-slash text-4xl mb-2"></i><br>لا توجد إشعارات جديدة</div>';
+                }
+            }
+        };
 const calculateProgressXP = (levelId, data, sections) => {
     if(!sections || !levelId) return { xp: 0, percent: 0 };
     let xp = 0; let totalLinks = 0; let clickedLinks = data.clickedLinks || [];
