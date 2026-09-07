@@ -197,18 +197,24 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         };
 
         // دوال ميزة التضمين والتحميل المباشر والبث المباشر
-        window.convertUrlToEmbed = (url) => {
+         window.convertUrlToEmbed = (url) => {
             if (!url) return '';
-            let ytWatchRegex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/i;
-            let matchYt = url.match(ytWatchRegex);
+            
+            // 🚀 التحديث السحري: التعرف على البث المباشر (live)، والفيديوهات العادية، والقصيرة
+            let ytRegex = /(?:youtube\.com\/(?:watch\?v=|live\/|shorts\/)|youtu\.be\/)([^&?/]+)/i;
+            let matchYt = url.match(ytRegex);
             if (matchYt && matchYt[1]) {
-                return `https://www.youtube.com/embed/${matchYt[1]}?rel=0&modestbranding=1`;
+                // أضفنا autoplay=1 لكي يشتغل البث المباشر تلقائياً فور فتح النافذة
+                return `https://www.youtube.com/embed/${matchYt[1]}?rel=0&modestbranding=1&autoplay=1`;
             }
+            
+            // التعرف على روابط جوجل درايف
             let driveRegex = /(?:drive\.google\.com\/file\/d\/|drive\.google\.com\/open\?id=)([^/&?]+)/i;
             let matchDrive = url.match(driveRegex);
             if (matchDrive && matchDrive[1]) {
                 return `https://drive.google.com/file/d/${matchDrive[1]}/preview`;
             }
+            
             return url; 
         };
 
