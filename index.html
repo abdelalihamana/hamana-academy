@@ -276,12 +276,33 @@
 
                 <!-- أزرار الدخول -->
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-                                       <button onclick="document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('auth-screen').classList.add('active'); if(window.isRegistering !== true) window.toggleAuthMode();" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-black text-xl transition-all shadow-[0_10px_20px_-10px_rgba(37,99,235,0.6)] hover:-translate-y-1 flex items-center justify-center gap-3">
+                                                           <button onclick="openAuthScreen(false)" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-black text-xl transition-all shadow-[0_10px_20px_-10px_rgba(37,99,235,0.6)] hover:-translate-y-1 flex items-center justify-center gap-3">
                         <i class="ph-bold ph-rocket-launch text-2xl"></i> ابدأ رحلتك معنا
                     </button>
-                    <button onclick="document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('auth-screen').classList.add('active'); if(window.isRegistering === true) window.toggleAuthMode();" class="w-full sm:w-auto px-10 py-4 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl font-black text-xl transition-all shadow-sm hover:-translate-y-1 flex items-center justify-center gap-3">
+                    <button onclick="openAuthScreen(true)" class="w-full sm:w-auto px-10 py-4 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl font-black text-xl transition-all shadow-sm hover:-translate-y-1 flex items-center justify-center gap-3">
                         <i class="ph-bold ph-sign-in text-2xl"></i> لدي حساب مسبقاً
                     </button>
+
+                    <!-- هذا السكربت يحل مشكلة الـ Module Scope نهائياً -->
+                    <script>
+                        function openAuthScreen(isLogin) {
+                            // 1. تحديد حالة التسجيل أو الدخول
+                            window.isRegistering = !isLogin;
+                            if (typeof window.toggleAuthMode === 'function') window.toggleAuthMode();
+                            
+                            // 2. إخفاء الواجهة الترحيبية وإظهار شاشة الدخول يدوياً (تخطي switchScreen)
+                            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                            const authScreen = document.getElementById('auth-screen');
+                            if (authScreen) {
+                                authScreen.classList.add('active');
+                                authScreen.classList.remove('blur-sm', 'pointer-events-none');
+                            }
+                            
+                            // 3. تحديث الرابط في المتصفح ليعمل بشكل سليم مع التحديثات
+                            window.location.hash = 'auth-screen';
+                        }
+                    </script>
+
                 </div>
 
                 <!-- البطاقات التوضيحية (الدمج بين العلم واللعب) -->
