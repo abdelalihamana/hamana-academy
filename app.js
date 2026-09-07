@@ -853,11 +853,31 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                         }
                     }
                 } catch(e) { console.error("OnAuthState Error:", e); }
-            } else {
-                switchScreen('auth-screen');
+                        } else {
+                const currentHash = window.location.hash.substring(1);
+                
+                // إذا كان المستخدم أصلاً في شاشة الدخول وعمل تحديث، أبقه هناك
+                if (currentHash === 'auth-screen') {
+                    switchScreen('auth-screen');
+                } else {
+                    // وإلا، اعرض له الواجهة الترحيبية الرائعة كأول شاشة يراها
+                    switchScreen('landing-screen'); 
+                }
+                
                 document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
             }
+
         });
+        window.startNewJourney = () => {
+            if (!window.isRegistering) window.toggleAuthMode();
+            switchScreen('auth-screen');
+        };
+
+        window.openExistingAccount = () => {
+            if (window.isRegistering) window.toggleAuthMode();
+            switchScreen('auth-screen');
+        };
+
 
         window.toggleAuthMode = () => {
             window.isRegistering = !window.isRegistering;
