@@ -141,19 +141,15 @@
                     <input type="text" id="settings-username" aria-label="اسم المستخدم" autocomplete="username" disabled class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 font-black outline-none cursor-not-allowed shadow-inner text-lg">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-lock-key"></i> كلمة المرور الحالية</label>
-                    <input type="text" id="settings-current-password" aria-label="كلمة المرور الحالية" disabled class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-500 font-black outline-none cursor-not-allowed shadow-inner text-lg">
+                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-lock-key"></i> كلمة المرور الجديدة</label>
+                    <input type="text" id="settings-new-password" aria-label="كلمة المرور الجديدة" autocomplete="new-password" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-lg text-slate-800 dark:text-white" placeholder="اتركه فارغاً إذا لم ترد تغييره">
                 </div>
-
                 <div id="settings-phone-container">
                     <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-device-mobile"></i> هاتف ولي الأمر</label>
                     <input type="tel" id="settings-new-phone" aria-label="رقم الهاتف" autocomplete="tel" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-left tracking-[0.2em] text-lg text-slate-800 dark:text-white" dir="auto" placeholder="05/06/07...">
                 </div>
 
                 <button onclick="saveSettingsData()" aria-label="حفظ التغييرات" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-xl transition btn-modern mt-2 shadow-lg shadow-blue-500/30 text-xl flex items-center justify-center gap-2"><i class="ph-bold ph-floppy-disk"></i> حفظ التغييرات</button>
-                                <!-- زر تسجيل الخروج (مدمج في الإعدادات) -->
-                <button id="student-logout-btn" onclick="logout()" aria-label="تسجيل الخروج" class="w-full bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-black py-4 rounded-xl transition border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/50 shadow-sm text-xl flex items-center justify-center gap-2 mt-4"><i class="ph-bold ph-sign-out"></i> تسجيل الخروج</button>
-
             </div>
         </div>
     </div>
@@ -250,11 +246,11 @@
     </div>
 
     <div class="max-w-7xl mx-auto relative z-10">
-       
         <!-- ===================================== -->
         <!-- شاشة المصادقة (Auth Screen) -->
         <!-- ===================================== -->
-           <div id="auth-screen" class="screen active max-w-md mx-auto relative z-10 py-10 px-4">            
+        <div id="auth-screen" class="screen active max-w-md mx-auto mt-8 md:mt-12 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-8 md:p-12 rounded-[3rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-white/60 dark:border-slate-700/60 relative overflow-hidden interactive-card">
+            
             <div class="absolute top-4 left-4 z-20">
                 <button onclick="toggleDarkMode()" aria-label="تبديل الوضع الليلي" class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 flex items-center justify-center text-2xl shadow-sm hover:scale-110 transition"><i class="ph-fill ph-moon"></i></button>
             </div>
@@ -376,6 +372,7 @@
                     </div>
 
                     <button onclick="toggleDarkMode()" aria-label="تبديل الوضع الليلي" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="تغيير المظهر"><i class="ph-fill ph-moon"></i></button>
+                    <button onclick="openSettings()" aria-label="فتح الإعدادات" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="الإعدادات"><i class="ph-fill ph-gear-six"></i></button>
                     <button onclick="logout()" aria-label="تسجيل الخروج" class="icon-btn px-6 h-12 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-lg font-black shadow-sm border border-red-100 dark:border-red-800 flex items-center gap-2">خروج <i class="ph-bold ph-sign-out"></i></button>
                 </div>
             </header>
@@ -550,11 +547,12 @@
                     <button id="student-settings-btn" onclick="openSettings()" aria-label="فتح الإعدادات" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="إعدادات الحساب"><i class="ph-fill ph-gear-six"></i></button>
 
                     <!-- زر الدردشة -->
-                    <button id="student-chat-btn" onclick="openChat('admin')" aria-label="فتح الدردشة" class="relative icon-btn w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl text-2xl hover:from-blue-700 hover:to-indigo-700 transition shadow-md shadow-blue-500/30 flex items-center justify-center" title="مراسلة الأستاذ">
-                        <i class="ph-fill ph-chat-circle-dots"></i>
-                        <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border border-white dark:border-slate-800 shadow-sm hidden animate-bounce">0</span>
+                    <button id="student-chat-btn" onclick="openChat('admin')" aria-label="فتح الدردشة" class="relative bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-2xl font-black text-lg hover:from-blue-700 hover:to-indigo-700 transition btn-modern shadow-md shadow-blue-500/30 flex items-center gap-2">
+                        <span class="hidden sm:inline">الدردشة</span> <i class="ph-fill ph-chat-circle-dots text-2xl"></i>
+                        <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[12px] font-black w-6 h-6 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-800 shadow-sm hidden animate-bounce">0</span>
                     </button>
 
+                    <button id="student-logout-btn" onclick="logout()" aria-label="تسجيل الخروج" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-5 py-3 rounded-2xl font-black hover:bg-red-100 dark:hover:bg-red-900/50 transition btn-modern border border-red-100 dark:border-red-800 shadow-sm flex items-center gap-2 text-lg">خروج <i class="ph-bold ph-sign-out"></i></button>
                 </div>
             </header>
 
@@ -573,58 +571,63 @@
                 <div class="relative z-10 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl group-hover:bg-white group-hover:text-red-600 transition-colors shadow-sm"><i class="ph-bold ph-arrow-left"></i></div>
             </button>
 
-                        <!-- شريط البحث (مستقل) -->
-            <div class="relative group mb-6">
-                <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-bold ph-magnifying-glass"></i></div>
-                <input type="text" id="lesson-search" aria-label="البحث عن الدروس والتمارين" onkeyup="executeStudentSearch()" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 shadow-sm" placeholder="ابحث عن درس، تمرين، أو وحدة...">
+            <!-- عنصر مؤقت بومودورو الجديد (Pomodoro Timer Widget) -->
+            <div class="mb-8 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-[2.5rem] shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="flex items-center gap-4 relative z-10">
+                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl shadow-inner backdrop-blur-md">
+                        <i class="ph-fill ph-timer"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-black tracking-wide" id="pomodoro-status-title">وقت التركيز والدراسة</h3>
+                        <p class="text-blue-100 font-bold text-sm mt-0.5">45 دقيقة دراسة / 15 دقيقة راحة</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-6 relative z-10 flex-wrap justify-center">
+                    <div class="text-4xl md:text-5xl font-black tracking-widest font-mono bg-black/20 px-6 py-2.5 rounded-2xl shadow-inner border border-white/10" id="pomodoro-timer-display">45:00</div>
+                    <div class="flex gap-2">
+                        <button onclick="togglePomodoro()" id="pomodoro-toggle-btn" class="bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2">
+                            <i class="ph-fill ph-play"></i> بدء
+                        </button>
+                        <button onclick="resetPomodoro()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-3 rounded-xl font-black text-lg transition shadow-md" title="إعادة ضبط">
+                            <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
 
-                    <!-- سطر مؤقت بومودورو ونقاط الخبرة (مدمج) -->
-            <div class="flex flex-col lg:flex-row gap-4 mb-8 items-stretch">
-                <!-- مؤقت بومودورو (75%) - تصميم صغير -->
-                <div class="w-full lg:w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-[2rem] shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-                    
-                    <div class="flex items-center gap-4 relative z-10 w-full sm:w-auto">
-                        <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl shadow-inner backdrop-blur-md shrink-0">
-                            <i class="ph-fill ph-timer"></i>
-                        </div>
+            <div class="flex flex-col md:flex-row gap-6 mb-8 items-center">
+                <div class="w-full md:w-1/2 relative group">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-bold ph-magnifying-glass"></i></div>
+                    <input type="text" id="lesson-search" aria-label="البحث عن الدروس والتمارين" onkeyup="executeStudentSearch()" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 shadow-sm" placeholder="ابحث عن درس، تمرين، أو وحدة...">
+                </div>
+
+                <div class="w-full md:w-1/2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-5 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-between interactive-card">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center text-2xl shadow-inner"><i class="ph-fill ph-shooting-star"></i></div>
                         <div>
-                            <h3 class="text-base font-black tracking-wide" id="pomodoro-status-title">وقت التركيز</h3>
+                            <h3 class="font-black text-slate-700 dark:text-slate-300 text-lg">نقاط الخبرة (XP)</h3>
+                            <div class="w-48 bg-slate-100 dark:bg-slate-700 rounded-full h-2.5 mt-2 overflow-hidden shadow-inner">
+                                <div id="progress-bar-fill" class="bg-gradient-to-l from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-1000 w-0"></div>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="flex items-center gap-4 relative z-10 flex-wrap justify-center sm:justify-end w-full sm:w-auto">
-                        <div class="text-3xl font-black tracking-widest font-mono bg-black/20 px-4 py-2 rounded-xl shadow-inner border border-white/10" id="pomodoro-timer-display">45:00</div>
-                        <div class="flex gap-2">
-                            <!-- زر التشغيل/الإيقاف (أيقونة فقط) -->
-                            <button onclick="togglePomodoro()" id="pomodoro-toggle-btn" class="w-12 h-12 bg-white text-blue-700 hover:bg-blue-50 rounded-xl text-xl transition shadow-sm flex items-center justify-center shrink-0" title="تشغيل / إيقاف">
-                                <i class="ph-fill ph-play"></i>
-                            </button>
-                            <!-- زر إعادة الضبط -->
-                            <button onclick="resetPomodoro()" class="w-12 h-12 bg-white/20 hover:bg-white/30 text-white rounded-xl text-xl transition shadow-sm flex items-center justify-center shrink-0" title="إعادة ضبط">
-                                <i class="ph-bold ph-arrow-counter-clockwise"></i>
-                            </button>
+                    <div class="flex items-center gap-4">
+                        <!-- شعلة الحماس -->
+                        <div class="flex items-center justify-center gap-1.5 bg-orange-50 dark:bg-orange-900/30 px-3 py-1.5 rounded-lg border border-orange-200 dark:border-orange-800 shadow-sm" title="أيام الدخول المتتالية">
+                            <span id="student-streak-count" class="text-xl font-black text-orange-600 dark:text-orange-400">0</span>
+                            <i class="ph-fill ph-fire text-2xl text-orange-500 animate-pulse"></i>
                         </div>
-                    </div>
-                </div>
-
-                <!-- نقاط الخبرة (25%) - بدون شعلة الحماس -->
-                <div class="w-full lg:w-1/4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center gap-1 interactive-card text-center">
-                    <div class="flex items-baseline gap-1">
-                        <span id="progress-text-xp" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0</span>
-                        <span class="text-xs font-bold text-slate-400">XP</span>
-                    </div>
-                    <div class="w-full px-2 mt-1">
-                        <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-2 overflow-hidden shadow-inner">
-                            <div id="progress-bar-fill" class="bg-gradient-to-l from-emerald-400 to-teal-500 h-full rounded-full transition-all duration-1000 w-0"></div>
+                        <div class="flex items-baseline gap-1">
+                            <span id="progress-text-xp" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 tracking-tighter drop-shadow-sm">0</span>
+                            <span class="text-lg font-bold text-slate-400">XP</span>
                         </div>
                     </div>
                 </div>
             </div>
-
-
-        <div id="student-program-view" class="pb-20"></div>
+            
+            <div id="student-program-view" class="pb-20"></div>
         </div>
     </div>
 
@@ -750,7 +753,7 @@
             localStorage.setItem(`pomodoro_${user}`, JSON.stringify(state));
         };
 
-                window.updatePomodoroUI = () => {
+        window.updatePomodoroUI = () => {
             const minutes = Math.floor(pomodoroTime / 60);
             const seconds = pomodoroTime % 60;
             const displayStr = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
@@ -759,20 +762,19 @@
             if (timerEl) timerEl.innerText = displayStr;
 
             const titleEl = document.getElementById('pomodoro-status-title');
-            if (titleEl) titleEl.innerText = isStudySession ? "وقت التركيز" : "وقت الراحة";
+            if (titleEl) titleEl.innerText = isStudySession ? "وقت التركيز والدراسة" : "وقت الراحة والاسترخاء";
 
             const btn = document.getElementById('pomodoro-toggle-btn');
             if (btn) {
                 if (isPomodoroRunning) {
-                    btn.innerHTML = '<i class="ph-fill ph-pause"></i>';
-                    btn.className = "w-12 h-12 bg-amber-400 text-slate-900 hover:bg-amber-500 rounded-xl text-xl transition shadow-sm flex items-center justify-center shrink-0";
+                    btn.innerHTML = '<i class="ph-fill ph-pause"></i> إيقاف مؤقت';
+                    btn.className = "bg-amber-400 text-slate-900 hover:bg-amber-500 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
                 } else {
-                    btn.innerHTML = '<i class="ph-fill ph-play"></i>';
-                    btn.className = "w-12 h-12 bg-white text-blue-700 hover:bg-blue-50 rounded-xl text-xl transition shadow-sm flex items-center justify-center shrink-0";
+                    btn.innerHTML = pomodoroTime === (isStudySession ? 45*60 : 15*60) ? '<i class="ph-fill ph-play"></i> بدء' : '<i class="ph-fill ph-play"></i> استئناف';
+                    btn.className = "bg-white text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl font-black text-lg transition shadow-md flex items-center gap-2";
                 }
             }
         };
-
 
         window.startPomodoroTick = () => {
             if (pomodoroInterval) clearInterval(pomodoroInterval);
@@ -1109,9 +1111,8 @@
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         };
-        
 
-        const sendTelegramCode = async (code) => {
+                           const sendTelegramCode = async (code) => {
             // ضع الرابط الطويل الذي حصلت عليه من Google Apps Script
             const scriptUrl = "https://script.google.com/macros/s/AKfycbzthWfE9JKl6i--6AfczqTTgj6WKzg0THpt8UeptPymHfr3k62gDn7ipJYQyWU8r8wv/exec"; 
             const secretKey = "ALMOJTAHID_SECURE_2026_KEY!"; // نفس المفتاح الموجود في الخادم
@@ -1489,7 +1490,7 @@
                         }
                     }
                 } catch(e) { console.error("OnAuthState Error:", e); }
-                    } else {
+            } else {
                 switchScreen('auth-screen');
                 document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
             }
@@ -1574,7 +1575,6 @@
         };
 
         window.logout = async () => {
-            if (typeof closeSettings === 'function') closeSettings();
             if(await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
                 try {
                     await signOut(auth);
@@ -1604,7 +1604,8 @@
 
         window.openSettings = () => {
             document.getElementById('settings-username').value = window.currentUserRecord.username;
-            document.getElementById('settings-current-password').value = window.currentUserRecord.password || 'غير متوفرة';            
+            document.getElementById('settings-new-password').value = '';
+            
             const phoneContainer = document.getElementById('settings-phone-container');
             const phoneInput = document.getElementById('settings-new-phone');
             
@@ -1626,32 +1627,52 @@
             setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
         };
 
-                window.saveSettingsData = async () => {
+        window.saveSettingsData = async () => {
+            const newPass = document.getElementById('settings-new-password').value.trim();
             const phoneInput = document.getElementById('settings-new-phone');
             let updates = {};
+            
+            if(newPass) {
+                try {
+                    if(auth.currentUser) {
+                        await updatePassword(auth.currentUser, newPass);
+                    }
+                    updates.password = newPass; 
+                } catch(e) {
+                    console.error("Password update error", e);
+                    if (e.code === 'auth/requires-recent-login' && window.currentUserRecord.password) {
+                        // حل مشكلة تغيير كلمة المرور بإعادة المصادقة التلقائية
+                        try {
+                            const credential = EmailAuthProvider.credential(auth.currentUser.email, window.currentUserRecord.password);
+                            await reauthenticateWithCredential(auth.currentUser, credential);
+                            await updatePassword(auth.currentUser, newPass);
+                            updates.password = newPass;
+                        } catch (reauthErr) {
+                            return showToast("يرجى تسجيل الخروج والدخول مجدداً لتغيير كلمة المرور", "error");
+                        }
+                    } else {
+                        return showToast("حدث خطأ أثناء تغيير كلمة المرور في نظام الحماية", "error");
+                    }
+                }
+            }
 
             if(window.currentUserRecord.role !== 'admin') {
                 const newPhone = phoneInput.value.trim();
                 const phoneRegex = /^(05|06|07)\d{8}$/;
-                
                 if(newPhone && !phoneRegex.test(newPhone)) return showToast("رقم الهاتف غير صحيح! يجب أن يبدأ بـ 05، 06، أو 07", "error");
-                if(newPhone && newPhone !== window.currentUserRecord.phoneNumber) updates.phoneNumber = newPhone;
-            }
-
-            if (Object.keys(updates).length === 0) {
-                closeSettings();
-                return showToast("لم تقم بإجراء أي تغييرات", "success");
+                if(newPhone) updates.phoneNumber = newPhone;
             }
 
             try {
-                await updateDoc(doc(usersCol, window.currentUserRecord.username), updates);
+                if (Object.keys(updates).length > 0) {
+                    await updateDoc(doc(usersCol, window.currentUserRecord.username), updates);
+                }
+                if(updates.password) window.currentUserRecord.password = updates.password;
                 if(updates.phoneNumber) window.currentUserRecord.phoneNumber = updates.phoneNumber;
                 
-                showToast("تم تحديث رقم الهاتف بنجاح 💾");
+                showToast("تم تحديث الإعدادات بنجاح 💾");
                 closeSettings();
-            } catch(e) { 
-                showToast("حدث خطأ أثناء الحفظ", "error"); 
-            }
+            } catch(e) { showToast("حدث خطأ أثناء الحفظ", "error"); }
         };
 
         window.openBroadcastModal = () => {
@@ -2058,22 +2079,10 @@
             let html = '<div class="flex flex-col gap-2">';
             levelMates.forEach((student, index) => {
                 let rank = index + 1; let rankClass = ''; let medal = '';
-                if(rank === 1) { 
-                rankClass = 'rank-1 shadow-sm border border-amber-200 dark:border-amber-800'; 
-                medal = `<span class="text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 rounded-full w-8 h-8 flex items-center justify-center text-sm font-black shadow-inner">1</span>`; 
-            }
-            else if(rank === 2) { 
-                rankClass = 'rank-2 shadow-sm border border-slate-200 dark:border-slate-600'; 
-                medal = `<span class="text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-full w-8 h-8 flex items-center justify-center text-sm font-black shadow-inner">2</span>`; 
-            }
-            else if(rank === 3) { 
-                rankClass = 'rank-3 shadow-sm border border-orange-200 dark:border-orange-800'; 
-                medal = `<span class="text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/50 rounded-full w-8 h-8 flex items-center justify-center text-sm font-black shadow-inner">3</span>`; 
-            }
-            else { 
-                rankClass = 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700'; 
-                medal = `<span class="text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 rounded-full w-7 h-7 flex items-center justify-center text-xs font-black">${rank}</span>`; 
-            }
+                if(rank === 1) { rankClass = 'rank-1 shadow-sm'; medal = '<i class="ph-fill ph-medal text-amber-400"></i>'; }
+                else if(rank === 2) { rankClass = 'rank-2 shadow-sm'; medal = '<i class="ph-fill ph-medal text-slate-400"></i>'; }
+                else if(rank === 3) { rankClass = 'rank-3 shadow-sm'; medal = '<i class="ph-fill ph-medal text-orange-400"></i>'; }
+                else { rankClass = 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700'; medal = `<span class="text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-700 rounded-full w-6 h-6 flex items-center justify-center text-xs font-black">${rank}</span>`; }
                 let isMe = student.id === window.currentUserRecord.username;
                 html += `
                     <div class="leaderboard-row flex items-center justify-between p-3 rounded-2xl ${rankClass} ${isMe ? 'ring-2 ring-blue-500 shadow-md scale-[1.02] z-10' : ''}">
