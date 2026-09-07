@@ -552,8 +552,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         };
 
         window.requestPasswordReset = async () => {
-            const username = document.getElementById('username').value.trim();
-            if (!username) return showToast("يرجى إدخال اسم المستخدم أولاً لتتمكن من مراسلة الأستاذ", "error");
+            const username = document.getElementById('login-username').value.trim();
+            if (!username) return showToast("يرجى إدخال الإسم واللقب أولاً لتتمكن من مراسلة الأستاذ", "error");
 
             if(await confirmAction(`هل تريد مراسلة الأستاذ عبر الواتساب لاسترجاع كلمة المرور الخاصة بحساب "${username}"؟`)) {
                 const message = encodeURIComponent(`السلام عليكم أستاذ، لقد نسيت كلمة المرور الخاصة بحسابي في منصة المجتهد.\nاسم المستخدم: ${username}`);
@@ -563,8 +563,18 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 
     window.handleAuth = async () => {
             if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
-            
-            const username = document.getElementById('username').value.trim().toLowerCase();
+                        let username = "";
+            if (window.isRegistering) {
+                const fName = document.getElementById('reg-firstname').value.trim();
+                const lName = document.getElementById('reg-lastname').value.trim();
+                if (fName && lName) {
+                    // دمج الاسم واللقب، ومسح المسافات الزائدة بينهما لضمان صحة التسجيل
+                    username = `${fName} ${lName}`.replace(/\s+/g, ' ').toLowerCase();
+                }
+            } else {
+                username = document.getElementById('login-username').value.trim().replace(/\s+/g, ' ').toLowerCase();
+            }
+
             const password = document.getElementById('password').value.trim();
             const level = document.getElementById('user-level').value;
             const parentName = document.getElementById('parent-name').value.trim();
@@ -603,7 +613,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     
                     document.getElementById('registration-success-modal').classList.remove('hidden');
                     document.getElementById('registration-success-modal').classList.add('flex');
-                    document.getElementById('username').value = ''; document.getElementById('password').value = '';
+                    document.getElementById('reg-firstname').value = ''; document.getElementById('reg-lastname').value = '';
+                    document.getElementById('login-username').value = ''; document.getElementById('password').value = '';
+
                     await signOut(auth); 
                     
                 } else {
@@ -884,16 +896,24 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             document.getElementById('auth-title').innerText = window.isRegistering ? "حساب جديد" : "منصة المجتهد";
             document.getElementById('auth-action-btn').innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
             document.getElementById('switch-mode-text').innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
-            
+            const loginNameCont = document.getElementById('login-name-container');
+            const regNamesCont = document.getElementById('register-names-container');
+            const levelSelect = document.getElementById('user-level'); 
+
             const levelSelect = document.getElementById('user-level'); const levelIcon = document.getElementById('level-icon');
             const parentNameCont = document.getElementById('parent-name-container'); const phoneNumCont = document.getElementById('phone-number-container');
             const forgotPassCont = document.getElementById('forgot-password-container');
             
             if(window.isRegistering) {
+                loginNameCont.classList.add('hidden');
+                regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex');
+
                 levelSelect.classList.remove('hidden'); levelIcon.classList.remove('hidden');
                 parentNameCont.classList.remove('hidden'); phoneNumCont.classList.remove('hidden');
                 forgotPassCont.classList.add('hidden');
             } else {
+                loginNameCont.classList.remove('hidden');
+                regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex');
                 levelSelect.classList.add('hidden'); levelIcon.classList.add('hidden');
                 parentNameCont.classList.add('hidden'); phoneNumCont.classList.add('hidden');
                 forgotPassCont.classList.remove('hidden');
