@@ -561,36 +561,30 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             }
         };
 
-                  window.handleAuth = async () => {
+         window.handleAuth = async () => {
             if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
             
-            let username = "";
-            let pseudoEmail = "";
+            let rawName = "";
             
             if (window.isRegistering) {
                 const fNameEl = document.getElementById('reg-firstname');
                 const lNameEl = document.getElementById('reg-lastname');
-                if(!fNameEl || !lNameEl) return showToast("حدث خطأ في الواجهة، يرجى تحديث الصفحة", "error");
+                if(!fNameEl || !lNameEl) return showToast("حدث خطأ في الواجهة", "error");
                 
                 const fName = fNameEl.value.trim();
                 const lName = lNameEl.value.trim();
                 
                 if (fName && lName) {
-                    username = `${fName} ${lName}`.replace(/\s+/g, ' ').toLowerCase();
+                    rawName = `${fName} ${lName}`.toLowerCase();
                 } else {
                     return showToast("يرجى كتابة الاسم واللقب", "error");
                 }
             } else {
                 const loginUserEl = document.getElementById('login-username');
-                if(!loginUserEl) {
-                    const oldUserEl = document.getElementById('username');
-                    if(oldUserEl) {
-                        username = oldUserEl.value.trim().replace(/\s+/g, ' ').toLowerCase();
-                    } else {
-                        return showToast("حدث خطأ في الواجهة، يرجى تحديث الصفحة", "error");
-                    }
+                if(loginUserEl) {
+                    rawName = loginUserEl.value.trim().toLowerCase();
                 } else {
-                    username = loginUserEl.value.trim().replace(/\s+/g, ' ').toLowerCase();
+                    return showToast("حدث خطأ في الواجهة", "error");
                 }
             }
 
@@ -599,21 +593,22 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             const parentName = document.getElementById('parent-name')?.value.trim() || "";
             const phoneNumber = document.getElementById('phone-number')?.value.trim() || "";
 
-            if (!username || !password) return showToast("يرجى ملء جميع البيانات المطلوبة", "error");
+            if (!rawName || !password) return showToast("يرجى ملء جميع البيانات المطلوبة", "error");
             
             if (window.isRegistering) {
                 if (!level || !parentName || !phoneNumber) return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
                 const phoneRegex = /^(05|06|07)\d{8}$/;
-                if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام", "error");
+                if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح", "error");
             }
 
             const btn = document.getElementById('auth-action-btn');
             const originalHTML = btn.innerHTML;
             btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-2xl"></i> جاري التحقق...';
 
-            // الإعداد الآمن للإيميل (مسح المسافات لكي يقبله فايربيز دون مشاكل)
-            const emailSafeUsername = username.replace(/\s+/g, '');
-            pseudoEmail = `${emailSafeUsername}@almojtahid.com`;
+            // --- الكود السحري للتوافق مع قواعد الأمان ---
+            // نستبدل المسافة بـ _ لكي تقبله قاعدة البيانات بسلاسة (مثال: محمد_علي)
+            const username = rawName.replace(/\s+/g, '_');
+            const pseudoEmail = `${username}@almojtahid.com`;
             const userRef = doc(usersCol, username); 
 
             try {
@@ -684,14 +679,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                             await signOut(auth);
                         } else {
                             await checkAndUpdateStreak(userRef, window.currentUserRecord);
-                            document.getElementById('display-username').innerText = username;
+                            
+                            // إرجاع المسافة لكي يظهر الاسم بشكل جميل في الواجهة
+                            document.getElementById('display-username').innerText = username.replace(/_/g, ' ');
+                            
                             document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
                             switchScreen('app-screen');
                             startStudentListeners();
                             if (typeof window.initPomodoro === 'function') {
                                 window.initPomodoro();
                             }
-                            // مسح حقول الدخول
                             if(document.getElementById('login-username')) document.getElementById('login-username').value = '';
                             if(document.getElementById('password')) document.getElementById('password').value = '';
                         }
@@ -699,12 +696,19 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 }
             } catch (err) { 
                 console.error("Auth Error:", err);
+                
+                // تنظيف الحسابات الشبحية إذا فشلت العملية
+                if (window.isRegistering && auth.currentUser) {
+                    try { await auth.currentUser.delete(); } catch(e) {}
+                }
+
                 if (err.code === 'auth/invalid-email') {
                     showToast("صيغة الاسم غير مقبولة", "error");
                 } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
                     showToast("بيانات الدخول غير صحيحة", "error");
                 } else if (err.code === 'auth/email-already-in-use') {
-                    showToast("الاسم واللقب مستخدم مسبقاً، يرجى إضافة اسم الأب.", "error");
+                    // رسالة مخصصة ليتجاوز التلميذ الحساب الشبح
+                    showToast("هذا الاسم علق في النظام بسبب محاولة سابقة. يرجى إضافة اسم الأب لجعله مميزاً (مثال: محمد علي أحمد).", "error");
                 } else if (err.code === 'auth/network-request-failed') {
                     showToast("ضعف في الاتصال بالإنترنت، يرجى المحاولة مرة أخرى.", "error");
                 } else {
@@ -714,7 +718,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             
             btn.disabled = false; btn.innerHTML = originalHTML;
         };
-
 
         const defaultProgramData = [
             { 
@@ -883,7 +886,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                             } else {
                                 await checkAndUpdateStreak(userRef, window.currentUserRecord);
 
-                                document.getElementById('display-username').innerText = username;
+                                document.getElementById('display-username').innerText = username.replace(/_/g, ' ');
                                 document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
                                 switchScreen('app-screen');
                                 startStudentListeners();
