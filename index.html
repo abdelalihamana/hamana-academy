@@ -250,10 +250,68 @@
     </div>
 
     <div class="max-w-7xl mx-auto relative z-10">
+                <!-- ===================================== -->
+        <!-- الشاشة الترحيبية (Landing Screen) -->
+        <!-- ===================================== -->
+        <div id="landing-screen" class="screen active min-h-[85vh] flex flex-col items-center justify-center relative py-10">
+            <!-- فقاعات متحركة في الخلفية للجمالية -->
+            <div class="absolute top-0 left-0 w-72 h-72 bg-blue-500/20 rounded-full blur-[100px] animate-pulse pointer-events-none"></div>
+            <div class="absolute bottom-10 right-0 w-72 h-72 bg-emerald-500/20 rounded-full blur-[100px] animate-pulse pointer-events-none" style="animation-delay: 2s;"></div>
+
+            <!-- محتوى الشاشة -->
+            <div class="relative z-10 text-center max-w-5xl mx-auto px-4 w-full">
+                <!-- الشعار -->
+                <div class="w-32 h-32 mx-auto mb-8 rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white dark:border-slate-700 bg-white p-1 transform transition hover:scale-105 duration-300">
+                    <img src="icon.png" alt="شعار المنصة" width="128" height="128" class="w-full h-full object-cover rounded-[1.6rem]">
+                </div>
+                
+                <!-- العنوان الرئيسي -->
+                <h1 class="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-emerald-400 mb-6 drop-shadow-sm leading-tight">
+                    منصة المجتهد <br> <span class="text-3xl md:text-4xl text-slate-700 dark:text-slate-300 mt-2 block">للعلوم الفيزيائية</span>
+                </h1>
+                
+                <p class="text-xl md:text-2xl text-slate-600 dark:text-slate-400 font-bold mb-12 max-w-3xl mx-auto leading-relaxed">
+                    بوابتك الذكية للتفوق. ادمج بين عمق الفهم العلمي ومتعة التعلم التفاعلي عبر أحدث التقنيات التعليمية.
+                </p>
+
+                <!-- أزرار الدخول -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
+                    <button onclick="startNewJourney()" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-black text-xl transition-all shadow-[0_10px_20px_-10px_rgba(37,99,235,0.6)] hover:-translate-y-1 flex items-center justify-center gap-3">
+                        <i class="ph-bold ph-rocket-launch text-2xl"></i> ابدأ رحلتك معنا
+                    </button>
+                    <button onclick="openExistingAccount()" class="w-full sm:w-auto px-10 py-4 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl font-black text-xl transition-all shadow-sm hover:-translate-y-1 flex items-center justify-center gap-3">
+                        <i class="ph-bold ph-sign-in text-2xl"></i> لدي حساب مسبقاً
+                    </button>
+                </div>
+
+                <!-- البطاقات التوضيحية (الدمج بين العلم واللعب) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-right">
+                    <!-- البطاقة 1: العلم -->
+                    <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/50 dark:border-slate-700 shadow-xl hover:-translate-y-2 transition-transform">
+                        <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-4xl mb-5 shadow-inner"><i class="ph-fill ph-atom"></i></div>
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-3">محتوى علمي دقيق</h3>
+                        <p class="text-slate-500 dark:text-slate-400 font-bold text-base leading-relaxed">دروس، ملخصات، ومواضيع شاملة تغطي مرحلتي التعليم المتوسط والثانوي وفق المنهاج الرسمي.</p>
+                    </div>
+                    <!-- البطاقة 2: التلعيب -->
+                    <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/50 dark:border-slate-700 shadow-xl hover:-translate-y-2 transition-transform">
+                        <div class="w-16 h-16 bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center text-4xl mb-5 shadow-inner"><i class="ph-fill ph-trophy"></i></div>
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-3">تحدَّ أصدقاءك</h3>
+                        <p class="text-slate-500 dark:text-slate-400 font-bold text-base leading-relaxed">اجمع نقاط الخبرة (XP)، حافظ على شعلة الحماس يومياً، وتصدر لوحة الشرف الخاصة بمستواك.</p>
+                    </div>
+                    <!-- البطاقة 3: التركيز والتواصل -->
+                    <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/50 dark:border-slate-700 shadow-xl hover:-translate-y-2 transition-transform">
+                        <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center text-4xl mb-5 shadow-inner"><i class="ph-fill ph-timer"></i></div>
+                        <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-3">بيئة دراسة مركزة</h3>
+                        <p class="text-slate-500 dark:text-slate-400 font-bold text-base leading-relaxed">تواصل مباشر مع الأستاذ، إشعارات حية، ومؤقت "بومودورو" مدمج لتنظيم وقت تركيزك وراحتك.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- ===================================== -->
         <!-- شاشة المصادقة (Auth Screen) -->
         <!-- ===================================== -->
-        <div id="auth-screen" class="screen active max-w-md mx-auto mt-8 md:mt-12 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-8 md:p-12 rounded-[3rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-white/60 dark:border-slate-700/60 relative overflow-hidden interactive-card">
+        <div id="auth-screen" class="screen max-w-md mx-auto mt-8 md:mt-12 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-8 md:p-12 rounded-[3rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-white/60 dark:border-slate-700/60 relative overflow-hidden interactive-card">
             
             <div class="absolute top-4 left-4 z-20">
                 <button onclick="toggleDarkMode()" aria-label="تبديل الوضع الليلي" class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 flex items-center justify-center text-2xl shadow-sm hover:scale-110 transition"><i class="ph-fill ph-moon"></i></button>
