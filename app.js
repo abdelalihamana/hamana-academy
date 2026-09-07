@@ -561,15 +561,19 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             }
         };
 
-    window.handleAuth = async () => {
+            window.handleAuth = async () => {
             if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
-                        let username = "";
+            
+            // --- 1. استخراج الاسم حسب حالة الواجهة ---
+            let username = "";
             if (window.isRegistering) {
                 const fName = document.getElementById('reg-firstname').value.trim();
                 const lName = document.getElementById('reg-lastname').value.trim();
                 if (fName && lName) {
-                    // دمج الاسم واللقب، ومسح المسافات الزائدة بينهما لضمان صحة التسجيل
+                    // دمج الاسم واللقب
                     username = `${fName} ${lName}`.replace(/\s+/g, ' ').toLowerCase();
+                } else {
+                    return showToast("يرجى كتابة الاسم واللقب", "error");
                 }
             } else {
                 username = document.getElementById('login-username').value.trim().replace(/\s+/g, ' ').toLowerCase();
@@ -580,19 +584,23 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             const parentName = document.getElementById('parent-name').value.trim();
             const phoneNumber = document.getElementById('phone-number').value.trim();
 
-            if (!username || !password) return showToast("يرجى ملء اسم المستخدم وكلمة المرور", "error");
+            if (!username || !password) return showToast("يرجى ملء جميع البيانات المطلوبة", "error");
             if (window.isRegistering) {
                 if (!level || !parentName || !phoneNumber) return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
                 const phoneRegex = /^(05|06|07)\d{8}$/;
-                if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام ويبدأ بـ 05، 06، أو 07", "error");
+                if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام", "error");
             }
 
             const btn = document.getElementById('auth-action-btn');
             const originalHTML = btn.innerHTML;
             btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-2xl"></i> جاري التحقق...';
 
-            const pseudoEmail = `${username}@almojtahid.com`;
-            const userRef = doc(usersCol, username);
+            // --- 2. الحل السحري لمشكلة فايربيز ---
+            // استبدال المسافات بشرطة سفلية لكي يقبله فايربيز كإيميل صالح
+            const emailSafeUsername = username.replace(/\s+/g, '_');
+            const pseudoEmail = `${emailSafeUsername}@almojtahid.com`;
+            // نحتفظ بالاسم الحقيقي لقاعدة البيانات (للعرض)
+            const userRef = doc(usersCol, username); 
 
             try {
                 if (window.isRegistering) {
@@ -613,18 +621,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                     
                     document.getElementById('registration-success-modal').classList.remove('hidden');
                     document.getElementById('registration-success-modal').classList.add('flex');
-                    document.getElementById('reg-firstname').value = ''; document.getElementById('reg-lastname').value = '';
-                    document.getElementById('login-username').value = ''; document.getElementById('password').value = '';
-
+                    document.getElementById('reg-firstname').value = ''; 
+                    document.getElementById('reg-lastname').value = ''; 
+                    document.getElementById('password').value = '';
                     await signOut(auth); 
                     
                 } else {
-                    // --- النظام الأمني الجديد للأدمن ---
+                    // --- النظام الأمني للأدمن ---
                     if (username === 'admin') {
                         try {
                            const url = `${window.GAS_WEB_APP_URL}?action=request2FA&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
                             const response = await fetch(url);
-
                             const result = await response.json();
                             
                             if (result.success) {
@@ -667,16 +674,23 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                             document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
                             switchScreen('app-screen');
                             startStudentListeners();
-                            window.initPomodoro();
+                            if (typeof window.initPomodoro === 'function') {
+                                window.initPomodoro();
+                            }
+                            // مسح حقول الدخول للترتيب
+                            document.getElementById('login-username').value = '';
+                            document.getElementById('password').value = '';
                         }
                     }
                 }
             } catch (err) { 
                 console.error("Auth Error:", err);
-                if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+                if (err.code === 'auth/invalid-email') {
+                    showToast("صيغة الاسم غير مقبولة", "error");
+                } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
                     showToast("بيانات الدخول غير صحيحة", "error");
                 } else if (err.code === 'auth/email-already-in-use') {
-                    showToast("اسم المستخدم مستخدم مسبقاً، يرجى اختيار اسم آخر.", "error");
+                    showToast("الاسم واللقب مستخدم مسبقاً، يرجى إضافة اسم الأب (مثال: محمد علي أحمد).", "error");
                 } else if (err.code === 'auth/network-request-failed') {
                     showToast("ضعف في الاتصال بالإنترنت، يرجى المحاولة مرة أخرى.", "error");
                 } else {
@@ -686,6 +700,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             
             btn.disabled = false; btn.innerHTML = originalHTML;
         };
+
 
         const defaultProgramData = [
             { 
