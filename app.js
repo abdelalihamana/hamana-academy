@@ -2237,11 +2237,11 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
             return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop'; 
         };
 
-        if (window.adminContentStep === 'parts') {
+       if (window.adminContentStep === 'parts') {
             html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[fadeInTab_0.3s_ease]">`;
             sections.forEach((part) => {
                 let icon = part.id === 'part_middle' ? '<i class="ph-fill ph-student"></i>' : '<i class="ph-fill ph-graduation-cap"></i>';
-                let bgImage = getAdminBg(part.id, part.title);
+                let bgImage = typeof getAdminBg === 'function' ? getAdminBg(part.id, part.title) : 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
                 html += `<button onclick="window.adminActivePart='${part.id}'; window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-8 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[220px] flex flex-col items-center justify-center text-center">
                     <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
                     <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
@@ -2257,7 +2257,7 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
             let part = sections.find(p => p.id === window.adminActivePart);
             html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-[fadeInTab_0.3s_ease]">`;
             part.years.forEach((year) => {
-                let bgImage = getAdminBg(year.id, year.title);
+                let bgImage = typeof getAdminBg === 'function' ? getAdminBg(year.id, year.title) : 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop';
                 html += `<button onclick="window.adminActiveYear['${part.id}']='${year.id}'; window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[180px] flex flex-col items-center justify-center text-center">
                     <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
                     <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
@@ -2274,12 +2274,12 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
             let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
             html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInTab_0.3s_ease]">`;
             year.branches.forEach((branch) => {
-                let bgImage = getAdminBg(branch.id, branch.title);
+                let bgImage = typeof getAdminBg === 'function' ? getAdminBg(branch.id, branch.title) : 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop';
                 html += `<button onclick="window.adminActiveBranch['${year.id}']='${branch.id}'; window.adminContentStep='details'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[200px] flex flex-col items-center justify-center text-center">
                     <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
                     <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
                     <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full">
-                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${getBranchIcon(branch.title)}</div>
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${typeof getBranchIcon === 'function' ? getBranchIcon(branch.title) : '<i class="ph-fill ph-folder"></i>'}</div>
                         <h3 class="text-xl font-black text-white drop-shadow-md leading-snug">${branch.title}</h3>
                     </div>
                 </button>`;
