@@ -354,13 +354,13 @@
             </div>
             
             <div class="space-y-5 relative z-10">
-                <!-- حقل الدخول (الاسم واللقب معاً - يظهر فقط عند تسجيل الدخول) -->
-                <div class="relative group" id="login-name-container">
+                <!-- حقل الدخول  -->
+              <div class="relative group" id="login-name-container">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-user"></i></div>
                     <input type="text" id="login-username" aria-label="الاسم واللقب" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="الاسم واللقب (مثال: محمد بن علي)">
                 </div>
 
-                <!-- حقول التسجيل 1: (الاسم واللقب في سطر واحد) -->
+                <!-- حقول التسجيل (الاسم واللقب، ثم هاتف واسم الولي جنباً إلى جنب في سطرين - تظهر فقط عند إنشاء حساب) -->
                 <div class="gap-4 hidden flex-col sm:flex-row" id="register-names-container">
                     <div class="relative group flex-1">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-xl"><i class="ph-fill ph-user"></i></div>
@@ -370,15 +370,14 @@
                         <input type="text" id="reg-lastname" aria-label="اللقب" class="w-full px-4 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="اللقب">
                     </div>
                 </div>
-                
-                <!-- حقول التسجيل 2: (اسم الولي ورقم الهاتف في سطر واحد) -->
-                <div class="gap-4 hidden flex-col sm:flex-row" id="register-parents-container">
-                    <div class="relative group flex-1">
+
+                <div class="gap-4 hidden flex-col sm:flex-row" id="register-parent-phone-container">
+                    <div class="relative group flex-1" id="parent-name-container">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-users-three"></i></div>
                         <input type="text" id="parent-name" aria-label="اسم ولي الأمر" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="اسم ولي الأمر">
                     </div>
                     
-                    <div class="relative group flex-1">
+                    <div class="relative group flex-1" id="phone-number-container">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-device-mobile"></i></div>
                         <input type="tel" id="phone-number" aria-label="رقم الهاتف" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 text-left tracking-[0.2em]" dir="auto" placeholder="05 / 06 / 07...">
                     </div>
