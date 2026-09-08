@@ -415,6 +415,21 @@ window.toggleDarkMode = () => {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
 };
 
+// دالة لجلب خلفيات الصور حسب اسم الوحدة
+const getBranchImage = (title) => {
+    // يمكنك لاحقاً تغيير هذه الروابط بصورك الخاصة
+    if(title.includes('الكهرباء') || title.includes('كهربائية')) return 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop';
+    if(title.includes('المادة') || title.includes('كيمياء') || title.includes('تحولات')) return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1000&auto=format&fit=crop';
+    if(title.includes('ميكانيك') || title.includes('حركة')) return 'https://images.unsplash.com/photo-1537495329792-41ae41ad3bf0?q=80&w=1000&auto=format&fit=crop';
+    if(title.includes('ضوء') || title.includes('بصريات') || title.includes('الضوئية')) return 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop';
+    if(title.includes('طاقة') || title.includes('عمل')) return 'https://images.unsplash.com/photo-1473649085228-583485e6e4d7?q=80&w=1000&auto=format&fit=crop';
+    if(title.includes('مغناطيس') || title.includes('كهرومغناطيسية')) return 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=1000&auto=format&fit=crop';
+    if(title.includes('شهادتك') || title.includes('شهادات')) return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
+    
+    // الصورة الافتراضية لأي وحدة أخرى
+    return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop'; 
+};
+
 const getBranchIcon = (title) => {
     if(title.includes('شهادتك') || title.includes('شهادات') || title.includes('تجريبية')) return '<i class="ph-fill ph-certificate"></i>';
     if(title.includes('الكهرباء') || title.includes('كهربائية')) return '<i class="ph-fill ph-lightning"></i>';
@@ -2249,18 +2264,32 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                         });
                         let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
                         
-                        html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="bg-gradient-to-br ${color} p-6 md:p-8 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group min-h-[220px]">
-                            ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 bg-white/30 backdrop-blur-sm rounded-full p-2"><i class="ph-bold ph-check text-white text-xl"></i></div>' : ''}
-                            <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:scale-110 transition-transform">${getBranchIcon(branch.title)}</div>
-                            <h3 class="text-2xl font-black drop-shadow-sm leading-tight text-white">${branch.title}</h3>
+                            html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="relative p-6 md:p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center justify-center gap-4 text-center overflow-hidden group min-h-[220px] border border-white/10">
                             
-                            <div class="w-full mt-auto pt-4 text-white">
-                                <div class="flex justify-between text-xs font-black mb-2 px-1"><span>التقدم</span><span>${unitProg}%</span></div>
-                                <div class="w-full bg-black/30 rounded-full h-2.5 shadow-inner overflow-hidden">
-                                    <div class="bg-white h-full rounded-full transition-all duration-1000" style="width: ${unitProg}%"></div>
+                            <!-- صورة الخلفية مع تأثير التقريب -->
+                            <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${getBranchImage(branch.title)}');"></div>
+                            
+                            <!-- الطبقة الزجاجية المظلمة (السر لبروز النص) -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-900/30 z-0 group-hover:via-slate-900/70 transition-colors duration-500"></div>
+
+                            ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 z-20 bg-emerald-500/80 backdrop-blur-md rounded-full w-8 h-8 flex items-center justify-center shadow-lg border border-emerald-300/50"><i class="ph-bold ph-check text-white text-lg"></i></div>' : ''}
+                            
+                            <!-- محتوى البطاقة (الأيقونة والنص) -->
+                            <div class="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:-translate-y-2 transition-transform duration-500 relative z-10 text-white">
+                                ${getBranchIcon(branch.title)}
+                            </div>
+                            
+                            <h3 class="text-2xl font-black drop-shadow-md leading-tight text-white relative z-10 transition-transform duration-500 group-hover:-translate-y-1">${branch.title}</h3>
+                            
+                            <!-- شريط التقدم -->
+                            <div class="w-full mt-auto pt-4 text-white relative z-10 opacity-90 group-hover:opacity-100 transition-opacity">
+                                <div class="flex justify-between text-xs font-black mb-2 px-1 text-slate-200"><span>التقدم</span><span>${unitProg}%</span></div>
+                                <div class="w-full bg-slate-900/80 rounded-full h-2.5 shadow-inner overflow-hidden border border-white/10">
+                                    <div class="bg-gradient-to-r from-blue-400 to-emerald-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(52,211,153,0.5)]" style="width: ${unitProg}%"></div>
                                 </div>
                             </div>
                         </button>`;
+
                     });
                     html += `</div>`;
                 } 
