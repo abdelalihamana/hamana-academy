@@ -607,7 +607,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 
                         if(phone) {
                             const waPhone = `213${phone.substring(1)}`;
-                            const waMessage = encodeURIComponent(`السلام عليكم.\nبناءً على طلبكم، هذه بيانات الدخول الخاصة بالتلميذ(ة) ${displayName} في منصة المجتهد للعلوم الفيزيائية:\n\nالاسم واللقب: ${displayName}\nكلمة المرور: ${pass}\n\nبالتوفيق!`);
+                            const waMessage = encodeURIComponent(`السلام عليكم.\nبناءً على طلبكم، هذه بيانات الدخول الخاصة بالتلميذ(ة) ${displayName} في أكاديمية حمانة للعلوم الفيزيائية:\n\nالاسم واللقب: ${displayName}\nكلمة المرور: ${pass}\n\nبالتوفيق!`);
                             window.open(`https://wa.me/${waPhone}?text=${waMessage}`, '_blank');
                         } else {
                             showToast("لا يوجد رقم هاتف مسجل لهذا التلميذ!", "error");
@@ -984,7 +984,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             window.isRegistering = !window.isRegistering;
             
             const titleEl = document.getElementById('auth-title');
-            if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "منصة المجتهد";
+            if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
             
             const btnEl = document.getElementById('auth-action-btn');
             if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
@@ -1497,7 +1497,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             } else {
                 let waLink = null;
                 if (phone) {
-                    let waMessage = encodeURIComponent("السلام عليكم. معكم منصة المجتهد للعلوم الفيزيائية نعلمكم أنه تم قبول إبنكم على مستوى المنصة نتمنى له النجاح والتوفيق. لأي إستفسار راسلونا عبر المنصة");
+                    let waMessage = encodeURIComponent("السلام عليكم. معكم أكاديمية حمانة للعلوم الفيزيائية نعلمكم أنه تم قبول إبنكم على مستوى المنصة نتمنى له النجاح والتوفيق. لأي إستفسار راسلونا عبر المنصة");
                     waLink = `https://wa.me/213${phone.substring(1)}?text=${waMessage}`;
                 }
                 let win = null; if(waLink) win = window.open(waLink, '_blank'); 
@@ -1626,7 +1626,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
                 let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
                 let prog = calculateProgressXP(data.level, data, window.currentSections);
                 
-                let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${d.id}. نعلمكم من منصة المجتهد للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
+                let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${d.id}. نعلمكم من أكاديمية حمانة للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
                 let waProgLink = data.phoneNumber ? `https://wa.me/213${data.phoneNumber.substring(1)}?text=${waProgMsg}` : '#';
 
                                let parentInfo = data.parentName ? 
