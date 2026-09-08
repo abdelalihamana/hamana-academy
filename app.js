@@ -37,9 +37,8 @@ window.currentSections = [];
 window.currentUpdates = []; 
 window.currentLiveUrl = "";
 window.currentEditParams = null; 
-window.highlightedLessonTitle = null; // متغير لحفظ اسم الدرس المراد تظليله
+window.highlightedLessonTitle = null; 
 
-// حالات الإدارة والتلميذ
 window.adminContentStep = 'parts'; 
 window.adminActivePart = null;
 window.adminActiveYear = {}; 
@@ -56,7 +55,6 @@ window.tempAdminCode = null;
 window.tempAdminData = null;
 window.tempAdminUsername = null;
 
-// متغيرات الترحيل والتصفح الخاص بالأدمن (Pagination)
 window.adminCurrentPage = 1;
 window.adminPageCursors = [];
 window.adminLastVisible = null;
@@ -386,13 +384,20 @@ const checkAndUpdateStreak = async (userRef, userData) => {
     if (streakEl) streakEl.innerText = currentStreak;
 };
 
+// --- دالة فتح أقسام الإدارة (تم إصلاح خطأ ظهور المحتوى تحت الجدول) ---
 window.openAdminSection = (section) => {
     document.getElementById('admin-dashboard-grid').classList.add('hidden');
     if (section === 'accounts') {
+        document.getElementById('admin-content-section').classList.add('hidden');
+        document.getElementById('admin-content-section').classList.remove('block');
+        
         document.getElementById('admin-accounts-section').classList.remove('hidden');
         document.getElementById('admin-accounts-section').classList.add('flex');
         window.loadAdminPage('init');
     } else {
+        document.getElementById('admin-accounts-section').classList.add('hidden');
+        document.getElementById('admin-accounts-section').classList.remove('flex');
+        
         document.getElementById('admin-content-section').classList.remove('hidden');
         document.getElementById('admin-content-section').classList.add('block');
         window.adminContentStep = 'parts';
@@ -414,6 +419,34 @@ window.toggleDarkMode = () => {
     const isDark = document.documentElement.classList.contains('dark');
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
 };
+
+const getBranchImage = (branchId, title) => {
+    if(branchId === 'm1_b1') return 'https://images.unsplash.com/photo-1493612276216-ee3925520721?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm1_b2') return 'https://images.unsplash.com/photo-1544473244-f6895e69ad8b?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm1_b3') return 'https://images.unsplash.com/photo-1501166222995-bb3b2fa7aca8?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm2_b1') return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm2_b2') return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm2_b3') return 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm3_b1') return 'https://images.unsplash.com/photo-1603126859544-0b73df780b6d?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm3_b2') return 'https://images.unsplash.com/photo-1473649085228-583485e6e4d7?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm3_b3') return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm3_b4') return 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm4_b1') return 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm4_b2') return 'https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm4_b3') return 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm4_b4') return 'https://images.unsplash.com/photo-1478144596228-51829eebc3f8?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm4_b5') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'h1_b1') return 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'h1_b2') return 'https://images.unsplash.com/photo-1537495329792-41ae41ad3bf0?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'h2_b1') return 'https://images.unsplash.com/photo-1528642474498-1af0c17fd8c3?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'h2_b2') return 'https://images.unsplash.com/photo-1518861961448-7098e9fc7eec?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'h3_b1') return 'https://images.unsplash.com/photo-1579389083078-4e7018379f7e?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'h3_b2') return 'https://images.unsplash.com/photo-1536697246787-1f7ae568d89a?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'h3_b3') return 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=1000&auto=format&fit=crop'; 
+    if(title && (title.includes('الفصل') || title.includes('فصل'))) return 'https://images.unsplash.com/photo-1455734729978-db1ae3368e1f?q=80&w=1000&auto=format&fit=crop'; 
+    return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop'; 
+};
+
 
 const getBranchIcon = (title) => {
     if(title.includes('شهادتك') || title.includes('شهادات') || title.includes('تجريبية')) return '<i class="ph-fill ph-certificate"></i>';
@@ -486,45 +519,55 @@ window.openExistingAccount = () => {
 };
 
 window.toggleAuthMode = () => {
-    window.isRegistering = !window.isRegistering;
-    
-    const titleEl = document.getElementById('auth-title');
-    if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
-    
-    const btnEl = document.getElementById('auth-action-btn');
-    if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
-    
-    const switchEl = document.getElementById('switch-mode-text');
-    if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
-    
-    const loginNameCont = document.getElementById('login-name-container');
-    const regNamesCont = document.getElementById('register-names-container');
-    const levelSelect = document.getElementById('user-level'); 
-    const levelIcon = document.getElementById('level-icon');
-    const parentNameCont = document.getElementById('parent-name-container'); 
-    const phoneNumCont = document.getElementById('phone-number-container');
-    const forgotPassCont = document.getElementById('forgot-password-container');
-    
-    if(window.isRegistering) {
-        if(loginNameCont) loginNameCont.classList.add('hidden');
-        if(regNamesCont) { regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex'); }
-        if(levelSelect) levelSelect.classList.remove('hidden'); 
-        if(levelIcon) levelIcon.classList.remove('hidden');
-        if(parentNameCont) parentNameCont.classList.remove('hidden'); 
-        if(phoneNumCont) phoneNumCont.classList.remove('hidden');
-        if(forgotPassCont) forgotPassCont.classList.add('hidden');
-    } else {
-        if(loginNameCont) loginNameCont.classList.remove('hidden');
-        if(regNamesCont) { regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex'); }
-        if(levelSelect) levelSelect.classList.add('hidden'); 
-        if(levelIcon) levelIcon.classList.add('hidden');
-        if(parentNameCont) parentNameCont.classList.add('hidden'); 
-        if(phoneNumCont) phoneNumCont.classList.add('hidden');
-        if(forgotPassCont) forgotPassCont.classList.remove('hidden');
-    }
-};
+            window.isRegistering = !window.isRegistering;
+            
+            const titleEl = document.getElementById('auth-title');
+            if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
+            
+            const btnEl = document.getElementById('auth-action-btn');
+            if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
+            
+            const switchEl = document.getElementById('switch-mode-text');
+            if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
+            
+            const authScreen = document.getElementById('auth-screen');
+            
+            const loginNameCont = document.getElementById('login-name-container');
+            const regNamesCont = document.getElementById('register-names-container');
+            const regParentPhoneCont = document.getElementById('register-parent-phone-container');
+            const levelSelect = document.getElementById('user-level'); 
+            const levelIcon = document.getElementById('level-icon');
+            const forgotPassCont = document.getElementById('forgot-password-container');
+            
+            if(window.isRegistering) {
+                if(authScreen) {
+                    authScreen.classList.remove('max-w-md');
+                    authScreen.classList.add('max-w-2xl', 'transition-all', 'duration-500'); 
+                }
+                
+                if(loginNameCont) loginNameCont.classList.add('hidden');
+                if(regNamesCont) { regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex'); }
+                if(regParentPhoneCont) { regParentPhoneCont.classList.remove('hidden'); regParentPhoneCont.classList.add('flex'); }
+                
+                if(levelSelect) levelSelect.classList.remove('hidden'); 
+                if(levelIcon) levelIcon.classList.remove('hidden');
+                if(forgotPassCont) forgotPassCont.classList.add('hidden');
+            } else {
+                if(authScreen) {
+                    authScreen.classList.remove('max-w-2xl');
+                    authScreen.classList.add('max-w-md');
+                }
+                
+                if(loginNameCont) loginNameCont.classList.remove('hidden');
+                if(regNamesCont) { regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex'); }
+                if(regParentPhoneCont) { regParentPhoneCont.classList.add('hidden'); regParentPhoneCont.classList.remove('flex'); }
+                
+                if(levelSelect) levelSelect.classList.add('hidden'); 
+                if(levelIcon) levelIcon.classList.add('hidden');
+                if(forgotPassCont) forgotPassCont.classList.remove('hidden');
+            }
+        };
 
-// --- دالة إظهار وإخفاء كلمة المرور ---
 window.togglePasswordVisibility = () => {
     const passInput = document.getElementById('password');
     const toggleIcon = document.getElementById('password-toggle-icon');
@@ -600,6 +643,7 @@ window.verifyAdminCode = async () => {
     btn.disabled = false; btn.innerHTML = originalHTML;
 };
 
+// --- إصلاح منع الإدارة من طلب كلمة المرور ---
 window.requestPasswordReset = async () => {
     const usernameInput = document.getElementById('login-username').value.trim();
     if (!usernameInput) return showToast("يرجى كتابة الاسم واللقب أولاً في حقل الدخول لطلب استرجاع كلمة المرور", "error");
@@ -693,7 +737,6 @@ window.handleAuth = async () => {
 
     if (!rawName || !password) return showToast("يرجى ملء جميع البيانات المطلوبة", "error");
     
-    // تم إصلاح الخطأ البرمجي هنا باستخدام علامات التنصيص المفردة
     if (password.length < 6) return showToast('عذراً، كلمة المرور يجب أن تتكون من 6 "أرقام أو أحرف أو مزيج بينهما" على الأقل', "error");
 
     if (window.isRegistering) {
@@ -778,6 +821,7 @@ window.handleAuth = async () => {
                     await checkAndUpdateStreak(userRef, window.currentUserRecord);
                     document.getElementById('display-username').innerText = username.replace(/_/g, ' ');
                     document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
+                    
                     switchScreen('app-screen');
                     startStudentListeners();
                     if (typeof window.initPomodoro === 'function') {
@@ -949,13 +993,14 @@ onAuthStateChanged(auth, async (user) => {
                 
                 if (userSnap.exists()) {
                     let data = userSnap.data();
+                    
                     if (data.role === 'admin') {
                         window.currentUserRecord = { username: 'admin', ...data };
                         document.getElementById('two-fa-modal').classList.add('hidden');
                         document.getElementById('two-fa-modal').classList.remove('flex');
                         document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
                         
-                        switchScreen('admin-screen');
+                        switchScreen('admin-screen'); 
                         startAdminListeners();
                         return; 
                     } 
@@ -968,15 +1013,22 @@ onAuthStateChanged(auth, async (user) => {
                         await checkAndUpdateStreak(userRef, window.currentUserRecord);
                         document.getElementById('display-username').innerText = username.replace(/_/g, ' ');
                         document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
-                        switchScreen('app-screen');
+                        
+                        switchScreen('app-screen'); 
                         startStudentListeners();
                         if (typeof window.initPomodoro === 'function') {
                             window.initPomodoro();
                         }
                     }
+                } else {
+                    switchScreen('landing-screen');
+                    await signOut(auth);
                 }
             }
-        } catch(e) { console.error("OnAuthState Error:", e); }
+        } catch(e) { 
+            console.error("OnAuthState Error:", e); 
+            switchScreen('landing-screen');
+        }
     } else {
         const currentHash = window.location.hash.substring(1);
         if (currentHash === 'auth-screen') {
@@ -1042,11 +1094,24 @@ window.returnToAdmin = () => {
 window.logout = async () => {
     if (typeof closeSettings === 'function') closeSettings();
     if(await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
+        
+        if(unsubscribeProgram) { unsubscribeProgram(); unsubscribeProgram = null; }
+        if(unsubscribeUsers) { unsubscribeUsers(); unsubscribeUsers = null; }
+        if(unsubscribeStudentData) { unsubscribeStudentData(); unsubscribeStudentData = null; }
+        if(unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
+        if(unsubscribeChatMeta) { unsubscribeChatMeta(); unsubscribeChatMeta = null; }
+        if(window.unsubscribeResetRequests) { window.unsubscribeResetRequests(); window.unsubscribeResetRequests = null; }
+        if(window.unsubscribePendingUsers) { window.unsubscribePendingUsers(); window.unsubscribePendingUsers = null; }
+
+        if(pomodoroInterval) clearInterval(pomodoroInterval);
+        if (typeof closeChat === 'function') closeChat();
+
         try {
             await signOut(auth);
         } catch(e) { console.error("Logout error", e); }
         
-        window.currentUserRecord = null; window.originalAdminRecord = null;
+        window.currentUserRecord = null; 
+        window.originalAdminRecord = null;
         if(document.getElementById('password')) document.getElementById('password').value = '';
         
         document.getElementById('return-admin-btn').classList.add('hidden');
@@ -1056,18 +1121,10 @@ window.logout = async () => {
         document.getElementById('student-logout-btn').classList.remove('hidden');
         document.getElementById('student-notif-btn').classList.remove('hidden');
 
-        if(unsubscribeProgram) unsubscribeProgram();
-        if(unsubscribeUsers) unsubscribeUsers();
-        if(unsubscribeStudentData) unsubscribeStudentData();
-        if(unsubscribeChat) unsubscribeChat();
-        if(unsubscribeChatMeta) unsubscribeChatMeta();
-        if(pomodoroInterval) clearInterval(pomodoroInterval);
-        if (typeof closeChat === 'function') closeChat();
         switchScreen('auth-screen');
         document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
     }
 };
-
 window.openSettings = () => {
     document.getElementById('settings-username').value = window.currentUserRecord.username.replace(/_/g, ' ');
     const passInput = document.getElementById('settings-current-password');
@@ -1250,7 +1307,7 @@ window.toggleUserStatus = async (uid, isApproved, phone) => {
     } else {
         let waLink = null;
         if (phone) {
-            let waMessage = encodeURIComponent("السلام عليكم. معكم أكاديمية حمانة للعلوم الفيزيائية نعلمكم أنه تم قبول إبنكم على مستوى المنصة نتمنى له النجاح والتوفيق. لأي إستفسار راسلونا عبر المنصة");
+            let waMessage = encodeURIComponent("السلام عليكم. معكم منصة المجتهد للعلوم الفيزيائية نعلمكم أنه تم قبول إبنكم على مستوى المنصة نتمنى له النجاح والتوفيق. لأي إستفسار راسلونا عبر المنصة");
             waLink = `https://wa.me/213${phone.substring(1)}?text=${waMessage}`;
         }
         let win = null; if(waLink) win = window.open(waLink, '_blank'); 
@@ -1376,7 +1433,7 @@ const renderAdminTable = () => {
         let prog = calculateProgressXP(data.level, data, window.currentSections);
         let displayName = d.id.replace(/_/g, ' ');
         
-        let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${displayName}. نعلمكم من أكاديمية حمانة للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
+        let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${displayName}. نعلمكم من منصة المجتهد للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
         let waProgLink = data.phoneNumber ? `https://wa.me/213${data.phoneNumber.substring(1)}?text=${waProgMsg}` : '#';
 
         let parentInfo = data.parentName ? 
@@ -1424,6 +1481,8 @@ const renderAdminTable = () => {
                     <div class="flex gap-2 justify-end">
                         <button onclick="loginAsStudent('${d.id}')" aria-label="مراقبة حساب التلميذ" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-black hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition border border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center gap-1" title="مراقبة حساب التلميذ"><i class="ph-bold ph-sign-in"></i> دخول للحساب</button>
                         <button onclick="openChat('${d.id}')" aria-label="مراسلة التلميذ" class="relative icon-btn w-9 h-9 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-lg shadow-sm border border-blue-200 dark:border-blue-800" title="مراسلة"><i class="ph-bold ph-chat-circle-dots"></i>${chatBadge}</button>
+                        <button onclick="upgradeStudentLevel('${d.id}', '${data.level}')" class="text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-700 p-2 rounded-lg transition" title="ترقية للعام القادم وتفريغ البيانات"><i class="ph-bold ph-trend-up text-lg"></i></button>
+                        <button onclick="deleteStudentBtn('${d.id}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 p-2 rounded-lg transition" title="حذف الحساب نهائياً"><i class="ph-bold ph-trash text-lg"></i></button>
                     </div>
                 </td>
             </tr>`;
@@ -1811,11 +1870,8 @@ window.sendChatMessage = async () => {
 };
 
 window.markStudentNotificationsAsRead = () => {
-    // 🛑 تم إفراغ هذه الدالة القديمة لكي لا تختفي جميع الإشعارات معاً 🛑
-    // الإخفاء أصبح يتم بشكل فردي ذكي عند الضغط على كل إشعار
 };
 
-// --- 1. الدالة السحرية لتوجيه التلميذ نحو الدرس ---
 window.goToUpdate = (branchTitle, updateId, updateTitle) => {
     if (window.currentUserRecord) {
         let hiddenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
@@ -2125,38 +2181,72 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
 
         html += `<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">`;
         
-        if (window.adminContentStep === 'parts') {
-            html += `<button onclick="returnToAdminDashboard()" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للوحة الرئيسية</button>`;
-            html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-2"><div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="ph-fill ph-books"></i></div> اختيار الطور التعليمي</h3>`;
-        }
-        else if (window.adminContentStep === 'years') {
-            html += `<button onclick="window.adminContentStep='parts'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للأطوار</button>`;
-            let part = sections.find(p => p.id === window.adminActivePart);
-            html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white">إدارة سنوات: ${part.title}</h3>`;
-        }
-        else if (window.adminContentStep === 'branches') {
-            html += `<button onclick="window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للسنوات</button>`;
-            let part = sections.find(p => p.id === window.adminActivePart);
-            let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
-            html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white">إدارة وحدات: ${year.title}</h3>`;
-        }
-        else if (window.adminContentStep === 'details') {
-            html += `<button onclick="window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للوحدات</button>`;
+        if (window.adminContentStep === 'details') {
             let part = sections.find(p => p.id === window.adminActivePart);
             let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
             let branch = year.branches.find(b => b.id === window.adminActiveBranch[year.id]);
-            html += `<div class="text-left"><h3 class="text-2xl font-black text-blue-600 dark:text-blue-400 flex items-center justify-end gap-2">${getBranchIcon(branch.title)} ${branch.title}</h3><p class="text-sm font-bold text-slate-500 mt-1">${part.title} - ${year.title}</p></div>`;
+            html += `<button onclick="window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للوحدات</button>`;
+            html += `<div class="text-left"><h3 class="text-2xl font-black text-blue-600 dark:text-blue-400 flex items-center justify-end gap-2">${typeof getBranchIcon === 'function' ? getBranchIcon(branch.title) : '<i class="ph-fill ph-folder"></i>'} ${branch.title}</h3><p class="text-sm font-bold text-slate-500 mt-1">${part.title} - ${year.title}</p></div>`;
+        } 
+        else if (window.adminContentStep === 'branches') {
+            let part = sections.find(p => p.id === window.adminActivePart);
+            let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
+            html += `<button onclick="window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للسنوات</button>`;
+            html += `<div class="text-left"><h3 class="text-2xl font-black text-blue-600 dark:text-blue-400 flex items-center justify-end gap-2"><i class="ph-fill ph-calendar-blank"></i> ${year.title}</h3><p class="text-sm font-bold text-slate-500 mt-1">${part.title}</p></div>`;
+        } 
+        else if (window.adminContentStep === 'years') {
+            let part = sections.find(p => p.id === window.adminActivePart);
+            html += `<button onclick="window.adminContentStep='parts'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للأطوار</button>`;
+            html += `<div class="text-left"><h3 class="text-2xl font-black text-blue-600 dark:text-blue-400 flex items-center justify-end gap-2"><i class="ph-fill ph-folders"></i> ${part.title}</h3></div>`;
+        } 
+        else {
+             html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3"><i class="ph-fill ph-folders text-blue-500"></i> إدارة المحتوى والدروس</h3>`;
         }
         html += `</div>`;
 
+        const getAdminBg = (id, title) => {
+            if(id === 'part_middle') return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
+            if(id === 'part_high') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
+            if(id === 'm1_b1') return 'https://images.unsplash.com/photo-1493612276216-ee3925520721?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm1_b2') return 'https://images.unsplash.com/photo-1544473244-f6895e69ad8b?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm1_b3') return 'https://images.unsplash.com/photo-1501166222995-bb3b2fa7aca8?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm2_b1') return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm2_b2') return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm2_b3') return 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm3_b1') return 'https://images.unsplash.com/photo-1603126859544-0b73df780b6d?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm3_b2') return 'https://images.unsplash.com/photo-1473649085228-583485e6e4d7?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm3_b3') return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm3_b4') return 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b1') return 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b2') return 'https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b3') return 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b4') return 'https://images.unsplash.com/photo-1478144596228-51829eebc3f8?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b5') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h1_b1') return 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h1_b2') return 'https://images.unsplash.com/photo-1537495329792-41ae41ad3bf0?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h2_b1') return 'https://images.unsplash.com/photo-1528642474498-1af0c17fd8c3?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h2_b2') return 'https://images.unsplash.com/photo-1518861961448-7098e9fc7eec?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h3_b1') return 'https://images.unsplash.com/photo-1579389083078-4e7018379f7e?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h3_b2') return 'https://images.unsplash.com/photo-1536697246787-1f7ae568d89a?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h3_b3') return 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=1000&auto=format&fit=crop'; 
+            if(title && title.includes('متوسط')) return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
+            if(title && title.includes('ثانوي')) return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
+            if(title && title.includes('الفصل')) return 'https://images.unsplash.com/photo-1455734729978-db1ae3368e1f?q=80&w=1000&auto=format&fit=crop';
+            return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop'; 
+        };
+
         if (window.adminContentStep === 'parts') {
             html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[fadeInTab_0.3s_ease]">`;
-            sections.forEach((part, idx) => {
-                let color = gridColors[idx % 7];
+            sections.forEach((part) => {
                 let icon = part.id === 'part_middle' ? '<i class="ph-fill ph-student"></i>' : '<i class="ph-fill ph-graduation-cap"></i>';
-                html += `<button onclick="window.adminActivePart='${part.id}'; window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="bg-gradient-to-br ${color} p-8 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center min-h-[220px]">
-                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner mb-2">${icon}</div>
-                    <h3 class="text-3xl font-black drop-shadow-sm">${part.title}</h3>
+                let bgImage = typeof getAdminBg === 'function' ? getAdminBg(part.id, part.title) : 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
+                html += `<button onclick="window.adminActivePart='${part.id}'; window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-8 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[220px] flex flex-col items-center justify-center text-center">
+                    <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
+                    <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full">
+                        <div class="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${icon}</div>
+                        <h3 class="text-3xl font-black text-white drop-shadow-md tracking-tight">${part.title}</h3>
+                    </div>
                 </button>`;
             });
             html += `</div>`;
@@ -2164,11 +2254,15 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
         else if (window.adminContentStep === 'years') {
             let part = sections.find(p => p.id === window.adminActivePart);
             html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-[fadeInTab_0.3s_ease]">`;
-            part.years.forEach((year, idx) => {
-                let color = gridColors[(idx + 2) % 7]; 
-                html += `<button onclick="window.adminActiveYear['${part.id}']='${year.id}'; window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="bg-gradient-to-br ${color} p-6 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-3 text-center min-h-[180px]">
-                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-4xl shadow-inner"><i class="ph-fill ph-calendar-blank"></i></div>
-                    <h3 class="text-2xl font-black drop-shadow-sm">${year.title}</h3>
+            part.years.forEach((year) => {
+                let bgImage = typeof getAdminBg === 'function' ? getAdminBg(year.id, year.title) : 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop';
+                html += `<button onclick="window.adminActiveYear['${part.id}']='${year.id}'; window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[180px] flex flex-col items-center justify-center text-center">
+                    <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
+                    <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center gap-3 w-full">
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500"><i class="ph-fill ph-calendar-blank"></i></div>
+                        <h3 class="text-2xl font-black text-white drop-shadow-md">${year.title}</h3>
+                    </div>
                 </button>`;
             });
             html += `</div>`;
@@ -2177,11 +2271,15 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
             let part = sections.find(p => p.id === window.adminActivePart);
             let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
             html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInTab_0.3s_ease]">`;
-            year.branches.forEach((branch, idx) => {
-                let color = gridColors[idx % 7];
-                html += `<button onclick="window.adminActiveBranch['${year.id}']='${branch.id}'; window.adminContentStep='details'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="bg-gradient-to-br ${color} p-6 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center min-h-[200px]">
-                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-4xl shadow-inner">${getBranchIcon(branch.title)}</div>
-                    <h3 class="text-xl font-black drop-shadow-sm leading-snug">${branch.title}</h3>
+            year.branches.forEach((branch) => {
+                let bgImage = typeof getAdminBg === 'function' ? getAdminBg(branch.id, branch.title) : 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop';
+                html += `<button onclick="window.adminActiveBranch['${year.id}']='${branch.id}'; window.adminContentStep='details'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[200px] flex flex-col items-center justify-center text-center">
+                    <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
+                    <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full">
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${typeof getBranchIcon === 'function' ? getBranchIcon(branch.title) : '<i class="ph-fill ph-folder"></i>'}</div>
+                        <h3 class="text-xl font-black text-white drop-shadow-md leading-snug">${branch.title}</h3>
+                    </div>
                 </button>`;
             });
             html += `</div>`;
@@ -2249,18 +2347,32 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                         });
                         let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
                         
-                        html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="bg-gradient-to-br ${color} p-6 md:p-8 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group min-h-[220px]">
-                            ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 bg-white/30 backdrop-blur-sm rounded-full p-2"><i class="ph-bold ph-check text-white text-xl"></i></div>' : ''}
-                            <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:scale-110 transition-transform">${getBranchIcon(branch.title)}</div>
-                            <h3 class="text-2xl font-black drop-shadow-sm leading-tight text-white">${branch.title}</h3>
+                            html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="relative p-6 md:p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center justify-center gap-4 text-center overflow-hidden group min-h-[220px] border border-white/10">
                             
-                            <div class="w-full mt-auto pt-4 text-white">
-                                <div class="flex justify-between text-xs font-black mb-2 px-1"><span>التقدم</span><span>${unitProg}%</span></div>
-                                <div class="w-full bg-black/30 rounded-full h-2.5 shadow-inner overflow-hidden">
-                                    <div class="bg-white h-full rounded-full transition-all duration-1000" style="width: ${unitProg}%"></div>
+                            <!-- صورة الخلفية مع تأثير التقريب -->
+                            <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${getBranchImage(branch.id, branch.title)}');"></div>
+
+                            <!-- الطبقة الزجاجية المظلمة (السر لبروز النص) -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-900/30 z-0 group-hover:via-slate-900/70 transition-colors duration-500"></div>
+
+                            ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 z-20 bg-emerald-500/80 backdrop-blur-md rounded-full w-8 h-8 flex items-center justify-center shadow-lg border border-emerald-300/50"><i class="ph-bold ph-check text-white text-lg"></i></div>' : ''}
+                            
+                            <!-- محتوى البطاقة (الأيقونة والنص) -->
+                            <div class="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:-translate-y-2 transition-transform duration-500 relative z-10 text-white">
+                                ${getBranchIcon(branch.title)}
+                            </div>
+                            
+                            <h3 class="text-2xl font-black drop-shadow-md leading-tight text-white relative z-10 transition-transform duration-500 group-hover:-translate-y-1">${branch.title}</h3>
+                            
+                            <!-- شريط التقدم -->
+                            <div class="w-full mt-auto pt-4 text-white relative z-10 opacity-90 group-hover:opacity-100 transition-opacity">
+                                <div class="flex justify-between text-xs font-black mb-2 px-1 text-slate-200"><span>التقدم</span><span>${unitProg}%</span></div>
+                                <div class="w-full bg-slate-900/80 rounded-full h-2.5 shadow-inner overflow-hidden border border-white/10">
+                                    <div class="bg-gradient-to-r from-blue-400 to-emerald-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(52,211,153,0.5)]" style="width: ${unitProg}%"></div>
                                 </div>
                             </div>
                         </button>`;
+
                     });
                     html += `</div>`;
                 } 
@@ -2315,7 +2427,6 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                                 let linkId = `${branch.id}_${cat}_${lIdx}`; 
                                 let isRead = clickedLinks.includes(linkId);
 
-                                // تمييز الدرس القادم من الإشعار
                                 let isHighlighted = window.highlightedLessonTitle && lnk.title.trim() === window.highlightedLessonTitle.trim();
                                 let btnClass = isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm bg-emerald-50/20' : 'border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-md hover:border-blue-300';
                                 
@@ -2343,4 +2454,76 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
         }
     }
     document.getElementById(containerId).innerHTML = html;
+};
+
+window.upgradeStudentLevel = async (username, currentLevel) => {
+    const levelProgression = {
+        'm_y1': { next: 'm_y2', name: 'الثانية متوسط' },
+        'm_y2': { next: 'm_y3', name: 'الثالثة متوسط' },
+        'm_y3': { next: 'm_y4', name: 'الرابعة متوسط' },
+        'm_y4': { next: 'h_y1', name: 'السنة أولى ثانوي' },
+        'h_y1': { next: 'h_y2', name: 'السنة الثانية ثانوي' },
+        'h_y2': { next: 'h_y3', name: 'السنة الثالثة ثانوي' }
+    };
+
+    if (currentLevel === 'h_y3') {
+        return showToast("هذا التلميذ في السنة النهائية (البكالوريا) ولا يمكن ترقيته أكثر.", "error");
+    }
+
+    const upgradeInfo = levelProgression[currentLevel];
+    
+    if (!upgradeInfo) {
+        return showToast("مستوى غير معروف", "error");
+    }
+
+    const studentName = username.replace(/_/g, ' ');
+
+    if (await confirmAction(`🎓 هل أنت متأكد من ترقية (${studentName}) إلى [ ${upgradeInfo.name} ]؟\n\n⚠️ تحذير: سيتم تفريغ مساحة التخزين الخاصة به بالكامل (حذف تقدم الدروس، نقاط XP، الإشعارات، والدردشات القديمة) ليبدأ عاماً جديداً بصفحة بيضاء.`)) {
+        
+        showToast("جاري الترقية وتنظيف بيانات الحساب... يرجى الانتظار", "success");
+
+        try {
+            const userRef = doc(usersCol, username);
+            await updateDoc(userRef, { 
+                level: upgradeInfo.next,
+                clickedLinks: [], 
+                seenUpdates: [],  
+                xp: 0,            
+                streak: 0,        
+                passwordResetRequest: false
+            });
+
+            try {
+                const messagesRef = collection(db, chatsPath, username, 'messages');
+                const q = query(messagesRef, limit(100)); 
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach(async (d) => {
+                    await deleteDoc(d.ref);
+                });
+                await setDoc(doc(db, chatsPath, username), { unreadAdmin: 0, unreadStudent: 0 }, { merge: true });
+            } catch(chatError) {
+                console.warn("حدث خطأ في مسح المحادثات:", chatError);
+            }
+            
+            showToast(`تمت ترقية ${studentName} إلى ${upgradeInfo.name} وتنظيف المساحة بنجاح! 🚀`, "success");
+            
+            if (typeof loadAdminPage === 'function') loadAdminPage('init');
+            
+        } catch (error) {
+            console.error("Upgrade error:", error);
+            showToast("حدث خطأ أثناء ترقية التلميذ", "error");
+        }
+    }
+};
+
+window.deleteStudentBtn = async (username) => {
+    if(await confirmAction(`هل أنت متأكد من حذف الحساب "${username.replace(/_/g, ' ')}" نهائياً؟ لا يمكن التراجع عن هذا الإجراء.`)) {
+        try {
+            await deleteDoc(doc(usersCol, username));
+            showToast("تم حذف الحساب بنجاح", "success");
+            loadAdminPage('init');
+        } catch(e) {
+            showToast("حدث خطأ أثناء الحذف", "error");
+        }
+    }
 };
