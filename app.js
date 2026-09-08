@@ -2193,12 +2193,7 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
         if (!window.adminContentStep) window.adminContentStep = 'parts';
 
         html += `<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">`;
-        const getAdminBg = (id, title) => {
-            if(id === 'part_middle') return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
-            if(id === 'part_high') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
-            // السطر السحري: جلب نفس صور التلميذ تلقائياً لكي لا نضطر لتعديلها مرتين!
-            return typeof getBranchImage === 'function' ? getBranchImage(id, title) : 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop';
-        };
+        
         if (window.adminContentStep === 'details') {
             let part = sections.find(p => p.id === window.adminActivePart);
             let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
