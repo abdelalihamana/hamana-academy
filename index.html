@@ -277,12 +277,24 @@
                         بوابتك الذكية للتفوق. ادمج بين عمق الفهم العلمي ومتعة التعلم التفاعلي عبر أحدث التقنيات التعليمية.
                     </p>
 
-                    <!-- أزرار الدخول (زر واحد مركزي مباشر) -->
-                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-                        <button onclick="document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('auth-screen').classList.add('active'); window.location.hash='auth-screen';" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-black text-xl transition-all shadow-[0_10px_20px_-10px_rgba(37,99,235,0.6)] hover:-translate-y-1 flex items-center justify-center gap-3">
-                            <i class="ph-bold ph-rocket-launch text-2xl"></i> ابدأ رحلتك معنا
-                        </button>
-                    </div>
+                    <!-- أزرار الدخول -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+                    <button onclick="document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('auth-screen').classList.add('active'); if(window.isRegistering !== true) window.toggleAuthMode();" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-black text-xl transition-all shadow-[0_10px_20px_-10px_rgba(37,99,235,0.6)] hover:-translate-y-1 flex items-center justify-center gap-3">
+                        <i class="ph-bold ph-rocket-launch text-2xl"></i> ابدأ رحلتك معنا
+                    </button>
+                    
+                <!-- أزرار التواصل الاجتماعي (فيسبوك ويوتيوب) -->
+                <div class="flex flex-wrap items-center justify-center gap-4 mb-20 animate-[fadeInTab_0.5s_ease]">
+                    <!-- زر فيسبوك -->
+                    <a href="https://web.facebook.com/profhamana/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 text-[#1877F2] font-black rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-700 hover:scale-105 transition-all">
+                        <i class="ph-fill ph-facebook-logo text-2xl"></i> تابعنا على فيسبوك
+                    </a>
+                    
+                    <!-- زر يوتيوب -->
+                    <a href="https://www.youtube.com/@Hamana.physique" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 text-[#FF0000] font-black rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-slate-700 hover:scale-105 transition-all">
+                        <i class="ph-fill ph-youtube-logo text-2xl"></i> اشترك في قناتنا
+                    </a>
+                </div>
 
             <!-- البطاقات التوضيحية (الدمج بين العلم واللعب) -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
