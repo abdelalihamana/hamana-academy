@@ -20,15 +20,6 @@
 
     <!-- استدعاء ملف التصميم المحلي (مهم لسرعة التطبيق) -->
     <link href="./output.css" rel="stylesheet">
-    
-    <script>
-        tailwind.config = { darkMode: 'class' };
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
