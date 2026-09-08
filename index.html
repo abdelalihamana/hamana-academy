@@ -280,8 +280,9 @@
              <!-- مجموعة الأزرار العصرية المدمجة في سطر واحد -->
                 <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-16 w-full max-w-4xl mx-auto px-4 relative z-20">
                     
-                    <button onclick="document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('auth-screen').classList.add('active'); if(typeof window.isRegistering !== 'undefined' && !window.isRegistering) window.toggleAuthMode();" class="w-full md:w-auto flex-1 px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-fuchsia-600 hover:from-indigo-700 hover:via-purple-700 hover:to-fuchsia-700 text-white rounded-2xl font-black text-lg transition-all duration-300 shadow-xl shadow-purple-500/30 hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2 border border-white/10">
-                    <i class="ph-bold ph-rocket-launch text-2xl"></i> ابدأ رحلتك معنا
+                              <!-- زر ابدأ رحلتك -->
+                    <button onclick="openExistingAccount()" class="px-6 sm:px-8 py-3.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl font-black text-lg transition-all shadow-sm hover:-translate-y-1 flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-sign-in text-xl"> ابدأ رحلتك معنا
                     </button>
 
                      <!-- خط فاصل ناعم يظهر في الشاشات الكبيرة فقط -->
