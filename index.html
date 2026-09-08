@@ -630,14 +630,16 @@
 
                     <button id="student-dark-btn" onclick="toggleDarkMode()" aria-label="تبديل الوضع الليلي" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="الوضع الليلي"><i class="ph-fill ph-moon"></i></button>
 
-                    <!-- زر الإعدادات للتلميذ -->
-                    <button id="student-settings-btn" onclick="openSettings()" aria-label="فتح الإعدادات" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="إعدادات الحساب"><i class="ph-fill ph-gear-six"></i></button>
+                    <!-- زر الإعدادات أولاً -->
+<button id="student-settings-btn" onclick="openSettings()" aria-label="فتح الإعدادات" class="icon-btn w-12 h-12 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-2xl shadow-sm border border-slate-200 dark:border-slate-600" title="الإعدادات">
+    <i class="ph-fill ph-gear-six"></i>
+</button>
 
-                    <!-- زر الدردشة -->
-                    <button id="student-chat-btn" onclick="openChat('admin')" aria-label="فتح الدردشة" class="relative icon-btn w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl text-2xl hover:from-blue-700 hover:to-indigo-700 transition shadow-md shadow-blue-500/30 flex items-center justify-center" title="مراسلة الأستاذ">
-                        <i class="ph-fill ph-chat-circle-dots"></i>
-                        <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border border-white dark:border-slate-800 shadow-sm hidden animate-bounce">0</span>
-                    </button>
+<!-- زر الدردشة ثانياً -->
+<button id="student-chat-btn" onclick="openChat('admin')" aria-label="فتح الدردشة" class="relative icon-btn w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl text-2xl hover:from-blue-700 hover:to-indigo-700 transition shadow-md shadow-blue-500/30 flex items-center justify-center" title="مراسلة الأستاذ">
+    <i class="ph-fill ph-chat-circle-dots"></i>
+    <span id="student-chat-badge" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border border-white dark:border-slate-800 shadow-sm hidden animate-bounce">0</span>
+</button>
 
                 </div>
             </header>
