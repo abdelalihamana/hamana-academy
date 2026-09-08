@@ -485,29 +485,24 @@ window.toggleAuthMode = () => {
     const switchEl = document.getElementById('switch-mode-text');
     if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
     
+    // جلب الحاويات الجديدة المنظمة
     const loginNameCont = document.getElementById('login-name-container');
     const regNamesCont = document.getElementById('register-names-container');
-    const levelSelect = document.getElementById('user-level'); 
-    const levelIcon = document.getElementById('level-icon');
-    const parentNameCont = document.getElementById('parent-name-container'); 
-    const phoneNumCont = document.getElementById('phone-number-container');
+    const regParentsCont = document.getElementById('register-parents-container');
+    const levelCont = document.getElementById('level-container'); 
     const forgotPassCont = document.getElementById('forgot-password-container');
     
     if(window.isRegistering) {
         if(loginNameCont) loginNameCont.classList.add('hidden');
         if(regNamesCont) { regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex'); }
-        if(levelSelect) levelSelect.classList.remove('hidden'); 
-        if(levelIcon) levelIcon.classList.remove('hidden');
-        if(parentNameCont) parentNameCont.classList.remove('hidden'); 
-        if(phoneNumCont) phoneNumCont.classList.remove('hidden');
+        if(regParentsCont) { regParentsCont.classList.remove('hidden'); regParentsCont.classList.add('flex'); }
+        if(levelCont) levelCont.classList.remove('hidden'); 
         if(forgotPassCont) forgotPassCont.classList.add('hidden');
     } else {
         if(loginNameCont) loginNameCont.classList.remove('hidden');
         if(regNamesCont) { regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex'); }
-        if(levelSelect) levelSelect.classList.add('hidden'); 
-        if(levelIcon) levelIcon.classList.add('hidden');
-        if(parentNameCont) parentNameCont.classList.add('hidden'); 
-        if(phoneNumCont) phoneNumCont.classList.add('hidden');
+        if(regParentsCont) { regParentsCont.classList.add('hidden'); regParentsCont.classList.remove('flex'); }
+        if(levelCont) levelCont.classList.add('hidden'); 
         if(forgotPassCont) forgotPassCont.classList.remove('hidden');
     }
 };
