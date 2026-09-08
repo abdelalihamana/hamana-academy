@@ -2559,3 +2559,54 @@ window.deleteStudentBtn = async (username) => {
         }
     }
 };
+// ==========================================
+// 🧠 نظام الذاكرة الذكية (حفظ مكان المستخدم بعد التحديث)
+// ==========================================
+
+// 1. استرجاع الذاكرة فوراً لتخطي الواجهة الرئيسية
+if(sessionStorage.getItem('adminContentStep')) window.adminContentStep = sessionStorage.getItem('adminContentStep');
+if(sessionStorage.getItem('adminActivePart')) window.adminActivePart = sessionStorage.getItem('adminActivePart');
+if(sessionStorage.getItem('adminActiveYear')) window.adminActiveYear = JSON.parse(sessionStorage.getItem('adminActiveYear'));
+if(sessionStorage.getItem('adminActiveBranch')) window.adminActiveBranch = JSON.parse(sessionStorage.getItem('adminActiveBranch'));
+
+if(sessionStorage.getItem('studentViewMode')) window.studentViewMode = sessionStorage.getItem('studentViewMode');
+if(sessionStorage.getItem('studentActiveBranchTab')) window.studentActiveBranchTab = sessionStorage.getItem('studentActiveBranchTab');
+
+// 2. اعتراض دالة الرسم الأصلية لحفظ المكان مع كل نقرة
+if (typeof window.renderProgramUI === 'function') {
+    const _originalRenderProgramUI = window.renderProgramUI;
+    window.renderProgramUI = (sections, containerId, isAdmin) => {
+        // حفظ المكان قبل الرسم
+        if (isAdmin) {
+            sessionStorage.setItem('adminContentStep', window.adminContentStep || 'parts');
+            if (window.adminActivePart) sessionStorage.setItem('adminActivePart', window.adminActivePart);
+            sessionStorage.setItem('adminActiveYear', JSON.stringify(window.adminActiveYear || {}));
+            sessionStorage.setItem('adminActiveBranch', JSON.stringify(window.adminActiveBranch || {}));
+        } else {
+            sessionStorage.setItem('studentViewMode', window.studentViewMode || 'grid');
+            if (window.studentActiveBranchTab) sessionStorage.setItem('studentActiveBranchTab', window.studentActiveBranchTab);
+        }
+        
+        // تنفيذ الدالة الأصلية
+        _originalRenderProgramUI(sections, containerId, isAdmin);
+    };
+}
+
+// 3. حفظ القسم النشط للأستاذ (هل هو في قسم المحتوى أم قسم التلاميذ؟)
+if (typeof window.openAdminSection === 'function') {
+    const _originalOpenAdminSection = window.openAdminSection;
+    window.openAdminSection = (sectionId) => {
+        sessionStorage.setItem('activeAdminSection', sectionId);
+        _originalOpenAdminSection(sectionId);
+    };
+}
+
+// 4. دالة استرجاع سريعة للقسم النشط بعد تحميل الصفحة
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        let savedSection = sessionStorage.getItem('activeAdminSection');
+        if (savedSection && typeof window.openAdminSection === 'function' && window.currentUserRecord && window.currentUserRecord.role === 'admin') {
+            window.openAdminSection(savedSection);
+        }
+    }, 1500); // ننتظر قليلاً حتى تكتمل المصادقة مع فايربيز
+});
