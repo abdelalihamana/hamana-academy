@@ -329,6 +329,16 @@ const levelNames = {
     "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي"
 };
 
+const gridColors = [
+    'from-red-500 to-rose-600 shadow-red-500/40 text-white',
+    'from-orange-500 to-amber-600 shadow-orange-500/40 text-white',
+    'from-yellow-400 to-yellow-500 shadow-yellow-500/40 text-slate-800', 
+    'from-emerald-400 to-teal-500 shadow-emerald-500/40 text-white',
+    'from-blue-500 to-indigo-600 shadow-blue-500/40 text-white',
+    'from-indigo-500 to-violet-600 shadow-indigo-500/40 text-white',
+    'from-purple-500 to-fuchsia-600 shadow-purple-500/40 text-white'
+];
+
 const getStudentBadge = (xp) => {
     if (xp >= 500) return { name: 'عالم (أينشتاين)', icon: '<i class="ph-fill ph-atom"></i>', cls: 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400 border-purple-200 dark:border-purple-800' };
     if (xp >= 200) return { name: 'باحث', icon: '<i class="ph-fill ph-microscope"></i>', cls: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800' };
@@ -430,6 +440,7 @@ const getBranchImage = (branchId, title) => {
     return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop'; 
 };
 
+
 const getBranchIcon = (title) => {
     if(title.includes('شهادتك') || title.includes('شهادات') || title.includes('تجريبية')) return '<i class="ph-fill ph-certificate"></i>';
     if(title.includes('الكهرباء') || title.includes('كهربائية')) return '<i class="ph-fill ph-lightning"></i>';
@@ -501,49 +512,53 @@ window.openExistingAccount = () => {
 };
 
 window.toggleAuthMode = () => {
-    window.isRegistering = !window.isRegistering;
-    
-    const titleEl = document.getElementById('auth-title');
-    if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
-    
-    const btnEl = document.getElementById('auth-action-btn');
-    if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
-    
-    const switchEl = document.getElementById('switch-mode-text');
-    if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
-    
-    const authScreen = document.getElementById('auth-screen');
-    const loginNameCont = document.getElementById('login-name-container');
-    const regNamesCont = document.getElementById('register-names-container');
-    const regParentPhoneCont = document.getElementById('register-parent-phone-container');
-    const levelSelect = document.getElementById('user-level'); 
-    const levelIcon = document.getElementById('level-icon');
-    const forgotPassCont = document.getElementById('forgot-password-container');
-    
-    if(window.isRegistering) {
-        if(authScreen) {
-            authScreen.classList.remove('max-w-md');
-            authScreen.classList.add('max-w-2xl', 'transition-all', 'duration-500'); 
-        }
-        if(loginNameCont) loginNameCont.classList.add('hidden');
-        if(regNamesCont) { regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex'); }
-        if(regParentPhoneCont) { regParentPhoneCont.classList.remove('hidden'); regParentPhoneCont.classList.add('flex'); }
-        if(levelSelect) levelSelect.classList.remove('hidden'); 
-        if(levelIcon) levelIcon.classList.remove('hidden');
-        if(forgotPassCont) forgotPassCont.classList.add('hidden');
-    } else {
-        if(authScreen) {
-            authScreen.classList.remove('max-w-2xl');
-            authScreen.classList.add('max-w-md');
-        }
-        if(loginNameCont) loginNameCont.classList.remove('hidden');
-        if(regNamesCont) { regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex'); }
-        if(regParentPhoneCont) { regParentPhoneCont.classList.add('hidden'); regParentPhoneCont.classList.remove('flex'); }
-        if(levelSelect) levelSelect.classList.add('hidden'); 
-        if(levelIcon) levelIcon.classList.add('hidden');
-        if(forgotPassCont) forgotPassCont.classList.remove('hidden');
-    }
-};
+            window.isRegistering = !window.isRegistering;
+            
+            const titleEl = document.getElementById('auth-title');
+            if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
+            
+            const btnEl = document.getElementById('auth-action-btn');
+            if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
+            
+            const switchEl = document.getElementById('switch-mode-text');
+            if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
+            
+            const authScreen = document.getElementById('auth-screen');
+            const loginNameCont = document.getElementById('login-name-container');
+            const regNamesCont = document.getElementById('register-names-container');
+            const regParentPhoneCont = document.getElementById('register-parent-phone-container');
+            const levelSelect = document.getElementById('user-level'); 
+            const levelIcon = document.getElementById('level-icon');
+            const forgotPassCont = document.getElementById('forgot-password-container');
+            
+            if(window.isRegistering) {
+                if(authScreen) {
+                    authScreen.classList.remove('max-w-md');
+                    authScreen.classList.add('max-w-2xl', 'transition-all', 'duration-500'); 
+                }
+                
+                if(loginNameCont) loginNameCont.classList.add('hidden');
+                if(regNamesCont) { regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex'); }
+                if(regParentPhoneCont) { regParentPhoneCont.classList.remove('hidden'); regParentPhoneCont.classList.add('flex'); }
+                
+                if(levelSelect) levelSelect.classList.remove('hidden'); 
+                if(levelIcon) levelIcon.classList.remove('hidden');
+                if(forgotPassCont) forgotPassCont.classList.add('hidden');
+            } else {
+                if(authScreen) {
+                    authScreen.classList.remove('max-w-2xl');
+                    authScreen.classList.add('max-w-md');
+                }
+                
+                if(loginNameCont) loginNameCont.classList.remove('hidden');
+                if(regNamesCont) { regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex'); }
+                if(regParentPhoneCont) { regParentPhoneCont.classList.add('hidden'); regParentPhoneCont.classList.remove('flex'); }
+                
+                if(levelSelect) levelSelect.classList.add('hidden'); 
+                if(levelIcon) levelIcon.classList.add('hidden');
+                if(forgotPassCont) forgotPassCont.classList.remove('hidden');
+            }
+        };
 
 window.togglePasswordVisibility = () => {
     const passInput = document.getElementById('password');
@@ -712,6 +727,7 @@ window.handleAuth = async () => {
     const phoneNumber = document.getElementById('phone-number')?.value.trim() || "";
 
     if (!rawName || !password) return showToast("يرجى ملء جميع البيانات المطلوبة", "error");
+    
     if (password.length < 6) return showToast('عذراً، كلمة المرور يجب أن تتكون من 6 "أرقام أو أحرف أو مزيج بينهما" على الأقل', "error");
 
     if (window.isRegistering) {
@@ -796,6 +812,8 @@ window.handleAuth = async () => {
                     await checkAndUpdateStreak(userRef, window.currentUserRecord);
                     document.getElementById('display-username').innerText = username.replace(/_/g, ' ');
                     document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
+                    
+                    // توجيه التلميذ مباشرة للواجهة
                     switchScreen('app-screen');
                     startStudentListeners();
                     if (typeof window.initPomodoro === 'function') {
@@ -826,6 +844,108 @@ window.handleAuth = async () => {
     btn.disabled = false; btn.innerHTML = originalHTML;
 };
 
+const defaultProgramData = [
+    { 
+        id: "part_middle", 
+        title: "التعليم المتوسط", 
+        color: "blue", 
+        years: [
+            { 
+                id: "m_y1", 
+                title: "السنة الأولى متوسط", 
+                branches: [
+                    { id: "m1_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
+                    { id: "m1_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
+                    { id: "m1_b3", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
+                    { id: "m1_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                    { id: "m1_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                    { id: "m1_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
+                ] 
+            },
+            { 
+                id: "m_y2", 
+                title: "السنة الثانية متوسط", 
+                branches: [
+                    { id: "m2_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
+                    { id: "m2_b2", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [] } },
+                    { id: "m2_b3", title: "الظواهر الكهرومغناطيسية", categories: { lessons: [], exercises: [] } },
+                    { id: "m2_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                    { id: "m2_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                    { id: "m2_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
+                ] 
+            },
+            { 
+                id: "m_y3", 
+                title: "السنة الثالثة متوسط", 
+                branches: [
+                    { id: "m3_b1", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
+                    { id: "m3_b2", title: "الطاقة", categories: { lessons: [], exercises: [] } },
+                    { id: "m3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
+                    { id: "m3_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
+                    { id: "m3_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                    { id: "m3_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                    { id: "m3_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
+                ] 
+            },
+            { 
+                id: "m_y4", 
+                title: "السنة الرابعة متوسط", 
+                branches: [
+                    { id: "m4_b1", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
+                    { id: "m4_b2", title: "المادة وتحولاتها", categories: { lessons: [], exercises: [] } },
+                    { id: "m4_b3", title: "الظواهر الميكانيكية", categories: { lessons: [], exercises: [] } },
+                    { id: "m4_b4", title: "الظواهر الضوئية", categories: { lessons: [], exercises: [] } },
+                    { id: "m4_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                    { id: "m4_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                    { id: "m4_s3", title: "الفصل 3", categories: { terms: [], exams: [] } },
+                    { id: "m4_b5", title: "شهادتك 🎓", categories: { past_exams: [], mock_exams: [] } }
+                ] 
+            }
+        ] 
+    },
+    { 
+        id: "part_high", 
+        title: "التعليم الثانوي", 
+        color: "indigo", 
+        years: [
+            { 
+                id: "h_y1", 
+                title: "السنة أولى ثانوي", 
+                branches: [
+                    { id: "h1_b1", title: "بنية وهندسة أفراد بعض الأنواع الكيميائية", categories: { lessons: [], exercises: [] } },
+                    { id: "h1_b2", title: "القوة والحركات المستقيمة", categories: { lessons: [], exercises: [] } },
+                    { id: "h1_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                    { id: "h1_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                    { id: "h1_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
+                ] 
+            },
+            { 
+                id: "h_y2", 
+                title: "السنة الثانية ثانوي", 
+                branches: [
+                    { id: "h2_b1", title: "المقاربة الكيفية لطاقة جملة وانحفاظها", categories: { lessons: [], exercises: [] } },
+                    { id: "h2_b2", title: "العمل والطاقة الحركية", categories: { lessons: [], exercises: [] } },
+                    { id: "h2_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                    { id: "h2_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                    { id: "h2_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
+                ] 
+            },
+            { 
+                id: "h_y3", 
+                title: "السنة الثالثة ثانوي", 
+                branches: [
+                    { id: "h3_b1", title: "تطور جملة كيميائية نحو حالة التوازن", categories: { lessons: [], exercises: [] } },
+                    { id: "h3_b2", title: "التحولات النووية", categories: { lessons: [], exercises: [] } },
+                    { id: "h3_b3", title: "الظواهر الكهربائية", categories: { lessons: [], exercises: [] } },
+                    { id: "h3_s1", title: "الفصل 1", categories: { terms: [], exams: [] } },
+                    { id: "h3_s2", title: "الفصل 2", categories: { terms: [], exams: [] } },
+                    { id: "h3_s3", title: "الفصل 3", categories: { terms: [], exams: [] } }
+                ] 
+            }
+        ] 
+    }
+];
+
 onAuthStateChanged(auth, async (user) => {
     isAuthReady = true;
     if (user) {
@@ -833,6 +953,29 @@ onAuthStateChanged(auth, async (user) => {
             if (user.email === 'admin@almojtahid.com') {
                 const adminDoc = await getDoc(doc(usersCol, 'admin'));
                 if (!adminDoc.exists()) await setDoc(doc(usersCol, 'admin'), { role: 'admin', approved: true, clickedLinks: [] });
+                
+                const oldMainDoc = await getDoc(doc(programCol, 'main'));
+                if (oldMainDoc.exists()) {
+                    let data = oldMainDoc.data();
+                    if(data.sections && data.sections.length >= 2) {
+                        await setDoc(doc(programCol, 'part_middle'), data.sections[0]);
+                        await setDoc(doc(programCol, 'part_high'), data.sections[1]);
+                    }
+                    await setDoc(doc(programCol, 'meta'), {
+                        liveStreamUrl: data.liveStreamUrl || "",
+                        latestUpdates: data.latestUpdates || []
+                    });
+                    await deleteDoc(doc(programCol, 'main')); 
+                } else {
+                    const metaDoc = await getDoc(doc(programCol, 'meta'));
+                    if (!metaDoc.exists()) {
+                        if (typeof defaultProgramData !== 'undefined') {
+                            await setDoc(doc(programCol, 'part_middle'), defaultProgramData[0]);
+                            await setDoc(doc(programCol, 'part_high'), defaultProgramData[1]);
+                        }
+                        await setDoc(doc(programCol, 'meta'), { liveStreamUrl: "", latestUpdates: [] });
+                    }
+                }
             }
 
             if (user.email && !window.currentUserRecord && !window.isRegistering) {
@@ -842,17 +985,20 @@ onAuthStateChanged(auth, async (user) => {
                 
                 if (userSnap.exists()) {
                     let data = userSnap.data();
+                    
+                    // توجيه الأستاذ مباشرة
                     if (data.role === 'admin') {
                         window.currentUserRecord = { username: 'admin', ...data };
                         document.getElementById('two-fa-modal').classList.add('hidden');
                         document.getElementById('two-fa-modal').classList.remove('flex');
                         document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
                         
-                        switchScreen('admin-screen');
+                        switchScreen('admin-screen'); // دخول فوري
                         startAdminListeners();
                         return; 
                     } 
                     
+                    // توجيه التلميذ مباشرة
                     window.currentUserRecord = { username, ...data };
                     if (!window.currentUserRecord.approved) {
                         switchScreen('pending-screen');
@@ -861,15 +1007,22 @@ onAuthStateChanged(auth, async (user) => {
                         await checkAndUpdateStreak(userRef, window.currentUserRecord);
                         document.getElementById('display-username').innerText = username.replace(/_/g, ' ');
                         document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
-                        switchScreen('app-screen');
+                        
+                        switchScreen('app-screen'); // دخول فوري
                         startStudentListeners();
                         if (typeof window.initPomodoro === 'function') {
                             window.initPomodoro();
                         }
                     }
+                } else {
+                    switchScreen('landing-screen');
+                    await signOut(auth);
                 }
             }
-        } catch(e) { console.error("OnAuthState Error:", e); }
+        } catch(e) { 
+            console.error("OnAuthState Error:", e); 
+            switchScreen('landing-screen');
+        }
     } else {
         const currentHash = window.location.hash.substring(1);
         if (currentHash === 'auth-screen') {
@@ -936,6 +1089,7 @@ window.logout = async () => {
     if (typeof closeSettings === 'function') closeSettings();
     if(await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
         
+        // 1. إيقاف جميع مستمعات قاعدة البيانات (Listeners) أولاً لتفادي خطأ الصلاحيات
         if(unsubscribeProgram) { unsubscribeProgram(); unsubscribeProgram = null; }
         if(unsubscribeUsers) { unsubscribeUsers(); unsubscribeUsers = null; }
         if(unsubscribeStudentData) { unsubscribeStudentData(); unsubscribeStudentData = null; }
@@ -947,10 +1101,12 @@ window.logout = async () => {
         if(pomodoroInterval) clearInterval(pomodoroInterval);
         if (typeof closeChat === 'function') closeChat();
 
+        // 2. الآن نقوم بتسجيل الخروج من فايربيز
         try {
             await signOut(auth);
         } catch(e) { console.error("Logout error", e); }
         
+        // 3. تصفير البيانات المحلية
         window.currentUserRecord = null; 
         window.originalAdminRecord = null;
         if(document.getElementById('password')) document.getElementById('password').value = '';
@@ -966,7 +1122,6 @@ window.logout = async () => {
         document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
     }
 };
-
 window.openSettings = () => {
     document.getElementById('settings-username').value = window.currentUserRecord.username.replace(/_/g, ' ');
     const passInput = document.getElementById('settings-current-password');
@@ -1149,7 +1304,7 @@ window.toggleUserStatus = async (uid, isApproved, phone) => {
     } else {
         let waLink = null;
         if (phone) {
-            let waMessage = encodeURIComponent("السلام عليكم. معكم أكاديمية حمانة للعلوم الفيزيائية نعلمكم أنه تم قبول إبنكم على مستوى المنصة نتمنى له النجاح والتوفيق. لأي إستفسار راسلونا عبر المنصة");
+            let waMessage = encodeURIComponent("السلام عليكم. معكم منصة المجتهد للعلوم الفيزيائية نعلمكم أنه تم قبول إبنكم على مستوى المنصة نتمنى له النجاح والتوفيق. لأي إستفسار راسلونا عبر المنصة");
             waLink = `https://wa.me/213${phone.substring(1)}?text=${waMessage}`;
         }
         let win = null; if(waLink) win = window.open(waLink, '_blank'); 
@@ -1181,6 +1336,64 @@ window.bulkAction = async (action) => {
     showToast(`تم ${actionText} الحسابات المحددة بنجاح 🚀`);
     document.getElementById('select-all-cb').checked = false;
     window.loadAdminPage('init'); 
+};
+
+window.loadLeaderboard = async () => {
+     if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
+     
+     try {
+         const q = query(usersCol, where('level', '==', window.currentUserRecord.level), where('approved', '==', true), limit(50));
+         const snap = await getDocs(q);
+         window.allStudentsProgress = [];
+         snap.forEach(d => {
+              let data = d.data();
+              let currentXp = data.xp || calculateProgressXP(data.level, data, window.currentSections).xp;
+              window.allStudentsProgress.push({ id: d.id, level: data.level, xp: currentXp, approved: data.approved });
+         });
+         renderLeaderboard();
+     } catch(e) { console.error("Error loading leaderboard", e); }
+};
+
+const renderLeaderboard = () => {
+    if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
+    const container = document.getElementById('leaderboard-container');
+    container.innerHTML = '';
+    
+    let levelMates = window.allStudentsProgress.sort((a, b) => b.xp - a.xp).slice(0, 10);
+    
+    if(levelMates.length === 0) { container.innerHTML = `<div class="flex flex-col items-center justify-center p-6 opacity-50"><i class="ph-fill ph-ghost text-5xl mb-2"></i><div class="text-slate-500 dark:text-slate-400 font-bold text-center">لا يوجد منافسون بعد.. كن أنت المتصدر!</div></div>`; return; }
+
+    let html = '<div class="flex flex-col gap-2">';
+    levelMates.forEach((student, index) => {
+        let rank = index + 1; let rankClass = ''; let medal = '';
+        if(rank === 1) { 
+            rankClass = 'rank-1 shadow-sm border border-amber-200 dark:border-amber-800'; 
+            medal = `<span class="text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 rounded-full w-8 h-8 flex items-center justify-center text-sm font-black shadow-inner">1</span>`; 
+        }
+        else if(rank === 2) { 
+            rankClass = 'rank-2 shadow-sm border border-slate-200 dark:border-slate-600'; 
+            medal = `<span class="text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-full w-8 h-8 flex items-center justify-center text-sm font-black shadow-inner">2</span>`; 
+        }
+        else if(rank === 3) { 
+            rankClass = 'rank-3 shadow-sm border border-orange-200 dark:border-orange-800'; 
+            medal = `<span class="text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/50 rounded-full w-8 h-8 flex items-center justify-center text-sm font-black shadow-inner">3</span>`; 
+        }
+        else { 
+            rankClass = 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700'; 
+            medal = `<span class="text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 rounded-full w-7 h-7 flex items-center justify-center text-xs font-black">${rank}</span>`; 
+        }
+        let isMe = student.id === window.currentUserRecord.username;
+        let displayName = student.id.replace(/_/g, ' ');
+        html += `
+            <div class="leaderboard-row flex items-center justify-between p-3 rounded-2xl ${rankClass} ${isMe ? 'ring-2 ring-blue-500 shadow-md scale-[1.02] z-10' : ''}">
+                <div class="flex items-center gap-3">
+                    <div class="text-2xl w-6 flex justify-center">${medal}</div>
+                    <div class="text-slate-700 dark:text-slate-200 font-bold text-sm ${isMe ? 'text-blue-700 dark:text-blue-400 font-black' : ''}">${isMe ? 'أنت (بطل المنصة)' : displayName}</div>
+                </div>
+                <div class="bg-gradient-to-r from-emerald-400 to-teal-500 text-white px-3 py-1 rounded-lg text-xs font-black shadow-inner flex items-center gap-1">${student.xp} XP</div>
+            </div>`;
+    });
+    html += '</div>'; container.innerHTML = html;
 };
 
 const renderAdminTable = () => {
@@ -1217,22 +1430,22 @@ const renderAdminTable = () => {
         let prog = calculateProgressXP(data.level, data, window.currentSections);
         let displayName = d.id.replace(/_/g, ' ');
         
-        let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${displayName}. نعلمكم من أكاديمية حمانة للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
+        let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${displayName}. نعلمكم من منصة المجتهد للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
         let waProgLink = data.phoneNumber ? `https://wa.me/213${data.phoneNumber.substring(1)}?text=${waProgMsg}` : '#';
 
         let parentInfo = data.parentName ? 
-            `<div class="flex items-center flex-wrap gap-2 mt-1">
+            `<div class="flex items-center flex-wrap gap-2">
                 <span class="font-black text-slate-800 dark:text-slate-200">${data.parentName}</span>
                 ${data.phoneNumber ? `<a href="${waProgLink}" target="_blank" class="text-[#25D366] hover:text-[#128C7E] transition hover:scale-110" title="إعلام بالتقدم عبر الواتساب"><i class="ph-fill ph-whatsapp-logo text-2xl drop-shadow-sm"></i></a>` : ''}
                 ${data.passwordResetRequest ? `<button onclick="resolvePasswordReset('${d.id}')" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded-lg text-xs font-black animate-pulse border border-red-200 dark:border-red-800 flex items-center gap-1 hover:bg-red-100 transition-colors" title="التلميذ يطلب كلمة المرور"><i class="ph-bold ph-key"></i> إظهار الكلمة</button>` : ''}
             </div>` 
-            : '<div class="text-sm text-slate-400 dark:text-slate-500 font-bold mt-1">غير متوفر</div>';
+            : '<div class="text-sm text-slate-400 dark:text-slate-500 font-bold">غير متوفر</div>';
 
         let unreadCount = window.adminChatsData[d.id]?.unreadAdmin || 0;
-        let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full animate-bounce shadow-md border border-white dark:border-slate-800">${unreadCount}</span>` : '';
+        let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full animate-bounce shadow-md border border-white">${unreadCount}</span>` : '';
 
         let statusBtn = data.approved 
-            ? `<button onclick="toggleUserStatus('${d.id}', true, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:scale-105 transition" title="انقر لإلغاء التفعيل">مفعل ✅</button>`
+            ? `<button onclick="toggleUserStatus('${d.id}', true, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:scale-105 transition" title="انقر لإلغاء التفعيل">م مفعل ✅</button>`
             : `<button onclick="toggleUserStatus('${d.id}', false, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:scale-105 transition" title="اضغط للتفعيل ومراسلة الولي">انتظار ⏳</button>`;
 
         let passDisplay = data.password ? data.password : "مفقودة ⚠";
@@ -1590,6 +1803,168 @@ const startStudentListeners = () => {
     });
 };
 
+window.openChat = async (targetUser) => {
+    try {
+        window.activeChatUser = targetUser; 
+        let displayTarget = window.currentUserRecord.role === 'admin' ? targetUser.replace(/_/g, ' ') : "الأستاذ";
+        document.getElementById('chat-target-name').innerText = displayTarget;
+        
+        // الفتح الفوري للنافذة لإعطاء استجابة بصرية سريعة
+        const modal = document.getElementById('chat-modal');
+        modal.classList.remove('hidden'); 
+        modal.classList.add('flex');
+        
+        const msgBox = document.getElementById('chat-messages');
+        msgBox.innerHTML = '<div class="h-full flex flex-col items-center justify-center opacity-50"><i class="ph-bold ph-spinner animate-spin text-4xl text-blue-500 mb-3"></i><div class="text-sm font-bold">جاري تحميل الرسائل...</div></div>';
+        
+        let chatRoomId = window.currentUserRecord.role === 'admin' ? targetUser : window.currentUserRecord.username;
+        let messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
+        
+        // تصفير العداد قبل جلب الرسائل لتفادي التعليق
+        const chatDocRef = doc(db, chatsPath, chatRoomId);
+        await setDoc(chatDocRef, { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
+
+        if(unsubscribeChat) unsubscribeChat();
+        
+        const q = query(messagesRef, orderBy("timestamp", "asc"), limit(100));
+        
+        unsubscribeChat = onSnapshot(q, (snapshot) => {
+            let msgs = []; snapshot.forEach(d => msgs.push({ id: d.id, ...d.data() }));
+            
+            let chatHtml = '';
+            msgs.forEach(m => {
+                let isMine = m.sender === window.currentUserRecord.role; let isAdminMsg = m.sender === 'admin';
+                let bubbleClass = isMine ? 'chat-mine dark:bg-blue-900/30 dark:border-blue-800' : 'chat-other dark:bg-slate-800 dark:border-slate-700';
+                let alignment = isMine ? 'self-end' : 'self-start';
+                let textColor = isAdminMsg && !isMine ? 'text-red-600 dark:text-red-400 font-bold' : 'text-slate-700 dark:text-slate-200';
+                
+                if (m.isSystemMessage) {
+                    bubbleClass = 'bg-amber-100 dark:bg-amber-900/40 border-amber-300 dark:border-amber-700 border-2 w-full max-w-[95%] text-center mx-auto shadow-md';
+                    alignment = 'self-center';
+                    textColor = 'text-amber-900 dark:text-amber-400 font-black';
+                }
+
+                chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md"><p class="text-[14px] whitespace-pre-wrap break-words ${textColor}" dir="auto">${escapeHtml(m.text)}</p></div>`;
+            });
+            
+            msgBox.innerHTML = chatHtml || `<div class="h-full flex flex-col items-center justify-center opacity-50"><i class="ph-fill ph-hand-waving text-6xl text-slate-400 mb-3"></i><div class="text-center text-slate-500 font-bold bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-sm">أهلاً بك! يمكنك المراسلة هنا.</div></div>`;
+            msgBox.scrollTop = msgBox.scrollHeight;
+            if (window.activeChatUser) setDoc(doc(db, chatsPath, chatRoomId), { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
+        }, e => { 
+            console.error("Chat Error", e); 
+            msgBox.innerHTML = `<div class="text-center text-red-500 font-bold mt-10">حدث خطأ في تحميل الرسائل</div>`;
+        });
+    } catch(err) {
+        console.error("Open chat error", err);
+        showToast("حدث خطأ أثناء فتح الدردشة", "error");
+    }
+};
+
+window.closeChat = () => { document.getElementById('chat-modal').classList.add('hidden'); document.getElementById('chat-modal').classList.remove('flex'); if(unsubscribeChat) unsubscribeChat(); window.activeChatUser = null; };
+
+window.sendChatMessage = async () => {
+    let inputEl = document.getElementById('chat-input'); let text = inputEl.value.trim();
+    if(!text) return; 
+    
+    let btn = document.getElementById('send-msg-btn'); const origHtml = btn.innerHTML;
+    btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i>';
+
+    try {
+        let chatRoomId = window.currentUserRecord.role === 'admin' ? window.activeChatUser : window.currentUserRecord.username;
+        let chatDocRef = doc(db, chatsPath, chatRoomId); let messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
+        await setDoc(doc(messagesRef, Date.now().toString()), { sender: window.currentUserRecord.role, text: text, timestamp: Date.now() });
+        await setDoc(chatDocRef, { [window.currentUserRecord.role === 'admin' ? 'unreadStudent' : 'unreadAdmin']: increment(1) }, { merge: true });
+        inputEl.value = ''; setTimeout(() => { const msgBox = document.getElementById('chat-messages'); msgBox.scrollTop = msgBox.scrollHeight; }, 100);
+    } catch(e) { console.error(e); showToast("فشل الإرسال. تأكد من اتصالك بالإنترنت", "error"); }
+    btn.disabled = false; btn.innerHTML = origHtml;
+};
+
+window.markStudentNotificationsAsRead = () => {
+    // 🛑 تم إفراغ هذه الدالة القديمة لكي لا تختفي جميع الإشعارات معاً 🛑
+};
+
+window.goToUpdate = (branchTitle, updateId, updateTitle) => {
+    if (window.currentUserRecord) {
+        let hiddenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+        if (!hiddenUpdates.includes(updateId)) {
+            hiddenUpdates.push(updateId);
+            localStorage.setItem(`seen_updates_${window.currentUserRecord.username}`, JSON.stringify(hiddenUpdates));
+        }
+    }
+
+    window.highlightedLessonTitle = updateTitle;
+
+    let targetBranchId = null;
+    if (window.currentSections) {
+        window.currentSections.forEach(p => p.years.forEach(y => {
+            if(y.id === window.currentUserRecord.level) {
+                y.branches.forEach(b => {
+                    if (b.title === branchTitle) targetBranchId = b.id;
+                });
+            }
+        }));
+    }
+
+    if (targetBranchId) {
+        window.studentActiveBranchTab = targetBranchId; 
+        window.studentViewMode = 'details'; 
+        window.renderProgramUI(window.currentSections, 'student-program-view', false);
+        
+        let metaUpdates = window.currentUpdates || [];
+        let myUpdates = metaUpdates.filter(u => u.level === window.currentUserRecord.level);
+        let hidden = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+        window.renderStudentNotifications(myUpdates, hidden);
+        
+        setTimeout(() => {
+            const targetView = document.getElementById('student-program-view');
+            if(targetView) targetView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
+    }
+};
+
+window.renderStudentNotifications = (myUpdates, hiddenUpdates) => {
+    let notifHtml = '';
+    
+    let visibleUpdates = myUpdates.filter(u => !hiddenUpdates.includes(u.id));
+    let sortedUpdates = [...visibleUpdates].sort((a, b) => b.timestamp - a.timestamp);
+
+    sortedUpdates.forEach(update => {
+        notifHtml += `
+            <button id="notif-${update.id}" onclick="goToUpdate('${escapeHtml(update.branch)}', '${update.id}', '${escapeHtml(update.title).replace(/'/g, "\\'")}')" class="w-full text-right flex items-start gap-3 p-3 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 transition shadow-sm hover:shadow-md hover:scale-[1.02] mb-2 last:mb-0">
+                <div class="notif-icon w-8 h-8 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center flex-shrink-0 shadow-sm text-blue-600 dark:text-blue-400 animate-pulse">
+                    <i class="ph-bold ph-bell-ringing"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-black text-sm text-slate-800 dark:text-white leading-tight mb-1">${update.title}</div>
+                    <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400">في وحدة: ${update.branch}</div>
+                </div>
+                <div class="self-center flex-shrink-0 bg-blue-100 dark:bg-blue-900/50 rounded-lg px-2 py-1">
+                    <span class="text-[10px] font-black text-blue-600 dark:text-blue-400">تصفح <i class="ph-bold ph-arrow-left"></i></span>
+                </div>
+            </button>`;
+    });
+
+    const badge = document.getElementById('student-global-badge');
+    const container = document.getElementById('student-notifications-container');
+
+    if (badge) {
+        if (sortedUpdates.length > 0) {
+            badge.innerText = sortedUpdates.length > 9 ? '9+' : sortedUpdates.length;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
+
+    if (container) {
+        if (sortedUpdates.length > 0) {
+            container.innerHTML = notifHtml;
+        } else {
+            container.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-6 opacity-70"><i class="ph-fill ph-bell-slash text-5xl mb-3"></i><br>لا توجد دروس أو إشعارات جديدة</div>';
+        }
+    }
+};
+
 const calculateProgressXP = (levelId, data, sections) => {
     if(!sections || !levelId) return { xp: 0, percent: 0 };
     let xp = 0; let totalLinks = 0; let clickedLinks = data.clickedLinks || [];
@@ -1815,20 +2190,33 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
     if (isAdmin) {
         if (!window.adminContentStep) window.adminContentStep = 'parts';
 
-        // --- 1. رأس الواجهة للأستاذ ---
+        // --- إصلاح زر العودة للأستاذ في إدارة المحتوى ---
         html += `<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">`;
+        
         if (window.adminContentStep === 'details') {
-            html += `<button onclick="window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للوحدات</button>`;
             let part = sections.find(p => p.id === window.adminActivePart);
             let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
             let branch = year.branches.find(b => b.id === window.adminActiveBranch[year.id]);
-            html += `<div class="text-left"><h3 class="text-2xl font-black text-blue-600 dark:text-blue-400 flex items-center justify-end gap-2">${getBranchIcon(branch.title)} ${branch.title}</h3><p class="text-sm font-bold text-slate-500 mt-1">${part.title} - ${year.title}</p></div>`;
-        } else {
+            html += `<button onclick="window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للوحدات</button>`;
+            html += `<div class="text-left"><h3 class="text-2xl font-black text-blue-600 dark:text-blue-400 flex items-center justify-end gap-2">${typeof getBranchIcon === 'function' ? getBranchIcon(branch.title) : '<i class="ph-fill ph-folder"></i>'} ${branch.title}</h3><p class="text-sm font-bold text-slate-500 mt-1">${part.title} - ${year.title}</p></div>`;
+        } 
+        else if (window.adminContentStep === 'branches') {
+            let part = sections.find(p => p.id === window.adminActivePart);
+            let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
+            html += `<button onclick="window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للسنوات</button>`;
+            html += `<div class="text-left"><h3 class="text-2xl font-black text-blue-600 dark:text-blue-400 flex items-center justify-end gap-2"><i class="ph-fill ph-calendar-blank"></i> ${year.title}</h3><p class="text-sm font-bold text-slate-500 mt-1">${part.title}</p></div>`;
+        } 
+        else if (window.adminContentStep === 'years') {
+            let part = sections.find(p => p.id === window.adminActivePart);
+            html += `<button onclick="window.adminContentStep='parts'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للأطوار</button>`;
+            html += `<div class="text-left"><h3 class="text-2xl font-black text-blue-600 dark:text-blue-400 flex items-center justify-end gap-2"><i class="ph-fill ph-folders"></i> ${part.title}</h3></div>`;
+        } 
+        else {
              html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3"><i class="ph-fill ph-folders text-blue-500"></i> إدارة المحتوى والدروس</h3>`;
         }
         html += `</div>`;
+        // -------------------------------------------------------------
 
-        // --- 2. محتوى البطاقات السينمائية ---
         const getAdminBg = (id, title) => {
             if(id === 'part_middle') return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
             if(id === 'part_high') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
@@ -1860,11 +2248,11 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
             return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop'; 
         };
 
-       if (window.adminContentStep === 'parts') {
+        if (window.adminContentStep === 'parts') {
             html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[fadeInTab_0.3s_ease]">`;
             sections.forEach((part) => {
                 let icon = part.id === 'part_middle' ? '<i class="ph-fill ph-student"></i>' : '<i class="ph-fill ph-graduation-cap"></i>';
-                let bgImage = getAdminBg(part.id, part.title);
+                let bgImage = typeof getAdminBg === 'function' ? getAdminBg(part.id, part.title) : 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
                 html += `<button onclick="window.adminActivePart='${part.id}'; window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-8 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[220px] flex flex-col items-center justify-center text-center">
                     <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
                     <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
@@ -1880,7 +2268,7 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
             let part = sections.find(p => p.id === window.adminActivePart);
             html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-[fadeInTab_0.3s_ease]">`;
             part.years.forEach((year) => {
-                let bgImage = getAdminBg(year.id, year.title);
+                let bgImage = typeof getAdminBg === 'function' ? getAdminBg(year.id, year.title) : 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop';
                 html += `<button onclick="window.adminActiveYear['${part.id}']='${year.id}'; window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[180px] flex flex-col items-center justify-center text-center">
                     <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
                     <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
@@ -1897,12 +2285,12 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
             let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
             html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInTab_0.3s_ease]">`;
             year.branches.forEach((branch) => {
-                let bgImage = getAdminBg(branch.id, branch.title);
+                let bgImage = typeof getAdminBg === 'function' ? getAdminBg(branch.id, branch.title) : 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop';
                 html += `<button onclick="window.adminActiveBranch['${year.id}']='${branch.id}'; window.adminContentStep='details'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[200px] flex flex-col items-center justify-center text-center">
                     <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
                     <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
                     <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full">
-                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${getBranchIcon(branch.title)}</div>
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${typeof getBranchIcon === 'function' ? getBranchIcon(branch.title) : '<i class="ph-fill ph-folder"></i>'}</div>
                         <h3 class="text-xl font-black text-white drop-shadow-md leading-snug">${branch.title}</h3>
                     </div>
                 </button>`;
@@ -1949,7 +2337,6 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
         }
 
     } else {
-        // --- 3. واجهة التلميذ ---
         let clickedLinks = window.currentUserRecord ? (window.currentUserRecord.clickedLinks || []) : [];
         let userLevel = window.currentUserRecord ? window.currentUserRecord.level : null;
 
@@ -1964,6 +2351,7 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                     html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInTab_0.3s_ease]">`;
                     
                     userYearData.branches.forEach((branch, idx) => {
+                        let color = gridColors[idx % 7];
                         let branchLinksTotal = 0; let branchLinksClicked = 0;
                         let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : (branch.id.includes('_s') ? ['terms', 'exams'] : ['lessons', 'exercises']);
                         cats.forEach(cat => {
@@ -1974,17 +2362,22 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                         
                             html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="relative p-6 md:p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center justify-center gap-4 text-center overflow-hidden group min-h-[220px] border border-white/10">
                             
+                            <!-- صورة الخلفية مع تأثير التقريب -->
                             <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${getBranchImage(branch.id, branch.title)}');"></div>
+
+                            <!-- الطبقة الزجاجية المظلمة (السر لبروز النص) -->
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-900/30 z-0 group-hover:via-slate-900/70 transition-colors duration-500"></div>
 
                             ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 z-20 bg-emerald-500/80 backdrop-blur-md rounded-full w-8 h-8 flex items-center justify-center shadow-lg border border-emerald-300/50"><i class="ph-bold ph-check text-white text-lg"></i></div>' : ''}
                             
+                            <!-- محتوى البطاقة (الأيقونة والنص) -->
                             <div class="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:-translate-y-2 transition-transform duration-500 relative z-10 text-white">
                                 ${getBranchIcon(branch.title)}
                             </div>
                             
                             <h3 class="text-2xl font-black drop-shadow-md leading-tight text-white relative z-10 transition-transform duration-500 group-hover:-translate-y-1">${branch.title}</h3>
                             
+                            <!-- شريط التقدم -->
                             <div class="w-full mt-auto pt-4 text-white relative z-10 opacity-90 group-hover:opacity-100 transition-opacity">
                                 <div class="flex justify-between text-xs font-black mb-2 px-1 text-slate-200"><span>التقدم</span><span>${unitProg}%</span></div>
                                 <div class="w-full bg-slate-900/80 rounded-full h-2.5 shadow-inner overflow-hidden border border-white/10">
@@ -2047,6 +2440,7 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                                 let linkId = `${branch.id}_${cat}_${lIdx}`; 
                                 let isRead = clickedLinks.includes(linkId);
 
+                                // تمييز الدرس القادم من الإشعار
                                 let isHighlighted = window.highlightedLessonTitle && lnk.title.trim() === window.highlightedLessonTitle.trim();
                                 let btnClass = isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm bg-emerald-50/20' : 'border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-md hover:border-blue-300';
                                 
