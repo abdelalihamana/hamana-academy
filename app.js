@@ -2180,21 +2180,88 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
 
         html += `<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">`;
         
+                // دالة مساعدة سريعة لجلب صور الخلفيات لبطاقات الإدارة
+        const getAdminBg = (id, title) => {
+            if(id === 'part_middle') return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
+            if(id === 'part_high') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
+            if(id === 'm1_b1') return 'https://images.unsplash.com/photo-1493612276216-ee3925520721?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm1_b2') return 'https://images.unsplash.com/photo-1544473244-f6895e69ad8b?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm1_b3') return 'https://images.unsplash.com/photo-1501166222995-bb3b2fa7aca8?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm2_b1') return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm2_b2') return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm2_b3') return 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm3_b1') return 'https://images.unsplash.com/photo-1603126859544-0b73df780b6d?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm3_b2') return 'https://images.unsplash.com/photo-1473649085228-583485e6e4d7?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm3_b3') return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm3_b4') return 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b1') return 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b2') return 'https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b3') return 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b4') return 'https://images.unsplash.com/photo-1478144596228-51829eebc3f8?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b5') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h1_b1') return 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h1_b2') return 'https://images.unsplash.com/photo-1537495329792-41ae41ad3bf0?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h2_b1') return 'https://images.unsplash.com/photo-1528642474498-1af0c17fd8c3?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h2_b2') return 'https://images.unsplash.com/photo-1518861961448-7098e9fc7eec?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h3_b1') return 'https://images.unsplash.com/photo-1579389083078-4e7018379f7e?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h3_b2') return 'https://images.unsplash.com/photo-1536697246787-1f7ae568d89a?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h3_b3') return 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=1000&auto=format&fit=crop'; 
+            if(title && title.includes('متوسط')) return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
+            if(title && title.includes('ثانوي')) return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
+            if(title && title.includes('الفصل')) return 'https://images.unsplash.com/photo-1455734729978-db1ae3368e1f?q=80&w=1000&auto=format&fit=crop';
+            return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop'; 
+        };
+
         if (window.adminContentStep === 'parts') {
-            html += `<button onclick="returnToAdminDashboard()" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للوحة الرئيسية</button>`;
-            html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-2"><div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="ph-fill ph-books"></i></div> اختيار الطور التعليمي</h3>`;
+            html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[fadeInTab_0.3s_ease]">`;
+            sections.forEach((part) => {
+                let icon = part.id === 'part_middle' ? '<i class="ph-fill ph-student"></i>' : '<i class="ph-fill ph-graduation-cap"></i>';
+                let bgImage = getAdminBg(part.id, part.title);
+                html += `<button onclick="window.adminActivePart='${part.id}'; window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-8 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[220px] flex flex-col items-center justify-center text-center">
+                    <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
+                    <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full">
+                        <div class="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${icon}</div>
+                        <h3 class="text-3xl font-black text-white drop-shadow-md tracking-tight">${part.title}</h3>
+                    </div>
+                </button>`;
+            });
+            html += `</div>`;
         }
         else if (window.adminContentStep === 'years') {
-            html += `<button onclick="window.adminContentStep='parts'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للأطوار</button>`;
             let part = sections.find(p => p.id === window.adminActivePart);
-            html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white">إدارة سنوات: ${part.title}</h3>`;
+            html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-[fadeInTab_0.3s_ease]">`;
+            part.years.forEach((year) => {
+                let bgImage = getAdminBg(year.id, year.title);
+                html += `<button onclick="window.adminActiveYear['${part.id}']='${year.id}'; window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[180px] flex flex-col items-center justify-center text-center">
+                    <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
+                    <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center gap-3 w-full">
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500"><i class="ph-fill ph-calendar-blank"></i></div>
+                        <h3 class="text-2xl font-black text-white drop-shadow-md">${year.title}</h3>
+                    </div>
+                </button>`;
+            });
+            html += `</div>`;
         }
         else if (window.adminContentStep === 'branches') {
-            html += `<button onclick="window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للسنوات</button>`;
             let part = sections.find(p => p.id === window.adminActivePart);
             let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
-            html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white">إدارة وحدات: ${year.title}</h3>`;
+            html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInTab_0.3s_ease]">`;
+            year.branches.forEach((branch) => {
+                let bgImage = getAdminBg(branch.id, branch.title);
+                html += `<button onclick="window.adminActiveBranch['${year.id}']='${branch.id}'; window.adminContentStep='details'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[200px] flex flex-col items-center justify-center text-center">
+                    <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
+                    <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full">
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${getBranchIcon(branch.title)}</div>
+                        <h3 class="text-xl font-black text-white drop-shadow-md leading-snug">${branch.title}</h3>
+                    </div>
+                </button>`;
+            });
+            html += `</div>`;
         }
+
         else if (window.adminContentStep === 'details') {
             html += `<button onclick="window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للوحدات</button>`;
             let part = sections.find(p => p.id === window.adminActivePart);
