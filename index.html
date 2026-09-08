@@ -281,8 +281,8 @@
                 <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-16 w-full max-w-4xl mx-auto px-4 relative z-20">
                     
                     <!-- زر ابدأ رحلتك (اللون البنفسجي) - مع الإصلاح القاطع لشاشة الدخول -->
-                    <button onclick="document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('auth-screen').classList.add('active'); if(typeof window.isRegistering !== 'undefined' && !window.isRegistering) window.toggleAuthMode();" class="w-full md:w-auto flex-1 px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-fuchsia-600 hover:from-indigo-700 hover:via-purple-700 hover:to-fuchsia-700 text-white rounded-2xl font-black text-lg transition-all duration-300 shadow-xl shadow-purple-500/30 hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2 border border-white/10">
-                        <i class="ph-bold ph-rocket-launch text-2xl"></i> ابدأ رحلتك معنا
+                    <button onclick="startNewJourney()" class="flex-1 sm:flex-none min-w-[220px] px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-fuchsia-600 hover:from-indigo-700 hover:via-purple-700 hover:to-fuchsia-700 text-white rounded-2xl font-black text-lg transition-all duration-300 shadow-xl shadow-purple-500/30 hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2 border border-white/10">
+                    <i class="ph-bold ph-rocket-launch text-2xl"></i> ابدأ رحلتك معنا
                     </button>
 
                     <!-- زر فيسبوك (اللون الأزرق) -->
