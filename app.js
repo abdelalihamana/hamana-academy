@@ -1086,9 +1086,9 @@ window.returnToAdmin = () => {
     if(pomodoroInterval) clearInterval(pomodoroInterval);
 
     switchScreen('admin-screen');
-    returnToAdminDashboard();
+    openAdminSection('accounts');
     startAdminListeners();
-    showToast("تمت العودة للوحة الإدارة بنجاح");
+    showToast("تمت العودة لمتابعة التلاميذ بنجاح");
 };
 
 window.logout = async () => {
@@ -2200,7 +2200,8 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
             html += `<div class="text-left"><h3 class="text-2xl font-black text-blue-600 dark:text-blue-400 flex items-center justify-end gap-2"><i class="ph-fill ph-folders"></i> ${part.title}</h3></div>`;
         } 
         else {
-             html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3"><i class="ph-fill ph-folders text-blue-500"></i> إدارة المحتوى والدروس</h3>`;
+             html += `<button onclick="openAdminSection('accounts');" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> العودة للإدارة (متابعة التلاميذ)</button>`;
+             html += `<div class="text-left"><h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center justify-end gap-3"><i class="ph-fill ph-folders text-blue-500"></i> إدارة المحتوى والدروس</h3></div>`;
         }
         html += `</div>`;
 
