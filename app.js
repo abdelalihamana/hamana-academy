@@ -434,11 +434,11 @@ const getBranchImage = (branchId, title) => {
     if(branchId === 'm3_b3') return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'; 
     if(branchId === 'm3_b4') return 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1000&auto=format&fit=crop'; 
    
-    if(branchId === 'm4_b1') return 'https://ibb.co/Qv9CHFcD'; 
-    if(branchId === 'm4_b2') return 'https://ibb.co/d4hTWN5t'; 
-    if(branchId === 'm4_b3') return 'https://ibb.co/wND3Wrxk'; 
-    if(branchId === 'm4_b4') return 'https://ibb.co/whh03w3p'; 
-    if(branchId === 'm4_b5') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop'; 
+    if(branchId === 'm4_b1') return 'https://i.ibb.co/d4BLp0cm/Electric.jpg'; 
+    if(branchId === 'm4_b2') return 'https://i.ibb.co/PGSLm26M/Organic.jpg'; 
+    if(branchId === 'm4_b3') return 'https://i.ibb.co/5Wqt8xf0/Physics.jpg'; 
+    if(branchId === 'm4_b4') return 'https://i.ibb.co/hFF7hZh2/optic.jpg'; 
+    if(branchId === 'm4_b5') return 'https://i.ibb.co/WvFGN9Qw/image.jpg'; 
   
     if(branchId === 'h1_b1') return 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop'; 
     if(branchId === 'h1_b2') return 'https://images.unsplash.com/photo-1537495329792-41ae41ad3bf0?q=80&w=1000&auto=format&fit=crop'; 
