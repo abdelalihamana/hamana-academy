@@ -277,14 +277,12 @@
                         بوابتك الذكية للتفوق. ادمج بين عمق الفهم العلمي ومتعة التعلم التفاعلي عبر أحدث التقنيات التعليمية.
                     </p>
 
-                              <!-- مجموعة الأزرار المدمجة (دخول + تواصل اجتماعي) -->
-                <div class="flex flex-wrap items-center justify-center gap-3 md:gap-4 mb-20 animate-[fadeInTab_0.5s_ease]">
-                    
+                    <!-- مجموعة الأزرار المدمجة (دخول + تواصل اجتماعي) -->
+
                     <!-- زر ابدأ رحلتك -->
-                   <button onclick="document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('auth-screen').classList.add('active'); if(window.isRegistering === true) window.toggleAuthMode();" class="px-6 sm:px-8 py-3.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl font-black text-lg transition-all shadow-sm hover:-translate-y-1 flex items-center justify-center gap-2">
+                    <button onclick="openExistingAccount()" class="px-6 sm:px-8 py-3.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl font-black text-lg transition-all shadow-sm hover:-translate-y-1 flex items-center justify-center gap-2">
                         <i class="ph-bold ph-sign-in text-xl"></i> ابدأ رحلتك معنا
-                    </button> 
-                    
+                    </button>
 
                     <!-- خط فاصل عمودي يظهر فقط في الشاشات الكبيرة لجمالية التصميم -->
                     <div class="hidden lg:block w-0.5 h-10 bg-slate-200 dark:bg-slate-700 mx-1 rounded-full"></div>
