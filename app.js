@@ -37,7 +37,7 @@ window.currentSections = [];
 window.currentUpdates = []; 
 window.currentLiveUrl = "";
 window.currentEditParams = null; 
-window.highlightedLessonTitle = null; 
+window.highlightedLessonTitle = null; // متغير لحفظ اسم الدرس المراد تظليله
 
 // حالات الإدارة والتلميذ
 window.adminContentStep = 'parts'; 
@@ -55,9 +55,8 @@ window.allStudentsProgress = [];
 window.tempAdminCode = null;
 window.tempAdminData = null;
 window.tempAdminUsername = null;
-window.isRegistering = false;
 
-// متغيرات الترحيل والتصفح الخاص بالأدمن
+// متغيرات الترحيل والتصفح الخاص بالأدمن (Pagination)
 window.adminCurrentPage = 1;
 window.adminPageCursors = [];
 window.adminLastVisible = null;
@@ -68,29 +67,6 @@ let pomodoroInterval = null;
 let isPomodoroRunning = false;
 let isStudySession = true; 
 
-// ==========================================
-// التوجيه العام والشاشات
-// ==========================================
-const switchScreen = (screenId) => {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
-};
-
-window.startNewJourney = () => {
-    if (!window.isRegistering) window.toggleAuthMode();
-    switchScreen('auth-screen');
-    window.location.hash = 'auth-screen';
-};
-
-window.openExistingAccount = () => {
-    if (window.isRegistering) window.toggleAuthMode();
-    switchScreen('auth-screen');
-    window.location.hash = 'auth-screen';
-};
-
-// ==========================================
-// مؤقت بومودورو
-// ==========================================
 window.initPomodoro = () => {
     if (!window.currentUserRecord) return;
     const user = window.currentUserRecord.username;
@@ -214,9 +190,6 @@ window.resetPomodoro = () => {
     window.updatePomodoroUI();
 };
 
-// ==========================================
-// مشغلات الفيديو والروابط
-// ==========================================
 window.convertUrlToEmbed = (url) => {
     if (!url) return '';
     let ytRegex = /(?:youtube\.com\/(?:watch\?v=|live\/|shorts\/)|youtu\.be\/)([^&?/]+)/i;
@@ -278,9 +251,6 @@ window.closeEmbedModal = () => {
     document.body.style.overflow = ''; 
 };
 
-// ==========================================
-// البث المباشر
-// ==========================================
 window.updateLiveStreamUI = (url, target = 'all') => {
     const studentBanner = document.getElementById('student-live-banner');
     const adminStatus = document.getElementById('admin-live-status-text');
@@ -333,6 +303,7 @@ window.startLiveStream = async () => {
 };
 
 window.stopLiveStream = async () => {
+    if (!window.currentLiveUrl) return;
     if(await confirmAction("هل أنت متأكد من إنهاء البث وإخفاء الزر عن التلاميذ؟")) {
         try {
             await updateDoc(doc(programCol, 'meta'), { liveStreamUrl: "", liveStreamTarget: "all" });
@@ -355,9 +326,6 @@ window.openLiveStream = () => {
     }
 };
 
-// ==========================================
-// إعدادات مستويات وأوسمة
-// ==========================================
 const levelNames = {
     "m_y1": "الأولى متوسط", "m_y2": "الثانية متوسط", "m_y3": "الثالثة متوسط", "m_y4": "الرابعة متوسط",
     "h_y1": "أولى ثانوي", "h_y2": "الثانية ثانوي", "h_y3": "الثالثة ثانوي"
@@ -418,9 +386,47 @@ const checkAndUpdateStreak = async (userRef, userData) => {
     if (streakEl) streakEl.innerText = currentStreak;
 };
 
-// ==========================================
-// الإشعارات والتحذيرات
-// ==========================================
+window.openAdminSection = (section) => {
+    document.getElementById('admin-dashboard-grid').classList.add('hidden');
+    if (section === 'accounts') {
+        document.getElementById('admin-accounts-section').classList.remove('hidden');
+        document.getElementById('admin-accounts-section').classList.add('flex');
+        window.loadAdminPage('init');
+    } else {
+        document.getElementById('admin-content-section').classList.remove('hidden');
+        document.getElementById('admin-content-section').classList.add('block');
+        window.adminContentStep = 'parts';
+        window.renderProgramUI(window.currentSections, 'admin-program-view', true);
+    }
+};
+
+window.returnToAdminDashboard = () => {
+    document.getElementById('admin-accounts-section').classList.add('hidden');
+    document.getElementById('admin-accounts-section').classList.remove('flex');
+    document.getElementById('admin-content-section').classList.add('hidden');
+    document.getElementById('admin-content-section').classList.remove('block');
+    document.getElementById('admin-dashboard-grid').classList.remove('hidden');
+    window.adminContentStep = 'parts';
+};
+
+window.toggleDarkMode = () => {
+    document.documentElement.classList.toggle('dark');
+    const isDark = document.documentElement.classList.contains('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+};
+
+const getBranchIcon = (title) => {
+    if(title.includes('شهادتك') || title.includes('شهادات') || title.includes('تجريبية')) return '<i class="ph-fill ph-certificate"></i>';
+    if(title.includes('الكهرباء') || title.includes('كهربائية')) return '<i class="ph-fill ph-lightning"></i>';
+    if(title.includes('المادة') || title.includes('كيمياء') || title.includes('تحولات')) return '<i class="ph-fill ph-flask"></i>';
+    if(title.includes('ميكانيك') || title.includes('حركة')) return '<i class="ph-fill ph-gear-six"></i>';
+    if(title.includes('ضوء') || title.includes('بصريات') || title.includes('الضوئية')) return '<i class="ph-fill ph-lightbulb"></i>';
+    if(title.includes('طاقة') || title.includes('عمل')) return '<i class="ph-fill ph-battery-full"></i>';
+    if(title.includes('مغناطيس') || title.includes('كهرومغناطيسية')) return '<i class="ph-fill ph-magnet"></i>';
+    if(title.includes('الفصل')) return '<i class="ph-fill ph-folder-open"></i>';
+    return '<i class="ph-fill ph-book-bookmark"></i>'; 
+};
+
 window.showToast = (msg, type = 'success') => {
     const toast = document.createElement('div');
     const icon = type === 'error' ? '<i class="ph-fill ph-warning-circle text-2xl"></i>' : '<i class="ph-fill ph-check-circle text-2xl"></i>';
@@ -464,15 +470,21 @@ window.closeRegModal = () => {
     window.toggleAuthMode();
 };
 
-window.toggleDarkMode = () => {
-    document.documentElement.classList.toggle('dark');
-    const isDark = document.documentElement.classList.contains('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+const switchScreen = (screenId) => {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
 };
 
-// ==========================================
-// مصادقة الدخول والتسجيل
-// ==========================================
+window.startNewJourney = () => {
+    if (!window.isRegistering) window.toggleAuthMode();
+    switchScreen('auth-screen');
+};
+
+window.openExistingAccount = () => {
+    if (window.isRegistering) window.toggleAuthMode();
+    switchScreen('auth-screen');
+};
+
 window.toggleAuthMode = () => {
     window.isRegistering = !window.isRegistering;
     
@@ -509,6 +521,26 @@ window.toggleAuthMode = () => {
         if(parentNameCont) parentNameCont.classList.add('hidden'); 
         if(phoneNumCont) phoneNumCont.classList.add('hidden');
         if(forgotPassCont) forgotPassCont.classList.remove('hidden');
+    }
+};
+
+// --- دالة إظهار وإخفاء كلمة المرور ---
+window.togglePasswordVisibility = () => {
+    const passInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('password-toggle-icon');
+    
+    if (passInput && toggleIcon) {
+        if (passInput.type === 'password') {
+            passInput.type = 'text';
+            toggleIcon.classList.remove('ph-eye-slash');
+            toggleIcon.classList.add('ph-eye');
+            toggleIcon.classList.add('text-blue-500');
+        } else {
+            passInput.type = 'password';
+            toggleIcon.classList.remove('ph-eye');
+            toggleIcon.classList.add('ph-eye-slash');
+            toggleIcon.classList.remove('text-blue-500');
+        }
     }
 };
 
@@ -570,11 +602,9 @@ window.verifyAdminCode = async () => {
 
 window.requestPasswordReset = async () => {
     const usernameInput = document.getElementById('login-username').value.trim();
-    
     if (!usernameInput) return showToast("يرجى كتابة الاسم واللقب أولاً في حقل الدخول لطلب استرجاع كلمة المرور", "error");
 
     const username = usernameInput.replace(/\s+/g, '_').toLowerCase(); 
-
     if (username === 'admin') return showToast("عذراً، لا يمكن إرسال طلب لحساب الإدارة", "error");
 
     if(!await confirmAction(`هل أنت متأكد أنك تريد إرسال طلب استرجاع كلمة مرور لحساب "${usernameInput}" للأستاذ؟`)) return;
@@ -632,33 +662,27 @@ window.resolvePasswordReset = async (username) => {
 window.handleAuth = async () => {
     if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
     
-    let username = "";
-    let pseudoEmail = "";
+    let rawName = "";
     
     if (window.isRegistering) {
         const fNameEl = document.getElementById('reg-firstname');
         const lNameEl = document.getElementById('reg-lastname');
-        if(!fNameEl || !lNameEl) return showToast("حدث خطأ في الواجهة، يرجى تحديث الصفحة", "error");
+        if(!fNameEl || !lNameEl) return showToast("حدث خطأ في الواجهة", "error");
         
         const fName = fNameEl.value.trim();
         const lName = lNameEl.value.trim();
         
         if (fName && lName) {
-            username = `${fName} ${lName}`.replace(/\s+/g, ' ').toLowerCase();
+            rawName = `${fName} ${lName}`.toLowerCase();
         } else {
             return showToast("يرجى كتابة الاسم واللقب", "error");
         }
     } else {
         const loginUserEl = document.getElementById('login-username');
-        if(!loginUserEl) {
-            const oldUserEl = document.getElementById('username');
-            if(oldUserEl) {
-                username = oldUserEl.value.trim().replace(/\s+/g, ' ').toLowerCase();
-            } else {
-                return showToast("حدث خطأ في الواجهة، يرجى تحديث الصفحة", "error");
-            }
+        if(loginUserEl) {
+            rawName = loginUserEl.value.trim().toLowerCase();
         } else {
-            username = loginUserEl.value.trim().replace(/\s+/g, ' ').toLowerCase();
+            return showToast("حدث خطأ في الواجهة", "error");
         }
     }
 
@@ -667,22 +691,24 @@ window.handleAuth = async () => {
     const parentName = document.getElementById('parent-name')?.value.trim() || "";
     const phoneNumber = document.getElementById('phone-number')?.value.trim() || "";
 
-    if (!username || !password) return showToast("يرجى ملء جميع البيانات المطلوبة", "error");
-    if (password.length < 6) return showToast("عذراً، كلمة المرور يجب أن تتكون من 6 خانات على الأقل", "error");
+    if (!rawName || !password) return showToast("يرجى ملء جميع البيانات المطلوبة", "error");
     
+    // تم إصلاح الخطأ البرمجي هنا باستخدام علامات التنصيص المفردة
+    if (password.length < 6) return showToast('عذراً، كلمة المرور يجب أن تتكون من 6 "أرقام أو أحرف أو مزيج بينهما" على الأقل', "error");
+
     if (window.isRegistering) {
         if (!level || !parentName || !phoneNumber) return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
         const phoneRegex = /^(05|06|07)\d{8}$/;
-        if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح! يجب أن يتكون من 10 أرقام", "error");
+        if(!phoneRegex.test(phoneNumber)) return showToast("رقم الهاتف غير صحيح", "error");
     }
 
     const btn = document.getElementById('auth-action-btn');
     const originalHTML = btn.innerHTML;
     btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-2xl"></i> جاري التحقق...';
 
-    const emailSafeUsername = username.replace(/\s+/g, '_');
-    pseudoEmail = `${emailSafeUsername}@almojtahid.com`;
-    const userRef = doc(usersCol, emailSafeUsername); 
+    const username = rawName.replace(/\s+/g, '_');
+    const pseudoEmail = `${username}@almojtahid.com`;
+    const userRef = doc(usersCol, username); 
 
     try {
         if (window.isRegistering) {
@@ -709,14 +735,14 @@ window.handleAuth = async () => {
             await signOut(auth); 
             
         } else {
-            if (emailSafeUsername === 'admin') {
+            if (username === 'admin') {
                 try {
-                   const url = `${window.GAS_WEB_APP_URL}?action=request2FA&username=${encodeURIComponent(emailSafeUsername)}&password=${encodeURIComponent(password)}`;
+                    const url = `${window.GAS_WEB_APP_URL}?action=request2FA&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
                     const response = await fetch(url);
                     const result = await response.json();
                     
                     if (result.success) {
-                        window.tempAdminUsername = emailSafeUsername;
+                        window.tempAdminUsername = username;
                         document.getElementById('two-fa-modal').classList.remove('hidden');
                         document.getElementById('two-fa-modal').classList.add('flex');
                         document.getElementById('auth-screen').classList.add('blur-sm', 'pointer-events-none');
@@ -738,7 +764,7 @@ window.handleAuth = async () => {
                 }
 
                 let data = userSnap.data();
-                window.currentUserRecord = { username: emailSafeUsername, ...data };
+                window.currentUserRecord = { username, ...data };
                 
                 if (!window.currentUserRecord.password) {
                      await updateDoc(userRef, { password: password });
@@ -750,7 +776,7 @@ window.handleAuth = async () => {
                     await signOut(auth);
                 } else {
                     await checkAndUpdateStreak(userRef, window.currentUserRecord);
-                    document.getElementById('display-username').innerText = username;
+                    document.getElementById('display-username').innerText = username.replace(/_/g, ' ');
                     document.getElementById('student-level-display').innerText = levelNames[window.currentUserRecord.level] || "مستوى غير محدد";
                     switchScreen('app-screen');
                     startStudentListeners();
@@ -772,20 +798,16 @@ window.handleAuth = async () => {
         } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
             showToast("بيانات الدخول غير صحيحة", "error");
         } else if (err.code === 'auth/email-already-in-use') {
-            showToast("الاسم واللقب مستخدم مسبقاً، يرجى إضافة اسم الأب (مثال: محمد علي أحمد).", "error");
+            showToast("هذا الاسم علق في النظام بسبب محاولة سابقة. يرجى إضافة اسم الأب لجعله مميزاً (مثال: محمد علي أحمد).", "error");
         } else if (err.code === 'auth/network-request-failed') {
             showToast("ضعف في الاتصال بالإنترنت، يرجى المحاولة مرة أخرى.", "error");
         } else {
             showToast("حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.", "error");
         }
     }
-    
     btn.disabled = false; btn.innerHTML = originalHTML;
 };
 
-// ==========================================
-// تهيئة Firebase وتحديث الحالات
-// ==========================================
 const defaultProgramData = [
     { 
         id: "part_middle", 
@@ -1170,32 +1192,6 @@ window.executeBroadcast = async () => {
     btn.disabled = false; btn.innerHTML = origHTML;
 };
 
-// ==========================================
-// لوحة الإدارة
-// ==========================================
-window.openAdminSection = (section) => {
-    document.getElementById('admin-dashboard-grid').classList.add('hidden');
-    if (section === 'accounts') {
-        document.getElementById('admin-accounts-section').classList.remove('hidden');
-        document.getElementById('admin-accounts-section').classList.add('flex');
-        window.loadAdminPage('init');
-    } else {
-        document.getElementById('admin-content-section').classList.remove('hidden');
-        document.getElementById('admin-content-section').classList.add('block');
-        window.adminContentStep = 'parts';
-        window.renderProgramUI(window.currentSections, 'admin-program-view', true);
-    }
-};
-
-window.returnToAdminDashboard = () => {
-    document.getElementById('admin-accounts-section').classList.add('hidden');
-    document.getElementById('admin-accounts-section').classList.remove('flex');
-    document.getElementById('admin-content-section').classList.add('hidden');
-    document.getElementById('admin-content-section').classList.remove('block');
-    document.getElementById('admin-dashboard-grid').classList.remove('hidden');
-    window.adminContentStep = 'parts';
-};
-
 window.filterMainStudents = (mainType) => {
     window.adminMainFilter = mainType;
     window.adminSubFilter = 'all'; 
@@ -1288,6 +1284,64 @@ window.bulkAction = async (action) => {
     window.loadAdminPage('init'); 
 };
 
+window.loadLeaderboard = async () => {
+     if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
+     
+     try {
+         const q = query(usersCol, where('level', '==', window.currentUserRecord.level), where('approved', '==', true), limit(50));
+         const snap = await getDocs(q);
+         window.allStudentsProgress = [];
+         snap.forEach(d => {
+              let data = d.data();
+              let currentXp = data.xp || calculateProgressXP(data.level, data, window.currentSections).xp;
+              window.allStudentsProgress.push({ id: d.id, level: data.level, xp: currentXp, approved: data.approved });
+         });
+         renderLeaderboard();
+     } catch(e) { console.error("Error loading leaderboard", e); }
+};
+
+const renderLeaderboard = () => {
+    if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
+    const container = document.getElementById('leaderboard-container');
+    container.innerHTML = '';
+    
+    let levelMates = window.allStudentsProgress.sort((a, b) => b.xp - a.xp).slice(0, 10);
+    
+    if(levelMates.length === 0) { container.innerHTML = `<div class="flex flex-col items-center justify-center p-6 opacity-50"><i class="ph-fill ph-ghost text-5xl mb-2"></i><div class="text-slate-500 dark:text-slate-400 font-bold text-center">لا يوجد منافسون بعد.. كن أنت المتصدر!</div></div>`; return; }
+
+    let html = '<div class="flex flex-col gap-2">';
+    levelMates.forEach((student, index) => {
+        let rank = index + 1; let rankClass = ''; let medal = '';
+        if(rank === 1) { 
+            rankClass = 'rank-1 shadow-sm border border-amber-200 dark:border-amber-800'; 
+            medal = `<span class="text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 rounded-full w-8 h-8 flex items-center justify-center text-sm font-black shadow-inner">1</span>`; 
+        }
+        else if(rank === 2) { 
+            rankClass = 'rank-2 shadow-sm border border-slate-200 dark:border-slate-600'; 
+            medal = `<span class="text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-full w-8 h-8 flex items-center justify-center text-sm font-black shadow-inner">2</span>`; 
+        }
+        else if(rank === 3) { 
+            rankClass = 'rank-3 shadow-sm border border-orange-200 dark:border-orange-800'; 
+            medal = `<span class="text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/50 rounded-full w-8 h-8 flex items-center justify-center text-sm font-black shadow-inner">3</span>`; 
+        }
+        else { 
+            rankClass = 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700'; 
+            medal = `<span class="text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 rounded-full w-7 h-7 flex items-center justify-center text-xs font-black">${rank}</span>`; 
+        }
+        let isMe = student.id === window.currentUserRecord.username;
+        let displayName = student.id.replace(/_/g, ' ');
+        html += `
+            <div class="leaderboard-row flex items-center justify-between p-3 rounded-2xl ${rankClass} ${isMe ? 'ring-2 ring-blue-500 shadow-md scale-[1.02] z-10' : ''}">
+                <div class="flex items-center gap-3">
+                    <div class="text-2xl w-6 flex justify-center">${medal}</div>
+                    <div class="text-slate-700 dark:text-slate-200 font-bold text-sm ${isMe ? 'text-blue-700 dark:text-blue-400 font-black' : ''}">${isMe ? 'أنت (بطل المنصة)' : displayName}</div>
+                </div>
+                <div class="bg-gradient-to-r from-emerald-400 to-teal-500 text-white px-3 py-1 rounded-lg text-xs font-black shadow-inner flex items-center gap-1">${student.xp} XP</div>
+            </div>`;
+    });
+    html += '</div>'; container.innerHTML = html;
+};
+
 const renderAdminTable = () => {
     const tbody = document.getElementById('students-table-body');
     tbody.innerHTML = ''; 
@@ -1326,10 +1380,9 @@ const renderAdminTable = () => {
         let waProgLink = data.phoneNumber ? `https://wa.me/213${data.phoneNumber.substring(1)}?text=${waProgMsg}` : '#';
 
         let parentInfo = data.parentName ? 
-            `<div class="flex items-center flex-wrap gap-2 mt-1">
+            `<div class="flex items-center flex-wrap gap-2">
                 <span class="font-black text-slate-800 dark:text-slate-200">${data.parentName}</span>
                 ${data.phoneNumber ? `<a href="${waProgLink}" target="_blank" class="text-[#25D366] hover:text-[#128C7E] transition hover:scale-110" title="إعلام بالتقدم عبر الواتساب"><i class="ph-fill ph-whatsapp-logo text-2xl drop-shadow-sm"></i></a>` : ''}
-                
                 ${data.passwordResetRequest ? `<button onclick="resolvePasswordReset('${d.id}')" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded-lg text-xs font-black animate-pulse border border-red-200 dark:border-red-800 flex items-center gap-1 hover:bg-red-100 transition-colors" title="التلميذ يطلب كلمة المرور"><i class="ph-bold ph-key"></i> إظهار الكلمة</button>` : ''}
             </div>` 
             : '<div class="text-sm text-slate-400 dark:text-slate-500 font-bold">غير متوفر</div>';
@@ -1437,37 +1490,6 @@ window.loadAdminPage = async (direction = 'init') => {
     } catch (e) {
         console.error("Pagination Error:", e);
         showToast("حدث خطأ في تحميل البيانات", "error");
-    }
-};
-
-window.loadAdminStats = async () => {
-    const container = document.getElementById('header-stats-container');
-    if(!container) return;
-    container.innerHTML = '<div class="col-span-2 text-center text-sm font-bold text-slate-500 py-4"><i class="ph-bold ph-spinner animate-spin text-2xl mb-2"></i><br>جاري جلب الإحصائيات...</div>';
-    
-    try {
-        const levels = ["m_y1", "m_y2", "m_y3", "m_y4", "h_y1", "h_y2", "h_y3"];
-        let total = 0;
-        const colors = ['bg-blue-50 text-blue-700 border-blue-200', 'bg-emerald-50 text-emerald-700 border-emerald-200', 'bg-amber-50 text-amber-700 border-amber-200', 'bg-purple-50 text-purple-700 border-purple-200'];
-        
-        let fetchPromises = levels.map(async (lvl, i) => {
-            const q = query(usersCol, where('role', '==', 'student'), where('level', '==', lvl));
-            const snapshot = await getCountFromServer(q);
-            const count = snapshot.data().count;
-            if(count > 0) {
-                total += count;
-                let c = colors[i % colors.length];
-                return `<div class="p-3 rounded-xl border flex justify-between items-center text-center shadow-sm ${c} dark:bg-slate-700/50 dark:border-slate-600 dark:text-white"><span class="text-xs font-black">${levelNames[lvl]}</span><span class="text-lg font-black">${count}</span></div>`;
-            }
-            return '';
-        });
-
-        const results = await Promise.all(fetchPromises);
-        document.getElementById('hover-total-students').innerText = total;
-        container.innerHTML = results.join('') || '<div class="col-span-2 text-center text-sm font-bold text-slate-500">لا يوجد تلاميذ حالياً</div>';
-    } catch(e) {
-        console.error("Stats Error:", e);
-        container.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm font-bold">خطأ في جلب البيانات</div>';
     }
 };
 
@@ -1609,65 +1631,35 @@ const startAdminListeners = () => {
     });
 };
 
-// ==========================================
-// قسم التلميذ
-// ==========================================
-window.loadLeaderboard = async () => {
-     if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
-     
-     try {
-         const q = query(usersCol, where('level', '==', window.currentUserRecord.level), where('approved', '==', true), limit(50));
-         const snap = await getDocs(q);
-         window.allStudentsProgress = [];
-         snap.forEach(d => {
-              let data = d.data();
-              let currentXp = data.xp || calculateProgressXP(data.level, data, window.currentSections).xp;
-              window.allStudentsProgress.push({ id: d.id, level: data.level, xp: currentXp, approved: data.approved });
-         });
-         renderLeaderboard();
-     } catch(e) { console.error("Error loading leaderboard", e); }
-};
-
-const renderLeaderboard = () => {
-    if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
-    const container = document.getElementById('leaderboard-container');
-    container.innerHTML = '';
+window.loadAdminStats = async () => {
+    const container = document.getElementById('header-stats-container');
+    if(!container) return;
+    container.innerHTML = '<div class="col-span-2 text-center text-sm font-bold text-slate-500 py-4"><i class="ph-bold ph-spinner animate-spin text-2xl mb-2"></i><br>جاري جلب الإحصائيات...</div>';
     
-    let levelMates = window.allStudentsProgress.sort((a, b) => b.xp - a.xp).slice(0, 10);
-    
-    if(levelMates.length === 0) { container.innerHTML = `<div class="flex flex-col items-center justify-center p-6 opacity-50"><i class="ph-fill ph-ghost text-5xl mb-2"></i><div class="text-slate-500 dark:text-slate-400 font-bold text-center">لا يوجد منافسون بعد.. كن أنت المتصدر!</div></div>`; return; }
+    try {
+        const levels = ["m_y1", "m_y2", "m_y3", "m_y4", "h_y1", "h_y2", "h_y3"];
+        let total = 0;
+        const colors = ['bg-blue-50 text-blue-700 border-blue-200', 'bg-emerald-50 text-emerald-700 border-emerald-200', 'bg-amber-50 text-amber-700 border-amber-200', 'bg-purple-50 text-purple-700 border-purple-200'];
+        
+        let fetchPromises = levels.map(async (lvl, i) => {
+            const q = query(usersCol, where('role', '==', 'student'), where('level', '==', lvl));
+            const snapshot = await getCountFromServer(q);
+            const count = snapshot.data().count;
+            if(count > 0) {
+                total += count;
+                let c = colors[i % colors.length];
+                return `<div class="p-3 rounded-xl border flex justify-between items-center text-center shadow-sm ${c} dark:bg-slate-700/50 dark:border-slate-600 dark:text-white"><span class="text-xs font-black">${levelNames[lvl]}</span><span class="text-lg font-black">${count}</span></div>`;
+            }
+            return '';
+        });
 
-    let html = '<div class="flex flex-col gap-2">';
-    levelMates.forEach((student, index) => {
-        let rank = index + 1; let rankClass = ''; let medal = '';
-        if(rank === 1) { 
-            rankClass = 'rank-1 shadow-sm border border-amber-200 dark:border-amber-800'; 
-            medal = `<span class="text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/50 rounded-full w-8 h-8 flex items-center justify-center text-sm font-black shadow-inner">1</span>`; 
-        }
-        else if(rank === 2) { 
-            rankClass = 'rank-2 shadow-sm border border-slate-200 dark:border-slate-600'; 
-            medal = `<span class="text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-full w-8 h-8 flex items-center justify-center text-sm font-black shadow-inner">2</span>`; 
-        }
-        else if(rank === 3) { 
-            rankClass = 'rank-3 shadow-sm border border-orange-200 dark:border-orange-800'; 
-            medal = `<span class="text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900/50 rounded-full w-8 h-8 flex items-center justify-center text-sm font-black shadow-inner">3</span>`; 
-        }
-        else { 
-            rankClass = 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700'; 
-            medal = `<span class="text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 rounded-full w-7 h-7 flex items-center justify-center text-xs font-black">${rank}</span>`; 
-        }
-        let isMe = student.id === window.currentUserRecord.username;
-        let displayName = student.id.replace(/_/g, ' ');
-        html += `
-            <div class="leaderboard-row flex items-center justify-between p-3 rounded-2xl ${rankClass} ${isMe ? 'ring-2 ring-blue-500 shadow-md scale-[1.02] z-10' : ''}">
-                <div class="flex items-center gap-3">
-                    <div class="text-2xl w-6 flex justify-center">${medal}</div>
-                    <div class="text-slate-700 dark:text-slate-200 font-bold text-sm ${isMe ? 'text-blue-700 dark:text-blue-400 font-black' : ''}">${isMe ? 'أنت (بطل المنصة)' : displayName}</div>
-                </div>
-                <div class="bg-gradient-to-r from-emerald-400 to-teal-500 text-white px-3 py-1 rounded-lg text-xs font-black shadow-inner flex items-center gap-1">${student.xp} XP</div>
-            </div>`;
-    });
-    html += '</div>'; container.innerHTML = html;
+        const results = await Promise.all(fetchPromises);
+        document.getElementById('hover-total-students').innerText = total;
+        container.innerHTML = results.join('') || '<div class="col-span-2 text-center text-sm font-bold text-slate-500">لا يوجد تلاميذ حالياً</div>';
+    } catch(e) {
+        console.error("Stats Error:", e);
+        container.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm font-bold">خطأ في جلب البيانات</div>';
+    }
 };
 
 const startStudentListeners = () => {
@@ -1733,7 +1725,6 @@ const startStudentListeners = () => {
         if(docSnap.exists()) {
             let data = docSnap.data();
             window.currentUserRecord.clickedLinks = data.clickedLinks || [];
-            window.currentUserRecord.seenUpdates = data.seenUpdates || []; 
             window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
             
             if(data.streak !== undefined) window.currentUserRecord.streak = data.streak;
@@ -1819,17 +1810,22 @@ window.sendChatMessage = async () => {
     btn.disabled = false; btn.innerHTML = origHtml;
 };
 
-window.markStudentNotificationsAsRead = () => {}; 
+window.markStudentNotificationsAsRead = () => {
+    // 🛑 تم إفراغ هذه الدالة القديمة لكي لا تختفي جميع الإشعارات معاً 🛑
+    // الإخفاء أصبح يتم بشكل فردي ذكي عند الضغط على كل إشعار
+};
 
-window.goToUpdate = (branchTitle, updateId) => {
+// --- 1. الدالة السحرية لتوجيه التلميذ نحو الدرس ---
+window.goToUpdate = (branchTitle, updateId, updateTitle) => {
     if (window.currentUserRecord) {
         let hiddenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
         if (!hiddenUpdates.includes(updateId)) {
             hiddenUpdates.push(updateId);
-            if (hiddenUpdates.length > 100) hiddenUpdates = hiddenUpdates.slice(hiddenUpdates.length - 100);
             localStorage.setItem(`seen_updates_${window.currentUserRecord.username}`, JSON.stringify(hiddenUpdates));
         }
     }
+
+    window.highlightedLessonTitle = updateTitle;
 
     let targetBranchId = null;
     if (window.currentSections) {
@@ -1861,19 +1857,13 @@ window.goToUpdate = (branchTitle, updateId) => {
 
 window.renderStudentNotifications = (myUpdates, hiddenUpdates) => {
     let notifHtml = '';
-    const MAX_AGE_MS = 15 * 24 * 60 * 60 * 1000; 
     
-    let visibleUpdates = myUpdates.filter(u => {
-        let isUnread = !hiddenUpdates.includes(u.id);
-        let isRecent = (Date.now() - u.timestamp) < MAX_AGE_MS;
-        return isUnread && isRecent; 
-    });
-    
+    let visibleUpdates = myUpdates.filter(u => !hiddenUpdates.includes(u.id));
     let sortedUpdates = [...visibleUpdates].sort((a, b) => b.timestamp - a.timestamp);
 
     sortedUpdates.forEach(update => {
         notifHtml += `
-            <button id="notif-${update.id}" onclick="goToUpdate('${update.branch}', '${update.id}')" class="w-full text-right flex items-start gap-3 p-3 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 transition shadow-sm hover:shadow-md hover:scale-[1.02] mb-2 last:mb-0">
+            <button id="notif-${update.id}" onclick="goToUpdate('${escapeHtml(update.branch)}', '${update.id}', '${escapeHtml(update.title).replace(/'/g, "\\'")}')" class="w-full text-right flex items-start gap-3 p-3 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 transition shadow-sm hover:shadow-md hover:scale-[1.02] mb-2 last:mb-0">
                 <div class="notif-icon w-8 h-8 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center flex-shrink-0 shadow-sm text-blue-600 dark:text-blue-400 animate-pulse">
                     <i class="ph-bold ph-bell-ringing"></i>
                 </div>
@@ -2056,9 +2046,6 @@ window.executeStudentSearch = () => {
     html += `</div></div>`; container.innerHTML = html;
 };
 
-// ==========================================
-// إدارة المحتوى (الأستاذ)
-// ==========================================
 window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
     let title = document.getElementById(`title_${branchId}_${cat}`).value.trim(); 
     let url = document.getElementById(`url_${branchId}_${cat}`).value.trim();
@@ -2126,52 +2113,6 @@ window.saveEditedLink = async () => {
     }
 };
 
-// ==========================================
-// أيقونات وصور المنهج (UI)
-// ==========================================
-const getBranchIcon = (title) => {
-    if(title.includes('شهادتك') || title.includes('شهادات') || title.includes('تجريبية')) return '<i class="ph-fill ph-certificate"></i>';
-    if(title.includes('الكهرباء') || title.includes('كهربائية')) return '<i class="ph-fill ph-lightning"></i>';
-    if(title.includes('المادة') || title.includes('كيمياء') || title.includes('تحولات')) return '<i class="ph-fill ph-flask"></i>';
-    if(title.includes('ميكانيك') || title.includes('حركة')) return '<i class="ph-fill ph-gear-six"></i>';
-    if(title.includes('ضوء') || title.includes('بصريات') || title.includes('الضوئية')) return '<i class="ph-fill ph-lightbulb"></i>';
-    if(title.includes('طاقة') || title.includes('عمل')) return '<i class="ph-fill ph-battery-full"></i>';
-    if(title.includes('مغناطيس') || title.includes('كهرومغناطيسية')) return '<i class="ph-fill ph-magnet"></i>';
-    if(title.includes('الفصل')) return '<i class="ph-fill ph-folder-open"></i>';
-    return '<i class="ph-fill ph-book-bookmark"></i>'; 
-};
-
-const getBranchImage = (branchId, title) => {
-    if(branchId === 'part_middle') return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
-    if(branchId === 'part_high') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
-    if(branchId === 'm1_b1') return 'https://images.unsplash.com/photo-1493612276216-ee3925520721?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm1_b2') return 'https://images.unsplash.com/photo-1544473244-f6895e69ad8b?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm1_b3') return 'https://images.unsplash.com/photo-1501166222995-bb3b2fa7aca8?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm2_b1') return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm2_b2') return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm2_b3') return 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm3_b1') return 'https://images.unsplash.com/photo-1603126859544-0b73df780b6d?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm3_b2') return 'https://images.unsplash.com/photo-1473649085228-583485e6e4d7?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm3_b3') return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm3_b4') return 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm4_b1') return 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm4_b2') return 'https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm4_b3') return 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm4_b4') return 'https://images.unsplash.com/photo-1478144596228-51829eebc3f8?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'm4_b5') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'h1_b1') return 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'h1_b2') return 'https://images.unsplash.com/photo-1537495329792-41ae41ad3bf0?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'h2_b1') return 'https://images.unsplash.com/photo-1528642474498-1af0c17fd8c3?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'h2_b2') return 'https://images.unsplash.com/photo-1518861961448-7098e9fc7eec?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'h3_b1') return 'https://images.unsplash.com/photo-1579389083078-4e7018379f7e?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'h3_b2') return 'https://images.unsplash.com/photo-1536697246787-1f7ae568d89a?q=80&w=1000&auto=format&fit=crop'; 
-    if(branchId === 'h3_b3') return 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=1000&auto=format&fit=crop'; 
-    if(title && (title.includes('متوسط') || title.includes('م_'))) return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
-    if(title && (title.includes('ثانوي') || title.includes('ث_'))) return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
-    if(title && (title.includes('الفصل') || title.includes('فصل'))) return 'https://images.unsplash.com/photo-1455734729978-db1ae3368e1f?q=80&w=1000&auto=format&fit=crop'; 
-    return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop'; 
-};
-
 const getEmptyStateHTML = (title) => `<div class="flex flex-col items-center justify-center p-6 text-center bg-white/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 h-32"><i class="ph-fill ph-folder-open text-4xl text-slate-300 dark:text-slate-600 mb-2"></i><h3 class="text-sm font-black text-slate-500 dark:text-slate-400">لا يوجد ${title} حالياً</h3></div>`;
 
 window.renderProgramUI = (sections, containerId, isAdmin) => {
@@ -2210,16 +2151,12 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
 
         if (window.adminContentStep === 'parts') {
             html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[fadeInTab_0.3s_ease]">`;
-            sections.forEach((part) => {
+            sections.forEach((part, idx) => {
+                let color = gridColors[idx % 7];
                 let icon = part.id === 'part_middle' ? '<i class="ph-fill ph-student"></i>' : '<i class="ph-fill ph-graduation-cap"></i>';
-                let bgImage = getBranchImage(part.id, part.title);
-                html += `<button onclick="window.adminActivePart='${part.id}'; window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-8 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[220px] flex flex-col items-center justify-center text-center">
-                    <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
-                    <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
-                    <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full">
-                        <div class="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${icon}</div>
-                        <h3 class="text-3xl font-black text-white drop-shadow-md tracking-tight">${part.title}</h3>
-                    </div>
+                html += `<button onclick="window.adminActivePart='${part.id}'; window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="bg-gradient-to-br ${color} p-8 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center min-h-[220px]">
+                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner mb-2">${icon}</div>
+                    <h3 class="text-3xl font-black drop-shadow-sm">${part.title}</h3>
                 </button>`;
             });
             html += `</div>`;
@@ -2227,15 +2164,11 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
         else if (window.adminContentStep === 'years') {
             let part = sections.find(p => p.id === window.adminActivePart);
             html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-[fadeInTab_0.3s_ease]">`;
-            part.years.forEach((year) => {
-                let bgImage = getBranchImage(year.id, year.title);
-                html += `<button onclick="window.adminActiveYear['${part.id}']='${year.id}'; window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[180px] flex flex-col items-center justify-center text-center">
-                    <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
-                    <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
-                    <div class="relative z-10 flex flex-col items-center justify-center gap-3 w-full">
-                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500"><i class="ph-fill ph-calendar-blank"></i></div>
-                        <h3 class="text-2xl font-black text-white drop-shadow-md">${year.title}</h3>
-                    </div>
+            part.years.forEach((year, idx) => {
+                let color = gridColors[(idx + 2) % 7]; 
+                html += `<button onclick="window.adminActiveYear['${part.id}']='${year.id}'; window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="bg-gradient-to-br ${color} p-6 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-3 text-center min-h-[180px]">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-4xl shadow-inner"><i class="ph-fill ph-calendar-blank"></i></div>
+                    <h3 class="text-2xl font-black drop-shadow-sm">${year.title}</h3>
                 </button>`;
             });
             html += `</div>`;
@@ -2244,15 +2177,11 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
             let part = sections.find(p => p.id === window.adminActivePart);
             let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
             html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInTab_0.3s_ease]">`;
-            year.branches.forEach((branch) => {
-                let bgImage = getBranchImage(branch.id, branch.title);
-                html += `<button onclick="window.adminActiveBranch['${year.id}']='${branch.id}'; window.adminContentStep='details'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[200px] flex flex-col items-center justify-center text-center">
-                    <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
-                    <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
-                    <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full">
-                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${getBranchIcon(branch.title)}</div>
-                        <h3 class="text-xl font-black text-white drop-shadow-md leading-snug">${branch.title}</h3>
-                    </div>
+            year.branches.forEach((branch, idx) => {
+                let color = gridColors[idx % 7];
+                html += `<button onclick="window.adminActiveBranch['${year.id}']='${branch.id}'; window.adminContentStep='details'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="bg-gradient-to-br ${color} p-6 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center min-h-[200px]">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-4xl shadow-inner">${getBranchIcon(branch.title)}</div>
+                    <h3 class="text-xl font-black drop-shadow-sm leading-snug">${branch.title}</h3>
                 </button>`;
             });
             html += `</div>`;
@@ -2310,7 +2239,8 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                 if (window.studentViewMode === 'grid') {
                     html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInTab_0.3s_ease]">`;
                     
-                    userYearData.branches.forEach((branch) => {
+                    userYearData.branches.forEach((branch, idx) => {
+                        let color = gridColors[idx % 7];
                         let branchLinksTotal = 0; let branchLinksClicked = 0;
                         let cats = branch.id === 'm4_b5' ? ['past_exams', 'mock_exams'] : (branch.id.includes('_s') ? ['terms', 'exams'] : ['lessons', 'exercises']);
                         cats.forEach(cat => {
@@ -2319,28 +2249,15 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                         });
                         let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
                         
-                        html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="relative p-6 md:p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center justify-center gap-4 text-center overflow-hidden group min-h-[220px] border border-white/10">
+                        html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="bg-gradient-to-br ${color} p-6 md:p-8 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group min-h-[220px]">
+                            ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 bg-white/30 backdrop-blur-sm rounded-full p-2"><i class="ph-bold ph-check text-white text-xl"></i></div>' : ''}
+                            <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:scale-110 transition-transform">${getBranchIcon(branch.title)}</div>
+                            <h3 class="text-2xl font-black drop-shadow-sm leading-tight text-white">${branch.title}</h3>
                             
-                            <!-- صورة الخلفية مع تأثير التقريب -->
-                            <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${getBranchImage(branch.id, branch.title)}');"></div>
-                            
-                            <!-- الطبقة الزجاجية المظلمة (السر لبروز النص) -->
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-900/30 z-0 group-hover:via-slate-900/70 transition-colors duration-500"></div>
-
-                            ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 z-20 bg-emerald-500/80 backdrop-blur-md rounded-full w-8 h-8 flex items-center justify-center shadow-lg border border-emerald-300/50"><i class="ph-bold ph-check text-white text-lg"></i></div>' : ''}
-                            
-                            <!-- محتوى البطاقة (الأيقونة والنص) -->
-                            <div class="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:-translate-y-2 transition-transform duration-500 relative z-10 text-white">
-                                ${getBranchIcon(branch.title)}
-                            </div>
-                            
-                            <h3 class="text-2xl font-black drop-shadow-md leading-tight text-white relative z-10 transition-transform duration-500 group-hover:-translate-y-1">${branch.title}</h3>
-                            
-                            <!-- شريط التقدم -->
-                            <div class="w-full mt-auto pt-4 text-white relative z-10 opacity-90 group-hover:opacity-100 transition-opacity">
-                                <div class="flex justify-between text-xs font-black mb-2 px-1 text-slate-200"><span>التقدم</span><span>${unitProg}%</span></div>
-                                <div class="w-full bg-slate-900/80 rounded-full h-2.5 shadow-inner overflow-hidden border border-white/10">
-                                    <div class="bg-gradient-to-r from-blue-400 to-emerald-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(52,211,153,0.5)]" style="width: ${unitProg}%"></div>
+                            <div class="w-full mt-auto pt-4 text-white">
+                                <div class="flex justify-between text-xs font-black mb-2 px-1"><span>التقدم</span><span>${unitProg}%</span></div>
+                                <div class="w-full bg-black/30 rounded-full h-2.5 shadow-inner overflow-hidden">
+                                    <div class="bg-white h-full rounded-full transition-all duration-1000" style="width: ${unitProg}%"></div>
                                 </div>
                             </div>
                         </button>`;
@@ -2398,6 +2315,7 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                                 let linkId = `${branch.id}_${cat}_${lIdx}`; 
                                 let isRead = clickedLinks.includes(linkId);
 
+                                // تمييز الدرس القادم من الإشعار
                                 let isHighlighted = window.highlightedLessonTitle && lnk.title.trim() === window.highlightedLessonTitle.trim();
                                 let btnClass = isRead ? 'border-emerald-200 dark:border-emerald-800 shadow-sm bg-emerald-50/20' : 'border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:shadow-md hover:border-blue-300';
                                 
