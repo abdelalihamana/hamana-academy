@@ -415,6 +415,61 @@ window.toggleDarkMode = () => {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
 };
 
+// دالة لجلب خلفيات الصور بناءً على الـ ID الدقيق للوحدة والمستوى
+const getBranchImage = (branchId, title) => {
+    
+    // ==========================================
+    // 🏫 الطور المتوسط
+    // ==========================================
+    
+    // --- السنة الأولى متوسط ---
+    if(branchId === 'm1_b1') return 'https://images.unsplash.com/photo-1493612276216-ee3925520721?q=80&w=1000&auto=format&fit=crop'; // دارة كهربائية بسيطة ومصباح
+    if(branchId === 'm1_b2') return 'https://images.unsplash.com/photo-1544473244-f6895e69ad8b?q=80&w=1000&auto=format&fit=crop'; // حالات المادة (جليد، ماء)
+    if(branchId === 'm1_b3') return 'https://images.unsplash.com/photo-1501166222995-bb3b2fa7aca8?q=80&w=1000&auto=format&fit=crop'; // الظل والضوء
+
+    // --- السنة الثانية متوسط ---
+    if(branchId === 'm2_b1') return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1000&auto=format&fit=crop'; // حبيبات وجزيئات ومختبر
+    if(branchId === 'm2_b2') return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000&auto=format&fit=crop'; // نقل الحركة والمسننات (ميكانيك)
+    if(branchId === 'm2_b3') return 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=1000&auto=format&fit=crop'; // مغناطيس وحقل مغناطيسي
+
+    // --- السنة الثالثة متوسط ---
+    if(branchId === 'm3_b1') return 'https://images.unsplash.com/photo-1603126859544-0b73df780b6d?q=80&w=1000&auto=format&fit=crop'; // التفاعل الكيميائي
+    if(branchId === 'm3_b2') return 'https://images.unsplash.com/photo-1473649085228-583485e6e4d7?q=80&w=1000&auto=format&fit=crop'; // السلاسل الطاقوية (طاقة رياح وشمسية)
+    if(branchId === 'm3_b3') return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'; // التيار الكهربائي المستمر
+    if(branchId === 'm3_b4') return 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1000&auto=format&fit=crop'; // المرايا والعدسات (بصريات)
+
+    // --- السنة الرابعة متوسط ---
+    if(branchId === 'm4_b1') return 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop'; // التيار المتناوب (راسم الاهتزاز)
+    if(branchId === 'm4_b2') return 'https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=1000&auto=format&fit=crop'; // الشوارد والمحاليل
+    if(branchId === 'm4_b3') return 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?q=80&w=1000&auto=format&fit=crop'; // دافعة أرخميدس وتوازن جسم
+    if(branchId === 'm4_b4') return 'https://images.unsplash.com/photo-1478144596228-51829eebc3f8?q=80&w=1000&auto=format&fit=crop'; // الأمن البصري ومجال الرؤية
+    if(branchId === 'm4_b5') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop'; // شهادة BEM
+
+    // ==========================================
+    // 🎓 الطور الثانوي
+    // ==========================================
+
+    // --- أولى ثانوي ---
+    if(branchId === 'h1_b1') return 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop'; // بنية الأفراد والجدول الدوري
+    if(branchId === 'h1_b2') return 'https://images.unsplash.com/photo-1537495329792-41ae41ad3bf0?q=80&w=1000&auto=format&fit=crop'; // القوة والحركات (مسارات)
+
+    // --- ثانية ثانوي ---
+    if(branchId === 'h2_b1') return 'https://images.unsplash.com/photo-1528642474498-1af0c17fd8c3?q=80&w=1000&auto=format&fit=crop'; // طاقة داخلية وديناميكا حرارية
+    if(branchId === 'h2_b2') return 'https://images.unsplash.com/photo-1518861961448-7098e9fc7eec?q=80&w=1000&auto=format&fit=crop'; // العمل والطاقة الحركية الكامنة
+
+    // --- ثالثة ثانوي (البكالوريا) ---
+    if(branchId === 'h3_b1') return 'https://images.unsplash.com/photo-1579389083078-4e7018379f7e?q=80&w=1000&auto=format&fit=crop'; // تطور جملة (معايرة أحماض وأسس)
+    if(branchId === 'h3_b2') return 'https://images.unsplash.com/photo-1536697246787-1f7ae568d89a?q=80&w=1000&auto=format&fit=crop'; // التحولات النووية (مفاعل أو إشعاع)
+    if(branchId === 'h3_b3') return 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=1000&auto=format&fit=crop'; // الظواهر الكهربائية (وشيعة ومكثفة)
+
+    // --- الصور الافتراضية للفصول وغيرها ---
+    if(title && (title.includes('الفصل') || title.includes('فصل'))) return 'https://images.unsplash.com/photo-1455734729978-db1ae3368e1f?q=80&w=1000&auto=format&fit=crop'; 
+    
+    // الصورة الافتراضية
+    return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop'; 
+};
+
+
 const getBranchIcon = (title) => {
     if(title.includes('شهادتك') || title.includes('شهادات') || title.includes('تجريبية')) return '<i class="ph-fill ph-certificate"></i>';
     if(title.includes('الكهرباء') || title.includes('كهربائية')) return '<i class="ph-fill ph-lightning"></i>';
@@ -486,41 +541,78 @@ window.openExistingAccount = () => {
 };
 
 window.toggleAuthMode = () => {
-    window.isRegistering = !window.isRegistering;
+            window.isRegistering = !window.isRegistering;
+            
+            const titleEl = document.getElementById('auth-title');
+            if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
+            
+            const btnEl = document.getElementById('auth-action-btn');
+            if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
+            
+            const switchEl = document.getElementById('switch-mode-text');
+            if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
+            
+            // جلب النافذة للتحكم في عرضها
+            const authScreen = document.getElementById('auth-screen');
+            
+            // جلب الحقول
+            const loginNameCont = document.getElementById('login-name-container');
+            const regNamesCont = document.getElementById('register-names-container');
+            const regParentPhoneCont = document.getElementById('register-parent-phone-container');
+            const levelSelect = document.getElementById('user-level'); 
+            const levelIcon = document.getElementById('level-icon');
+            const forgotPassCont = document.getElementById('forgot-password-container');
+            
+            if(window.isRegistering) {
+                // --- توسيع النافذة للتسجيل ---
+                if(authScreen) {
+                    authScreen.classList.remove('max-w-md');
+                    authScreen.classList.add('max-w-2xl', 'transition-all', 'duration-500'); 
+                }
+                
+                // إظهار الحقول الأفقية
+                if(loginNameCont) loginNameCont.classList.add('hidden');
+                if(regNamesCont) { regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex'); }
+                if(regParentPhoneCont) { regParentPhoneCont.classList.remove('hidden'); regParentPhoneCont.classList.add('flex'); }
+                
+                if(levelSelect) levelSelect.classList.remove('hidden'); 
+                if(levelIcon) levelIcon.classList.remove('hidden');
+                if(forgotPassCont) forgotPassCont.classList.add('hidden');
+            } else {
+                // --- تضييق النافذة للدخول ---
+                if(authScreen) {
+                    authScreen.classList.remove('max-w-2xl');
+                    authScreen.classList.add('max-w-md');
+                }
+                
+                // إخفاء حقول التسجيل
+                if(loginNameCont) loginNameCont.classList.remove('hidden');
+                if(regNamesCont) { regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex'); }
+                if(regParentPhoneCont) { regParentPhoneCont.classList.add('hidden'); regParentPhoneCont.classList.remove('flex'); }
+                
+                if(levelSelect) levelSelect.classList.add('hidden'); 
+                if(levelIcon) levelIcon.classList.add('hidden');
+                if(forgotPassCont) forgotPassCont.classList.remove('hidden');
+            }
+        };
+
+// --- دالة إظهار وإخفاء كلمة المرور ---
+window.togglePasswordVisibility = () => {
+    const passInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('password-toggle-icon');
     
-    const titleEl = document.getElementById('auth-title');
-    if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "منصة المجتهد";
-    
-    const btnEl = document.getElementById('auth-action-btn');
-    if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
-    
-    const switchEl = document.getElementById('switch-mode-text');
-    if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
-    
-    const loginNameCont = document.getElementById('login-name-container');
-    const regNamesCont = document.getElementById('register-names-container');
-    const levelSelect = document.getElementById('user-level'); 
-    const levelIcon = document.getElementById('level-icon');
-    const parentNameCont = document.getElementById('parent-name-container'); 
-    const phoneNumCont = document.getElementById('phone-number-container');
-    const forgotPassCont = document.getElementById('forgot-password-container');
-    
-    if(window.isRegistering) {
-        if(loginNameCont) loginNameCont.classList.add('hidden');
-        if(regNamesCont) { regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex'); }
-        if(levelSelect) levelSelect.classList.remove('hidden'); 
-        if(levelIcon) levelIcon.classList.remove('hidden');
-        if(parentNameCont) parentNameCont.classList.remove('hidden'); 
-        if(phoneNumCont) phoneNumCont.classList.remove('hidden');
-        if(forgotPassCont) forgotPassCont.classList.add('hidden');
-    } else {
-        if(loginNameCont) loginNameCont.classList.remove('hidden');
-        if(regNamesCont) { regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex'); }
-        if(levelSelect) levelSelect.classList.add('hidden'); 
-        if(levelIcon) levelIcon.classList.add('hidden');
-        if(parentNameCont) parentNameCont.classList.add('hidden'); 
-        if(phoneNumCont) phoneNumCont.classList.add('hidden');
-        if(forgotPassCont) forgotPassCont.classList.remove('hidden');
+    if (passInput && toggleIcon) {
+        if (passInput.type === 'password') {
+            passInput.type = 'text';
+            toggleIcon.classList.remove('ph-eye-slash');
+            toggleIcon.classList.add('ph-eye');
+            toggleIcon.classList.add('text-blue-500');
+        } else {
+            passInput.type = 'password';
+            toggleIcon.classList.remove('ph-eye');
+            toggleIcon.classList.add('ph-eye-slash');
+            toggleIcon.classList.remove('text-blue-500');
+        }
     }
 };
 
@@ -627,7 +719,7 @@ window.resolvePasswordReset = async (username) => {
 
                 if(phone) {
                     const waPhone = `213${phone.substring(1)}`;
-                    const waMessage = encodeURIComponent(`السلام عليكم.\nبناءً على طلبكم، هذه بيانات الدخول الخاصة بالتلميذ(ة) ${displayName} في منصة المجتهد للعلوم الفيزيائية:\n\nالاسم واللقب: ${displayName}\nكلمة المرور: ${pass}\n\nبالتوفيق!`);
+                    const waMessage = encodeURIComponent(`السلام عليكم.\nبناءً على طلبكم، هذه بيانات الدخول الخاصة بالتلميذ(ة) ${displayName} في أكاديمية حمانة للعلوم الفيزيائية:\n\nالاسم واللقب: ${displayName}\nكلمة المرور: ${pass}\n\nبالتوفيق!`);
                     window.open(`https://wa.me/${waPhone}?text=${waMessage}`, '_blank');
                 } else {
                     showToast("لا يوجد رقم هاتف مسجل لهذا التلميذ!", "error");
@@ -672,7 +764,9 @@ window.handleAuth = async () => {
     const phoneNumber = document.getElementById('phone-number')?.value.trim() || "";
 
     if (!rawName || !password) return showToast("يرجى ملء جميع البيانات المطلوبة", "error");
-    if (password.length < 6) return showToast("عذراً، كلمة المرور يجب أن تتكون من 6 "أرقام أو أحرف أو مزيج بينهما" على الأقل", "error");
+    
+    // تم إصلاح الخطأ البرمجي هنا باستخدام علامات التنصيص المفردة
+    if (password.length < 6) return showToast('عذراً، كلمة المرور يجب أن تتكون من 6 "أرقام أو أحرف أو مزيج بينهما" على الأقل', "error");
 
     if (window.isRegistering) {
         if (!level || !parentName || !phoneNumber) return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
@@ -1020,11 +1114,27 @@ window.returnToAdmin = () => {
 window.logout = async () => {
     if (typeof closeSettings === 'function') closeSettings();
     if(await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
+        
+        // 1. إيقاف جميع مستمعات قاعدة البيانات (Listeners) أولاً لتفادي خطأ الصلاحيات
+        if(unsubscribeProgram) { unsubscribeProgram(); unsubscribeProgram = null; }
+        if(unsubscribeUsers) { unsubscribeUsers(); unsubscribeUsers = null; }
+        if(unsubscribeStudentData) { unsubscribeStudentData(); unsubscribeStudentData = null; }
+        if(unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
+        if(unsubscribeChatMeta) { unsubscribeChatMeta(); unsubscribeChatMeta = null; }
+        if(window.unsubscribeResetRequests) { window.unsubscribeResetRequests(); window.unsubscribeResetRequests = null; }
+        if(window.unsubscribePendingUsers) { window.unsubscribePendingUsers(); window.unsubscribePendingUsers = null; }
+
+        if(pomodoroInterval) clearInterval(pomodoroInterval);
+        if (typeof closeChat === 'function') closeChat();
+
+        // 2. الآن نقوم بتسجيل الخروج من فايربيز
         try {
             await signOut(auth);
         } catch(e) { console.error("Logout error", e); }
         
-        window.currentUserRecord = null; window.originalAdminRecord = null;
+        // 3. تصفير البيانات المحلية
+        window.currentUserRecord = null; 
+        window.originalAdminRecord = null;
         if(document.getElementById('password')) document.getElementById('password').value = '';
         
         document.getElementById('return-admin-btn').classList.add('hidden');
@@ -1034,18 +1144,10 @@ window.logout = async () => {
         document.getElementById('student-logout-btn').classList.remove('hidden');
         document.getElementById('student-notif-btn').classList.remove('hidden');
 
-        if(unsubscribeProgram) unsubscribeProgram();
-        if(unsubscribeUsers) unsubscribeUsers();
-        if(unsubscribeStudentData) unsubscribeStudentData();
-        if(unsubscribeChat) unsubscribeChat();
-        if(unsubscribeChatMeta) unsubscribeChatMeta();
-        if(pomodoroInterval) clearInterval(pomodoroInterval);
-        if (typeof closeChat === 'function') closeChat();
         switchScreen('auth-screen');
         document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
     }
 };
-
 window.openSettings = () => {
     document.getElementById('settings-username').value = window.currentUserRecord.username.replace(/_/g, ' ');
     const passInput = document.getElementById('settings-current-password');
@@ -1681,9 +1783,7 @@ const startStudentListeners = () => {
 
             if (window.currentUserRecord && window.currentUserRecord.role === 'student') {
                 let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
-                
-                // 💡 التعديل السحري: جلب الإشعارات المقروءة من قاعدة البيانات مباشرة بدلاً من ذاكرة الهاتف
-                let seenUpdates = window.currentUserRecord.seenUpdates || [];
+                let seenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
 
                 if (!isInitialProgramLoad) {
                     myUpdates.forEach(u => {
@@ -1705,9 +1805,6 @@ const startStudentListeners = () => {
         if(docSnap.exists()) {
             let data = docSnap.data();
             window.currentUserRecord.clickedLinks = data.clickedLinks || [];
-            
-            // 💡 التعديل السحري: تحديث قائمة المقروءات محلياً عند تغيرها في السحابة
-            window.currentUserRecord.seenUpdates = data.seenUpdates || []; 
             window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
             
             if(data.streak !== undefined) window.currentUserRecord.streak = data.streak;
@@ -1793,101 +1890,93 @@ window.sendChatMessage = async () => {
     btn.disabled = false; btn.innerHTML = origHtml;
 };
 
-// 💡 تفريغ الدالة القديمة لكي لا تقوم بمسح الإشعارات دفعة واحدة
-window.markStudentNotificationsAsRead = () => {};
+window.markStudentNotificationsAsRead = () => {
+    // 🛑 تم إفراغ هذه الدالة القديمة لكي لا تختفي جميع الإشعارات معاً 🛑
+    // الإخفاء أصبح يتم بشكل فردي ذكي عند الضغط على كل إشعار
+};
 
-window.goToUpdate = (branchTitle, updateId) => {
-            if (window.currentUserRecord) {
-                let hiddenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
-                if (!hiddenUpdates.includes(updateId)) {
-                    hiddenUpdates.push(updateId);
-                    
-                    // نحتفظ بآخر 100 إشعار في الذاكرة لتجنب ثقل المتصفح
-                    if (hiddenUpdates.length > 100) hiddenUpdates = hiddenUpdates.slice(hiddenUpdates.length - 100);
-                    
-                    localStorage.setItem(`seen_updates_${window.currentUserRecord.username}`, JSON.stringify(hiddenUpdates));
-                }
+// --- 1. الدالة السحرية لتوجيه التلميذ نحو الدرس ---
+window.goToUpdate = (branchTitle, updateId, updateTitle) => {
+    if (window.currentUserRecord) {
+        let hiddenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+        if (!hiddenUpdates.includes(updateId)) {
+            hiddenUpdates.push(updateId);
+            localStorage.setItem(`seen_updates_${window.currentUserRecord.username}`, JSON.stringify(hiddenUpdates));
+        }
+    }
+
+    window.highlightedLessonTitle = updateTitle;
+
+    let targetBranchId = null;
+    if (window.currentSections) {
+        window.currentSections.forEach(p => p.years.forEach(y => {
+            if(y.id === window.currentUserRecord.level) {
+                y.branches.forEach(b => {
+                    if (b.title === branchTitle) targetBranchId = b.id;
+                });
             }
+        }));
+    }
 
-            let targetBranchId = null;
-            if (window.currentSections) {
-                window.currentSections.forEach(p => p.years.forEach(y => {
-                    if(y.id === window.currentUserRecord.level) {
-                        y.branches.forEach(b => {
-                            if (b.title === branchTitle) targetBranchId = b.id;
-                        });
-                    }
-                }));
-            }
+    if (targetBranchId) {
+        window.studentActiveBranchTab = targetBranchId; 
+        window.studentViewMode = 'details'; 
+        window.renderProgramUI(window.currentSections, 'student-program-view', false);
+        
+        let metaUpdates = window.currentUpdates || [];
+        let myUpdates = metaUpdates.filter(u => u.level === window.currentUserRecord.level);
+        let hidden = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+        window.renderStudentNotifications(myUpdates, hidden);
+        
+        setTimeout(() => {
+            const targetView = document.getElementById('student-program-view');
+            if(targetView) targetView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
+    }
+};
 
-            if (targetBranchId) {
-                window.studentActiveBranchTab = targetBranchId; 
-                window.studentViewMode = 'details'; 
-                window.renderProgramUI(window.currentSections, 'student-program-view', false);
-                
-                let metaUpdates = window.currentUpdates || [];
-                let myUpdates = metaUpdates.filter(u => u.level === window.currentUserRecord.level);
-                let hidden = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
-                window.renderStudentNotifications(myUpdates, hidden);
-                
-                setTimeout(() => {
-                    const targetView = document.getElementById('student-program-view');
-                    if(targetView) targetView.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 200);
-            }
-        };
+window.renderStudentNotifications = (myUpdates, hiddenUpdates) => {
+    let notifHtml = '';
+    
+    let visibleUpdates = myUpdates.filter(u => !hiddenUpdates.includes(u.id));
+    let sortedUpdates = [...visibleUpdates].sort((a, b) => b.timestamp - a.timestamp);
 
-        // --- 2. دالة رسم الإشعارات (مع التنظيف التلقائي الذكي) ---
-        window.renderStudentNotifications = (myUpdates, hiddenUpdates) => {
-            let notifHtml = '';
-            
-            // 💡 التنظيف التلقائي: أي إشعار يمر عليه أكثر من 15 يوم يختفي من القائمة تلقائياً
-            const MAX_AGE_MS = 15 * 24 * 60 * 60 * 1000; 
-            
-            let visibleUpdates = myUpdates.filter(u => {
-                let isUnread = !hiddenUpdates.includes(u.id);
-                let isRecent = (Date.now() - u.timestamp) < MAX_AGE_MS;
-                return isUnread && isRecent; // يجب أن يكون غير مقروء وجديد (أقل من 15 يوم)
-            });
-            
-            let sortedUpdates = [...visibleUpdates].sort((a, b) => b.timestamp - a.timestamp);
+    sortedUpdates.forEach(update => {
+        notifHtml += `
+            <button id="notif-${update.id}" onclick="goToUpdate('${escapeHtml(update.branch)}', '${update.id}', '${escapeHtml(update.title).replace(/'/g, "\\'")}')" class="w-full text-right flex items-start gap-3 p-3 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 transition shadow-sm hover:shadow-md hover:scale-[1.02] mb-2 last:mb-0">
+                <div class="notif-icon w-8 h-8 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center flex-shrink-0 shadow-sm text-blue-600 dark:text-blue-400 animate-pulse">
+                    <i class="ph-bold ph-bell-ringing"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-black text-sm text-slate-800 dark:text-white leading-tight mb-1">${update.title}</div>
+                    <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400">في وحدة: ${update.branch}</div>
+                </div>
+                <div class="self-center flex-shrink-0 bg-blue-100 dark:bg-blue-900/50 rounded-lg px-2 py-1">
+                    <span class="text-[10px] font-black text-blue-600 dark:text-blue-400">تصفح <i class="ph-bold ph-arrow-left"></i></span>
+                </div>
+            </button>`;
+    });
 
-            sortedUpdates.forEach(update => {
-                notifHtml += `
-                    <button id="notif-${update.id}" onclick="goToUpdate('${update.branch}', '${update.id}')" class="w-full text-right flex items-start gap-3 p-3 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 transition shadow-sm hover:shadow-md hover:scale-[1.02] mb-2 last:mb-0">
-                        <div class="notif-icon w-8 h-8 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center flex-shrink-0 shadow-sm text-blue-600 dark:text-blue-400 animate-pulse">
-                            <i class="ph-bold ph-bell-ringing"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="font-black text-sm text-slate-800 dark:text-white leading-tight mb-1">${update.title}</div>
-                            <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400">في وحدة: ${update.branch}</div>
-                        </div>
-                        <div class="self-center flex-shrink-0 bg-blue-100 dark:bg-blue-900/50 rounded-lg px-2 py-1">
-                            <span class="text-[10px] font-black text-blue-600 dark:text-blue-400">تصفح <i class="ph-bold ph-arrow-left"></i></span>
-                        </div>
-                    </button>`;
-            });
+    const badge = document.getElementById('student-global-badge');
+    const container = document.getElementById('student-notifications-container');
 
-            const badge = document.getElementById('student-global-badge');
-            const container = document.getElementById('student-notifications-container');
+    if (badge) {
+        if (sortedUpdates.length > 0) {
+            badge.innerText = sortedUpdates.length > 9 ? '9+' : sortedUpdates.length;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
 
-            if (badge) {
-                if (sortedUpdates.length > 0) {
-                    badge.innerText = sortedUpdates.length > 9 ? '9+' : sortedUpdates.length;
-                    badge.classList.remove('hidden');
-                } else {
-                    badge.classList.add('hidden');
-                }
-            }
-
-            if (container) {
-                if (sortedUpdates.length > 0) {
-                    container.innerHTML = notifHtml;
-                } else {
-                    container.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-6 opacity-70"><i class="ph-fill ph-bell-slash text-5xl mb-3"></i><br>لا توجد دروس أو إشعارات جديدة</div>';
-                }
-            }
-        };
+    if (container) {
+        if (sortedUpdates.length > 0) {
+            container.innerHTML = notifHtml;
+        } else {
+            container.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-6 opacity-70"><i class="ph-fill ph-bell-slash text-5xl mb-3"></i><br>لا توجد دروس أو إشعارات جديدة</div>';
+        }
+    }
+};
 
 const calculateProgressXP = (levelId, data, sections) => {
     if(!sections || !levelId) return { xp: 0, percent: 0 };
@@ -2116,21 +2205,88 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
 
         html += `<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">`;
         
+                // دالة مساعدة سريعة لجلب صور الخلفيات لبطاقات الإدارة
+        const getAdminBg = (id, title) => {
+            if(id === 'part_middle') return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
+            if(id === 'part_high') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
+            if(id === 'm1_b1') return 'https://images.unsplash.com/photo-1493612276216-ee3925520721?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm1_b2') return 'https://images.unsplash.com/photo-1544473244-f6895e69ad8b?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm1_b3') return 'https://images.unsplash.com/photo-1501166222995-bb3b2fa7aca8?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm2_b1') return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm2_b2') return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm2_b3') return 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm3_b1') return 'https://images.unsplash.com/photo-1603126859544-0b73df780b6d?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm3_b2') return 'https://images.unsplash.com/photo-1473649085228-583485e6e4d7?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm3_b3') return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm3_b4') return 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b1') return 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b2') return 'https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b3') return 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b4') return 'https://images.unsplash.com/photo-1478144596228-51829eebc3f8?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'm4_b5') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h1_b1') return 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h1_b2') return 'https://images.unsplash.com/photo-1537495329792-41ae41ad3bf0?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h2_b1') return 'https://images.unsplash.com/photo-1528642474498-1af0c17fd8c3?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h2_b2') return 'https://images.unsplash.com/photo-1518861961448-7098e9fc7eec?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h3_b1') return 'https://images.unsplash.com/photo-1579389083078-4e7018379f7e?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h3_b2') return 'https://images.unsplash.com/photo-1536697246787-1f7ae568d89a?q=80&w=1000&auto=format&fit=crop'; 
+            if(id === 'h3_b3') return 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=1000&auto=format&fit=crop'; 
+            if(title && title.includes('متوسط')) return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
+            if(title && title.includes('ثانوي')) return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
+            if(title && title.includes('الفصل')) return 'https://images.unsplash.com/photo-1455734729978-db1ae3368e1f?q=80&w=1000&auto=format&fit=crop';
+            return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop'; 
+        };
+
         if (window.adminContentStep === 'parts') {
-            html += `<button onclick="returnToAdminDashboard()" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للوحة الرئيسية</button>`;
-            html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-2"><div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center text-xl shadow-inner"><i class="ph-fill ph-books"></i></div> اختيار الطور التعليمي</h3>`;
+            html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[fadeInTab_0.3s_ease]">`;
+            sections.forEach((part) => {
+                let icon = part.id === 'part_middle' ? '<i class="ph-fill ph-student"></i>' : '<i class="ph-fill ph-graduation-cap"></i>';
+                let bgImage = getAdminBg(part.id, part.title);
+                html += `<button onclick="window.adminActivePart='${part.id}'; window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-8 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[220px] flex flex-col items-center justify-center text-center">
+                    <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
+                    <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full">
+                        <div class="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${icon}</div>
+                        <h3 class="text-3xl font-black text-white drop-shadow-md tracking-tight">${part.title}</h3>
+                    </div>
+                </button>`;
+            });
+            html += `</div>`;
         }
         else if (window.adminContentStep === 'years') {
-            html += `<button onclick="window.adminContentStep='parts'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للأطوار</button>`;
             let part = sections.find(p => p.id === window.adminActivePart);
-            html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white">إدارة سنوات: ${part.title}</h3>`;
+            html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-[fadeInTab_0.3s_ease]">`;
+            part.years.forEach((year) => {
+                let bgImage = getAdminBg(year.id, year.title);
+                html += `<button onclick="window.adminActiveYear['${part.id}']='${year.id}'; window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[180px] flex flex-col items-center justify-center text-center">
+                    <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
+                    <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center gap-3 w-full">
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500"><i class="ph-fill ph-calendar-blank"></i></div>
+                        <h3 class="text-2xl font-black text-white drop-shadow-md">${year.title}</h3>
+                    </div>
+                </button>`;
+            });
+            html += `</div>`;
         }
         else if (window.adminContentStep === 'branches') {
-            html += `<button onclick="window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للسنوات</button>`;
             let part = sections.find(p => p.id === window.adminActivePart);
             let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
-            html += `<h3 class="text-2xl font-black text-slate-800 dark:text-white">إدارة وحدات: ${year.title}</h3>`;
+            html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInTab_0.3s_ease]">`;
+            year.branches.forEach((branch) => {
+                let bgImage = getAdminBg(branch.id, branch.title);
+                html += `<button onclick="window.adminActiveBranch['${year.id}']='${branch.id}'; window.adminContentStep='details'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[200px] flex flex-col items-center justify-center text-center">
+                    <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
+                    <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
+                    <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full">
+                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${getBranchIcon(branch.title)}</div>
+                        <h3 class="text-xl font-black text-white drop-shadow-md leading-snug">${branch.title}</h3>
+                    </div>
+                </button>`;
+            });
+            html += `</div>`;
         }
+
         else if (window.adminContentStep === 'details') {
             html += `<button onclick="window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl flex items-center gap-2 font-black text-slate-700 dark:text-slate-300 transition-all shadow-sm border border-slate-200 dark:border-slate-600"><i class="ph-bold ph-arrow-right"></i> عودة للوحدات</button>`;
             let part = sections.find(p => p.id === window.adminActivePart);
@@ -2240,18 +2396,32 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                         });
                         let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
                         
-                        html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="bg-gradient-to-br ${color} p-6 md:p-8 rounded-[2rem] shadow-lg hover:scale-[1.03] transition-all duration-300 flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group min-h-[220px]">
-                            ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 bg-white/30 backdrop-blur-sm rounded-full p-2"><i class="ph-bold ph-check text-white text-xl"></i></div>' : ''}
-                            <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:scale-110 transition-transform">${getBranchIcon(branch.title)}</div>
-                            <h3 class="text-2xl font-black drop-shadow-sm leading-tight text-white">${branch.title}</h3>
+                            html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="relative p-6 md:p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center justify-center gap-4 text-center overflow-hidden group min-h-[220px] border border-white/10">
                             
-                            <div class="w-full mt-auto pt-4 text-white">
-                                <div class="flex justify-between text-xs font-black mb-2 px-1"><span>التقدم</span><span>${unitProg}%</span></div>
-                                <div class="w-full bg-black/30 rounded-full h-2.5 shadow-inner overflow-hidden">
-                                    <div class="bg-white h-full rounded-full transition-all duration-1000" style="width: ${unitProg}%"></div>
+                            <!-- صورة الخلفية مع تأثير التقريب -->
+                            <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${getBranchImage(branch.id, branch.title)}');"></div>
+
+                            <!-- الطبقة الزجاجية المظلمة (السر لبروز النص) -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-900/30 z-0 group-hover:via-slate-900/70 transition-colors duration-500"></div>
+
+                            ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 z-20 bg-emerald-500/80 backdrop-blur-md rounded-full w-8 h-8 flex items-center justify-center shadow-lg border border-emerald-300/50"><i class="ph-bold ph-check text-white text-lg"></i></div>' : ''}
+                            
+                            <!-- محتوى البطاقة (الأيقونة والنص) -->
+                            <div class="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:-translate-y-2 transition-transform duration-500 relative z-10 text-white">
+                                ${getBranchIcon(branch.title)}
+                            </div>
+                            
+                            <h3 class="text-2xl font-black drop-shadow-md leading-tight text-white relative z-10 transition-transform duration-500 group-hover:-translate-y-1">${branch.title}</h3>
+                            
+                            <!-- شريط التقدم -->
+                            <div class="w-full mt-auto pt-4 text-white relative z-10 opacity-90 group-hover:opacity-100 transition-opacity">
+                                <div class="flex justify-between text-xs font-black mb-2 px-1 text-slate-200"><span>التقدم</span><span>${unitProg}%</span></div>
+                                <div class="w-full bg-slate-900/80 rounded-full h-2.5 shadow-inner overflow-hidden border border-white/10">
+                                    <div class="bg-gradient-to-r from-blue-400 to-emerald-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(52,211,153,0.5)]" style="width: ${unitProg}%"></div>
                                 </div>
                             </div>
                         </button>`;
+
                     });
                     html += `</div>`;
                 } 
