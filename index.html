@@ -280,10 +280,13 @@
              <!-- مجموعة الأزرار العصرية المدمجة في سطر واحد -->
                 <div class="flex flex-col md:flex-row items-center justify-center gap-4 mb-16 w-full max-w-4xl mx-auto px-4 relative z-20">
                     
-                    <!-- زر ابدأ رحلتك (اللون البنفسجي) - مع الإصلاح القاطع لشاشة الدخول -->
                     <button onclick="startNewJourney()" class="flex-1 sm:flex-none min-w-[220px] px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-fuchsia-600 hover:from-indigo-700 hover:via-purple-700 hover:to-fuchsia-700 text-white rounded-2xl font-black text-lg transition-all duration-300 shadow-xl shadow-purple-500/30 hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2 border border-white/10">
                     <i class="ph-bold ph-rocket-launch text-2xl"></i> ابدأ رحلتك معنا
-                    </button>
+                     </button>
+
+                     <!-- خط فاصل ناعم يظهر في الشاشات الكبيرة فقط -->
+                      <div class="hidden sm:block w-px h-10 bg-slate-300 dark:bg-slate-700 mx-2"></div>
+
 
                     <!-- زر فيسبوك (اللون الأزرق) -->
                     <a href="https://web.facebook.com/profhamana07/" target="_blank" rel="noopener noreferrer" class="w-full md:w-auto flex-1 px-8 py-4 bg-gradient-to-r from-[#1877F2] to-[#0A5BC4] hover:from-[#166fe5] hover:to-[#094ca3] text-white rounded-2xl font-black text-lg transition-all duration-300 shadow-xl shadow-blue-500/30 hover:-translate-y-1 hover:scale-105 flex items-center justify-center gap-2 border border-white/10">
