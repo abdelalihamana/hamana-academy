@@ -2286,17 +2286,25 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
             });
             html += `</div>`;
         }
-        else if (window.adminContentStep === 'branches') {
+       else if (window.adminContentStep === 'branches') {
             let part = sections.find(p => p.id === window.adminActivePart);
             let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
             html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInTab_0.3s_ease]">`;
             year.branches.forEach((branch) => {
                 let bgImage = typeof getAdminBg === 'function' ? getAdminBg(branch.id, branch.title) : 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop';
+                
+                // 1. التعرف على بطاقات الفصول
+                let isTerm = branch.id.endsWith('_s1') || branch.id.endsWith('_s2') || branch.id.endsWith('_s3');
+                
+                // 2. إخفاء النص وإزالة الطبقة السوداء للفصول فقط
+                let overlay = isTerm ? 'bg-slate-900/10 group-hover:bg-slate-900/0' : 'bg-slate-900/80 group-hover:bg-slate-900/60';
+                let titleHtml = isTerm ? '' : `<h3 class="text-3xl md:text-4xl font-black text-white drop-shadow-lg leading-snug group-hover:scale-105 transition-transform duration-500">${branch.title}</h3>`;
+
                 html += `<button onclick="window.adminActiveBranch['${year.id}']='${branch.id}'; window.adminContentStep='details'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[200px] flex flex-col items-center justify-center text-center">
                     <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
-                    <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
+                    <div class="absolute inset-0 ${overlay} transition-colors duration-500 z-0"></div>
                     <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full px-2">
-                        <h3 class="text-3xl md:text-4xl font-black text-white drop-shadow-lg leading-snug group-hover:scale-105 transition-transform duration-500">${branch.title}</h3>
+                        ${titleHtml}
                     </div>
                 </button>`;
             });
@@ -2352,7 +2360,7 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
             
             if (userYearData && userYearData.branches && userYearData.branches.length > 0) {
                 
-                if (window.studentViewMode === 'grid') {
+               if (window.studentViewMode === 'grid') {
                     html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInTab_0.3s_ease]">`;
                     
                     userYearData.branches.forEach((branch, idx) => {
@@ -2365,18 +2373,25 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                         });
                         let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
                         
-                            html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="relative p-6 md:p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center justify-center gap-4 text-center overflow-hidden group min-h-[220px] border border-white/10">
+                        // 1. التعرف على بطاقات الفصول
+                        let isTerm = branch.id.endsWith('_s1') || branch.id.endsWith('_s2') || branch.id.endsWith('_s3');
+                        
+                        // 2. إخفاء النص وإضاءة الصورة (مع ترك تدرج بسيط في الأسفل فقط ليظهر شريط التقدم)
+                        let overlay = isTerm ? 'bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent' : 'bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-900/30 group-hover:via-slate-900/70';
+                        let titleHtml = isTerm ? '' : `<h3 class="text-3xl md:text-4xl font-black drop-shadow-lg leading-tight text-white relative z-10 transition-transform duration-500 group-hover:scale-105 px-2">${branch.title}</h3>`;
+
+                        html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="relative p-6 md:p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center justify-center gap-4 text-center overflow-hidden group min-h-[220px] border border-white/10">
                             
                             <!-- صورة الخلفية مع تأثير التقريب -->
                             <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${getBranchImage(branch.id, branch.title)}');"></div>
 
-                            <!-- الطبقة الزجاجية المظلمة -->
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-900/30 z-0 group-hover:via-slate-900/70 transition-colors duration-500"></div>
+                            <!-- الطبقة الزجاجية -->
+                            <div class="absolute inset-0 ${overlay} z-0 transition-colors duration-500"></div>
 
                             ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 z-20 bg-emerald-500/80 backdrop-blur-md rounded-full w-8 h-8 flex items-center justify-center shadow-lg border border-emerald-300/50"><i class="ph-bold ph-check text-white text-lg"></i></div>' : ''}
                             
-                            <!-- محتوى البطاقة (النص فقط مع تكبير الحجم والظل العميق) -->
-                            <h3 class="text-3xl md:text-4xl font-black drop-shadow-lg leading-tight text-white relative z-10 transition-transform duration-500 group-hover:scale-105 px-2">${branch.title}</h3>
+                            <!-- محتوى البطاقة -->
+                            ${titleHtml}
                             
                             <!-- شريط التقدم -->
                             <div class="w-full mt-auto pt-4 text-white relative z-10 opacity-90 group-hover:opacity-100 transition-opacity">
