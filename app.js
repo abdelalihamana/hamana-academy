@@ -544,7 +544,7 @@ window.toggleAuthMode = () => {
             window.isRegistering = !window.isRegistering;
             
             const titleEl = document.getElementById('auth-title');
-            if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "منصة المجتهد";
+            if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
             
             const btnEl = document.getElementById('auth-action-btn');
             if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
@@ -719,7 +719,7 @@ window.resolvePasswordReset = async (username) => {
 
                 if(phone) {
                     const waPhone = `213${phone.substring(1)}`;
-                    const waMessage = encodeURIComponent(`السلام عليكم.\nبناءً على طلبكم، هذه بيانات الدخول الخاصة بالتلميذ(ة) ${displayName} في منصة المجتهد للعلوم الفيزيائية:\n\nالاسم واللقب: ${displayName}\nكلمة المرور: ${pass}\n\nبالتوفيق!`);
+                    const waMessage = encodeURIComponent(`السلام عليكم.\nبناءً على طلبكم، هذه بيانات الدخول الخاصة بالتلميذ(ة) ${displayName} في أكاديمية حمانة للعلوم الفيزيائية:\n\nالاسم واللقب: ${displayName}\nكلمة المرور: ${pass}\n\nبالتوفيق!`);
                     window.open(`https://wa.me/${waPhone}?text=${waMessage}`, '_blank');
                 } else {
                     showToast("لا يوجد رقم هاتف مسجل لهذا التلميذ!", "error");
