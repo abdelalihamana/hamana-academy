@@ -354,14 +354,14 @@
             </div>
             
             <div class="space-y-5 relative z-10">
-                <!-- حقل الدخول  -->
-             <div class="relative group" id="login-name-container">
+                <!-- حقل الدخول (الاسم واللقب معاً - يظهر فقط عند تسجيل الدخول) -->
+                <div class="relative group" id="login-name-container">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-user"></i></div>
                     <input type="text" id="login-username" aria-label="الاسم واللقب" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="الاسم واللقب">
                 </div>
 
-                <!-- حقول التسجيل (الاسم واللقب في سطر واحد أفقي) -->
-                <div class="gap-4 hidden w-full flex-col sm:flex-row" id="register-names-container">
+                <!-- حقول التسجيل (الاسم واللقب مفصولين في سطر واحد - تظهر فقط عند إنشاء حساب) -->
+                <div class="gap-4 hidden" id="register-names-container">
                     <div class="relative group flex-1">
                         <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-xl"><i class="ph-fill ph-user"></i></div>
                         <input type="text" id="reg-firstname" aria-label="الاسم" class="w-full pl-4 pr-11 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="الاسم">
@@ -371,25 +371,19 @@
                     </div>
                 </div>
                 
-                <!-- حقول الولي والهاتف (في سطر واحد أفقي) -->
-                <div class="gap-4 hidden w-full flex-col sm:flex-row" id="register-parent-phone-container">
-                    <div class="relative group flex-1" id="parent-name-container">
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-users-three"></i></div>
-                        <input type="text" id="parent-name" aria-label="اسم ولي الأمر" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="اسم ولي الأمر">
-                    </div>
-                    
-                    <div class="relative group flex-1" id="phone-number-container">
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-device-mobile"></i></div>
-                        <input type="tel" id="phone-number" aria-label="رقم الهاتف" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 text-left tracking-[0.2em]" dir="auto" placeholder="05 / 06 / 07...">
-                    </div>
+                <div class="relative group hidden" id="parent-name-container">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-users-three"></i></div>
+                    <input type="text" id="parent-name" aria-label="اسم ولي الأمر" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="اسم ولي الأمر">
+                </div>
+                
+                <div class="relative group hidden" id="phone-number-container">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-device-mobile"></i></div>
+                    <input type="tel" id="phone-number" aria-label="رقم الهاتف" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 text-left tracking-[0.2em]" dir="auto" placeholder="05 / 06 / 07...">
                 </div>
 
                 <div class="relative group">
-
-                <!-- حقل المستوى الدراسي (جمعناه في حاوية واحدة للترتيب) -->
-                <div class="relative group hidden" id="level-container">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-graduation-cap"></i></div>
-                    <select id="user-level" aria-label="المستوى الدراسي" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-blue-700 dark:text-blue-400 text-lg appearance-none cursor-pointer">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors hidden text-2xl" id="level-icon"><i class="ph-fill ph-graduation-cap"></i></div>
+                    <select id="user-level" aria-label="المستوى الدراسي" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all hidden font-black text-blue-700 dark:text-blue-400 text-lg appearance-none cursor-pointer">
                         <option value="" disabled selected>اختر مستواك الدراسي بدقة...</option>
                         <option value="m_y1">السنة الأولى متوسط</option>
                         <option value="m_y2">السنة الثانية متوسط</option>
@@ -710,7 +704,7 @@
             <!-- سطر مؤقت بومودورو ونقاط الخبرة (مدمج) -->
             <div class="flex flex-col lg:flex-row gap-4 mb-8 items-stretch">
                 <!-- مؤقت بومودورو (75%) - تصميم صغير -->
-                <div class="w-full lg:w-3/4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-[2rem] shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
+                <div class="w-full lg:w-1/2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-[2rem] shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
                     
                     <div class="flex items-center gap-4 relative z-10 w-full sm:w-auto">
@@ -738,7 +732,7 @@
                 </div>
 
                 <!-- نقاط الخبرة (25%) - بدون شعلة الحماس -->
-                <div class="w-full lg:w-1/4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center gap-1 interactive-card text-center">
+                <div class="w-full lg:w-1/2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl p-4 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center gap-1 interactive-card text-center">
                     <div class="flex items-baseline justify-center gap-2">
                         <span class="text-sm font-black text-slate-500 dark:text-slate-400">مجموع نقاطك:</span>
                         <div class="flex items-baseline gap-1">
