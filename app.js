@@ -1681,7 +1681,9 @@ const startStudentListeners = () => {
 
             if (window.currentUserRecord && window.currentUserRecord.role === 'student') {
                 let myUpdates = window.currentUpdates.filter(u => u.level === window.currentUserRecord.level);
-                let seenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+                
+                // 💡 التعديل السحري: جلب الإشعارات المقروءة من قاعدة البيانات مباشرة بدلاً من ذاكرة الهاتف
+                let seenUpdates = window.currentUserRecord.seenUpdates || [];
 
                 if (!isInitialProgramLoad) {
                     myUpdates.forEach(u => {
@@ -1703,6 +1705,9 @@ const startStudentListeners = () => {
         if(docSnap.exists()) {
             let data = docSnap.data();
             window.currentUserRecord.clickedLinks = data.clickedLinks || [];
+            
+            // 💡 التعديل السحري: تحديث قائمة المقروءات محلياً عند تغيرها في السحابة
+            window.currentUserRecord.seenUpdates = data.seenUpdates || []; 
             window.currentUserRecord.phoneNumber = data.phoneNumber || ''; 
             
             if(data.streak !== undefined) window.currentUserRecord.streak = data.streak;
@@ -1788,93 +1793,101 @@ window.sendChatMessage = async () => {
     btn.disabled = false; btn.innerHTML = origHtml;
 };
 
-window.markStudentNotificationsAsRead = () => {
-    // 🛑 تم إفراغ هذه الدالة القديمة لكي لا تختفي جميع الإشعارات معاً 🛑
-    // الإخفاء أصبح يتم بشكل فردي ذكي عند الضغط على كل إشعار
-};
+// 💡 تفريغ الدالة القديمة لكي لا تقوم بمسح الإشعارات دفعة واحدة
+window.markStudentNotificationsAsRead = () => {};
 
-// --- 1. الدالة السحرية لتوجيه التلميذ نحو الدرس ---
-window.goToUpdate = (branchTitle, updateId, updateTitle) => {
-    if (window.currentUserRecord) {
-        let hiddenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
-        if (!hiddenUpdates.includes(updateId)) {
-            hiddenUpdates.push(updateId);
-            localStorage.setItem(`seen_updates_${window.currentUserRecord.username}`, JSON.stringify(hiddenUpdates));
-        }
-    }
-
-    window.highlightedLessonTitle = updateTitle;
-
-    let targetBranchId = null;
-    if (window.currentSections) {
-        window.currentSections.forEach(p => p.years.forEach(y => {
-            if(y.id === window.currentUserRecord.level) {
-                y.branches.forEach(b => {
-                    if (b.title === branchTitle) targetBranchId = b.id;
-                });
+window.goToUpdate = (branchTitle, updateId) => {
+            if (window.currentUserRecord) {
+                let hiddenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+                if (!hiddenUpdates.includes(updateId)) {
+                    hiddenUpdates.push(updateId);
+                    
+                    // نحتفظ بآخر 100 إشعار في الذاكرة لتجنب ثقل المتصفح
+                    if (hiddenUpdates.length > 100) hiddenUpdates = hiddenUpdates.slice(hiddenUpdates.length - 100);
+                    
+                    localStorage.setItem(`seen_updates_${window.currentUserRecord.username}`, JSON.stringify(hiddenUpdates));
+                }
             }
-        }));
-    }
 
-    if (targetBranchId) {
-        window.studentActiveBranchTab = targetBranchId; 
-        window.studentViewMode = 'details'; 
-        window.renderProgramUI(window.currentSections, 'student-program-view', false);
-        
-        let metaUpdates = window.currentUpdates || [];
-        let myUpdates = metaUpdates.filter(u => u.level === window.currentUserRecord.level);
-        let hidden = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
-        window.renderStudentNotifications(myUpdates, hidden);
-        
-        setTimeout(() => {
-            const targetView = document.getElementById('student-program-view');
-            if(targetView) targetView.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 200);
-    }
-};
+            let targetBranchId = null;
+            if (window.currentSections) {
+                window.currentSections.forEach(p => p.years.forEach(y => {
+                    if(y.id === window.currentUserRecord.level) {
+                        y.branches.forEach(b => {
+                            if (b.title === branchTitle) targetBranchId = b.id;
+                        });
+                    }
+                }));
+            }
 
-window.renderStudentNotifications = (myUpdates, hiddenUpdates) => {
-    let notifHtml = '';
-    
-    let visibleUpdates = myUpdates.filter(u => !hiddenUpdates.includes(u.id));
-    let sortedUpdates = [...visibleUpdates].sort((a, b) => b.timestamp - a.timestamp);
+            if (targetBranchId) {
+                window.studentActiveBranchTab = targetBranchId; 
+                window.studentViewMode = 'details'; 
+                window.renderProgramUI(window.currentSections, 'student-program-view', false);
+                
+                let metaUpdates = window.currentUpdates || [];
+                let myUpdates = metaUpdates.filter(u => u.level === window.currentUserRecord.level);
+                let hidden = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
+                window.renderStudentNotifications(myUpdates, hidden);
+                
+                setTimeout(() => {
+                    const targetView = document.getElementById('student-program-view');
+                    if(targetView) targetView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 200);
+            }
+        };
 
-    sortedUpdates.forEach(update => {
-        notifHtml += `
-            <button id="notif-${update.id}" onclick="goToUpdate('${escapeHtml(update.branch)}', '${update.id}', '${escapeHtml(update.title).replace(/'/g, "\\'")}')" class="w-full text-right flex items-start gap-3 p-3 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 transition shadow-sm hover:shadow-md hover:scale-[1.02] mb-2 last:mb-0">
-                <div class="notif-icon w-8 h-8 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center flex-shrink-0 shadow-sm text-blue-600 dark:text-blue-400 animate-pulse">
-                    <i class="ph-bold ph-bell-ringing"></i>
-                </div>
-                <div class="flex-1">
-                    <div class="font-black text-sm text-slate-800 dark:text-white leading-tight mb-1">${update.title}</div>
-                    <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400">في وحدة: ${update.branch}</div>
-                </div>
-                <div class="self-center flex-shrink-0 bg-blue-100 dark:bg-blue-900/50 rounded-lg px-2 py-1">
-                    <span class="text-[10px] font-black text-blue-600 dark:text-blue-400">تصفح <i class="ph-bold ph-arrow-left"></i></span>
-                </div>
-            </button>`;
-    });
+        // --- 2. دالة رسم الإشعارات (مع التنظيف التلقائي الذكي) ---
+        window.renderStudentNotifications = (myUpdates, hiddenUpdates) => {
+            let notifHtml = '';
+            
+            // 💡 التنظيف التلقائي: أي إشعار يمر عليه أكثر من 15 يوم يختفي من القائمة تلقائياً
+            const MAX_AGE_MS = 15 * 24 * 60 * 60 * 1000; 
+            
+            let visibleUpdates = myUpdates.filter(u => {
+                let isUnread = !hiddenUpdates.includes(u.id);
+                let isRecent = (Date.now() - u.timestamp) < MAX_AGE_MS;
+                return isUnread && isRecent; // يجب أن يكون غير مقروء وجديد (أقل من 15 يوم)
+            });
+            
+            let sortedUpdates = [...visibleUpdates].sort((a, b) => b.timestamp - a.timestamp);
 
-    const badge = document.getElementById('student-global-badge');
-    const container = document.getElementById('student-notifications-container');
+            sortedUpdates.forEach(update => {
+                notifHtml += `
+                    <button id="notif-${update.id}" onclick="goToUpdate('${update.branch}', '${update.id}')" class="w-full text-right flex items-start gap-3 p-3 rounded-xl border bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 transition shadow-sm hover:shadow-md hover:scale-[1.02] mb-2 last:mb-0">
+                        <div class="notif-icon w-8 h-8 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center flex-shrink-0 shadow-sm text-blue-600 dark:text-blue-400 animate-pulse">
+                            <i class="ph-bold ph-bell-ringing"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-black text-sm text-slate-800 dark:text-white leading-tight mb-1">${update.title}</div>
+                            <div class="text-[11px] font-bold text-slate-500 dark:text-slate-400">في وحدة: ${update.branch}</div>
+                        </div>
+                        <div class="self-center flex-shrink-0 bg-blue-100 dark:bg-blue-900/50 rounded-lg px-2 py-1">
+                            <span class="text-[10px] font-black text-blue-600 dark:text-blue-400">تصفح <i class="ph-bold ph-arrow-left"></i></span>
+                        </div>
+                    </button>`;
+            });
 
-    if (badge) {
-        if (sortedUpdates.length > 0) {
-            badge.innerText = sortedUpdates.length > 9 ? '9+' : sortedUpdates.length;
-            badge.classList.remove('hidden');
-        } else {
-            badge.classList.add('hidden');
-        }
-    }
+            const badge = document.getElementById('student-global-badge');
+            const container = document.getElementById('student-notifications-container');
 
-    if (container) {
-        if (sortedUpdates.length > 0) {
-            container.innerHTML = notifHtml;
-        } else {
-            container.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-6 opacity-70"><i class="ph-fill ph-bell-slash text-5xl mb-3"></i><br>لا توجد دروس أو إشعارات جديدة</div>';
-        }
-    }
-};
+            if (badge) {
+                if (sortedUpdates.length > 0) {
+                    badge.innerText = sortedUpdates.length > 9 ? '9+' : sortedUpdates.length;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+
+            if (container) {
+                if (sortedUpdates.length > 0) {
+                    container.innerHTML = notifHtml;
+                } else {
+                    container.innerHTML = '<div class="text-center text-slate-500 dark:text-slate-400 text-sm font-bold p-6 opacity-70"><i class="ph-fill ph-bell-slash text-5xl mb-3"></i><br>لا توجد دروس أو إشعارات جديدة</div>';
+                }
+            }
+        };
 
 const calculateProgressXP = (levelId, data, sections) => {
     if(!sections || !levelId) return { xp: 0, percent: 0 };
