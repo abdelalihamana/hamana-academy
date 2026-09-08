@@ -1345,7 +1345,8 @@ window.loadLeaderboard = async () => {
      if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
      
      try {
-         const q = query(usersCol, where('level', '==', window.currentUserRecord.level), where('approved', '==', true), limit(50));
+         // التعديل: استخدام orderBy لترتيب النقاط، و limit(10) لجلب 10 فقط بدلا من 50 لتوفير القراءات
+         const q = query(usersCol, where('level', '==', window.currentUserRecord.level), where('approved', '==', true), orderBy('xp', 'desc'), limit(10));
          const snap = await getDocs(q);
          window.allStudentsProgress = [];
          snap.forEach(d => {
@@ -1354,7 +1355,12 @@ window.loadLeaderboard = async () => {
               window.allStudentsProgress.push({ id: d.id, level: data.level, xp: currentXp, approved: data.approved });
          });
          renderLeaderboard();
-     } catch(e) { console.error("Error loading leaderboard", e); }
+     } catch(e) { 
+         console.error("Error loading leaderboard", e); 
+         if (e.message && e.message.includes("index")) {
+             console.warn("⚠️ تنبيه للأستاذ: يرجى الضغط على الرابط الموجود في الخطأ أعلاه لإنشاء الفهرس (Index) في فايربيز لكي تعمل لوحة الشرف.");
+         }
+     }
 };
 
 const renderLeaderboard = () => {
@@ -1362,7 +1368,8 @@ const renderLeaderboard = () => {
     const container = document.getElementById('leaderboard-container');
     container.innerHTML = '';
     
-    let levelMates = window.allStudentsProgress.sort((a, b) => b.xp - a.xp).slice(0, 10);
+    // لم نعد بحاجة لاستخدام slice(0,10) لأننا جلبنا 10 فقط من القاعدة الأساسية
+    let levelMates = window.allStudentsProgress.sort((a, b) => b.xp - a.xp);
     
     if(levelMates.length === 0) { container.innerHTML = `<div class="flex flex-col items-center justify-center p-6 opacity-50"><i class="ph-fill ph-ghost text-5xl mb-2"></i><div class="text-slate-500 dark:text-slate-400 font-bold text-center">لا يوجد منافسون بعد.. كن أنت المتصدر!</div></div>`; return; }
 
