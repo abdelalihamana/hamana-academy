@@ -672,8 +672,8 @@ window.handleAuth = async () => {
     const phoneNumber = document.getElementById('phone-number')?.value.trim() || "";
 
     if (!rawName || !password) return showToast("يرجى ملء جميع البيانات المطلوبة", "error");
-        if (password.length < 6) return showToast("عذراً، كلمة المرور يجب أن تتكون من 6 "أرقام أو أحرف أو مزيج بينهما" على الأقل", "error");
-)
+    if (password.length < 6) return showToast("عذراً، كلمة المرور يجب أن تتكون من 6 "أرقام أو أحرف أو مزيج بينهما" على الأقل", "error");
+
     if (window.isRegistering) {
         if (!level || !parentName || !phoneNumber) return showToast("يرجى تعبئة جميع الحقول بدقة", "error");
         const phoneRegex = /^(05|06|07)\d{8}$/;
