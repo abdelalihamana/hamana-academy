@@ -277,24 +277,33 @@
                         بوابتك الذكية للتفوق. ادمج بين عمق الفهم العلمي ومتعة التعلم التفاعلي عبر أحدث التقنيات التعليمية.
                     </p>
 
-                    <!-- أزرار الدخول -->
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-                    <button onclick="document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('auth-screen').classList.add('active'); if(window.isRegistering !== true) window.toggleAuthMode();" class="w-full sm:w-auto px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-black text-xl transition-all shadow-[0_10px_20px_-10px_rgba(37,99,235,0.6)] hover:-translate-y-1 flex items-center justify-center gap-3">
-                        <i class="ph-bold ph-rocket-launch text-2xl"></i> ابدأ رحلتك معنا
-                    </button>
+                              <!-- مجموعة الأزرار المدمجة (دخول + تواصل اجتماعي) -->
+                <div class="flex flex-wrap items-center justify-center gap-3 md:gap-4 mb-20 animate-[fadeInTab_0.5s_ease]">
                     
-                <!-- أزرار التواصل الاجتماعي (فيسبوك ويوتيوب) -->
-                <div class="flex flex-wrap items-center justify-center gap-4 mb-20 animate-[fadeInTab_0.5s_ease]">
+                    <!-- زر ابدأ رحلتك -->
+                    <button onclick="document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('auth-screen').classList.add('active'); if(window.isRegistering !== true) window.toggleAuthMode();" class="px-6 sm:px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-black text-lg transition-all shadow-lg shadow-blue-500/30 hover:-translate-y-1 flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-rocket-launch text-xl"></i> ابدأ رحلتك معنا
+                    </button>
+
+                    <!-- زر لدي حساب -->
+                    <button onclick="document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById('auth-screen').classList.add('active'); if(window.isRegistering === true) window.toggleAuthMode();" class="px-6 sm:px-8 py-3.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-white border-2 border-slate-200 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-500 rounded-2xl font-black text-lg transition-all shadow-sm hover:-translate-y-1 flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-sign-in text-xl"></i> حساب مسبق
+                    </button>
+
+                    <!-- خط فاصل عمودي يظهر فقط في الشاشات الكبيرة لجمالية التصميم -->
+                    <div class="hidden lg:block w-0.5 h-10 bg-slate-200 dark:bg-slate-700 mx-1 rounded-full"></div>
+
                     <!-- زر فيسبوك -->
-                    <a href="https://web.facebook.com/profhamana07/" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 text-[#1877F2] font-black rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-700 hover:scale-105 transition-all">
-                        <i class="ph-fill ph-facebook-logo text-2xl"></i> تابعنا على فيسبوك
+                    <a href="https://web.facebook.com/profhamana07/" target="_blank" rel="noopener noreferrer" class="px-5 sm:px-6 py-3.5 bg-white dark:bg-slate-800 text-[#1877F2] font-black rounded-2xl shadow-sm border-2 border-slate-100 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-slate-700 hover:-translate-y-1 transition-all flex items-center justify-center gap-2 text-lg">
+                        <i class="ph-fill ph-facebook-logo text-xl"></i> فيسبوك
                     </a>
                     
                     <!-- زر يوتيوب -->
-                    <a href="https://www.youtube.com/@Hamana.physique" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 text-[#FF0000] font-black rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-slate-700 hover:scale-105 transition-all">
-                        <i class="ph-fill ph-youtube-logo text-2xl"></i> اشترك في قناتنا
+                    <a href="https://www.youtube.com/@Hamana.physique" target="_blank" rel="noopener noreferrer" class="px-5 sm:px-6 py-3.5 bg-white dark:bg-slate-800 text-[#FF0000] font-black rounded-2xl shadow-sm border-2 border-slate-100 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-slate-700 hover:-translate-y-1 transition-all flex items-center justify-center gap-2 text-lg">
+                        <i class="ph-fill ph-youtube-logo text-xl"></i> يوتيوب
                     </a>
                 </div>
+
 
             <!-- البطاقات التوضيحية (الدمج بين العلم واللعب) -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
