@@ -449,9 +449,17 @@ const getBranchImage = (branchId, title) => {
     if(branchId === 'h3_b1') return 'https://images.unsplash.com/photo-1579389083078-4e7018379f7e?q=80&w=1000&auto=format&fit=crop'; 
     if(branchId === 'h3_b2') return 'https://images.unsplash.com/photo-1536697246787-1f7ae568d89a?q=80&w=1000&auto=format&fit=crop'; 
     if(branchId === 'h3_b3') return 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=1000&auto=format&fit=crop'; 
-    if(title && (title.includes('الفصل') || title.includes('فصل'))) return 'https://images.unsplash.com/photo-1455734729978-db1ae3368e1f?q=80&w=1000&auto=format&fit=crop'; 
-    return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop'; 
-};
+
+    // صورة الفصل الأول (لكل المستويات)
+    if(branchId.endsWith('_s1')) return 'https://i.ibb.co/V07SqjTB/1.jpg'; 
+    
+    // صورة الفصل الثاني (لكل المستويات)
+    if(branchId.endsWith('_s2')) return 'https://i.ibb.co/6R6mrnFF/2.jpg'; 
+    
+    // صورة الفصل الثالث (لكل المستويات)
+    if(branchId.endsWith('_s3')) return 'https://i.ibb.co/ch83MR70/3.jpg'; 
+    
+    };
 
 
 const getBranchIcon = (title) => {
@@ -2252,14 +2260,12 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
         if (window.adminContentStep === 'parts') {
             html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[fadeInTab_0.3s_ease]">`;
             sections.forEach((part) => {
-                let icon = part.id === 'part_middle' ? '<i class="ph-fill ph-student"></i>' : '<i class="ph-fill ph-graduation-cap"></i>';
                 let bgImage = typeof getAdminBg === 'function' ? getAdminBg(part.id, part.title) : 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
                 html += `<button onclick="window.adminActivePart='${part.id}'; window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-8 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[220px] flex flex-col items-center justify-center text-center">
                     <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
                     <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
-                    <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full">
-                        <div class="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${icon}</div>
-                        <h3 class="text-3xl font-black text-white drop-shadow-md tracking-tight">${part.title}</h3>
+                    <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full px-4">
+                        <h3 class="text-4xl md:text-5xl font-black text-white drop-shadow-lg tracking-tight group-hover:scale-105 transition-transform duration-500">${part.title}</h3>
                     </div>
                 </button>`;
             });
@@ -2273,9 +2279,8 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                 html += `<button onclick="window.adminActiveYear['${part.id}']='${year.id}'; window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[180px] flex flex-col items-center justify-center text-center">
                     <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
                     <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
-                    <div class="relative z-10 flex flex-col items-center justify-center gap-3 w-full">
-                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500"><i class="ph-fill ph-calendar-blank"></i></div>
-                        <h3 class="text-2xl font-black text-white drop-shadow-md">${year.title}</h3>
+                    <div class="relative z-10 flex flex-col items-center justify-center gap-3 w-full px-2">
+                        <h3 class="text-3xl md:text-4xl font-black text-white drop-shadow-lg group-hover:scale-105 transition-transform duration-500">${year.title}</h3>
                     </div>
                 </button>`;
             });
@@ -2290,9 +2295,8 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                 html += `<button onclick="window.adminActiveBranch['${year.id}']='${branch.id}'; window.adminContentStep='details'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[200px] flex flex-col items-center justify-center text-center">
                     <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
                     <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
-                    <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full">
-                        <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-full flex items-center justify-center text-4xl shadow-inner group-hover:-translate-y-1 transition-transform duration-500">${typeof getBranchIcon === 'function' ? getBranchIcon(branch.title) : '<i class="ph-fill ph-folder"></i>'}</div>
-                        <h3 class="text-xl font-black text-white drop-shadow-md leading-snug">${branch.title}</h3>
+                    <div class="relative z-10 flex flex-col items-center justify-center gap-4 w-full px-2">
+                        <h3 class="text-3xl md:text-4xl font-black text-white drop-shadow-lg leading-snug group-hover:scale-105 transition-transform duration-500">${branch.title}</h3>
                     </div>
                 </button>`;
             });
@@ -2366,17 +2370,13 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                             <!-- صورة الخلفية مع تأثير التقريب -->
                             <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${getBranchImage(branch.id, branch.title)}');"></div>
 
-                            <!-- الطبقة الزجاجية المظلمة (السر لبروز النص) -->
+                            <!-- الطبقة الزجاجية المظلمة -->
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-900/30 z-0 group-hover:via-slate-900/70 transition-colors duration-500"></div>
 
                             ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 z-20 bg-emerald-500/80 backdrop-blur-md rounded-full w-8 h-8 flex items-center justify-center shadow-lg border border-emerald-300/50"><i class="ph-bold ph-check text-white text-lg"></i></div>' : ''}
                             
-                            <!-- محتوى البطاقة (الأيقونة والنص) -->
-                            <div class="w-20 h-20 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center text-5xl shadow-inner group-hover:-translate-y-2 transition-transform duration-500 relative z-10 text-white">
-                                ${getBranchIcon(branch.title)}
-                            </div>
-                            
-                            <h3 class="text-2xl font-black drop-shadow-md leading-tight text-white relative z-10 transition-transform duration-500 group-hover:-translate-y-1">${branch.title}</h3>
+                            <!-- محتوى البطاقة (النص فقط مع تكبير الحجم والظل العميق) -->
+                            <h3 class="text-3xl md:text-4xl font-black drop-shadow-lg leading-tight text-white relative z-10 transition-transform duration-500 group-hover:scale-105 px-2">${branch.title}</h3>
                             
                             <!-- شريط التقدم -->
                             <div class="w-full mt-auto pt-4 text-white relative z-10 opacity-90 group-hover:opacity-100 transition-opacity">
