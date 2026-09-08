@@ -415,20 +415,60 @@ window.toggleDarkMode = () => {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
 };
 
-// دالة لجلب خلفيات الصور حسب اسم الوحدة
-const getBranchImage = (title) => {
-    // يمكنك لاحقاً تغيير هذه الروابط بصورك الخاصة
-    if(title.includes('الكهرباء') || title.includes('كهربائية')) return 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000&auto=format&fit=crop';
-    if(title.includes('المادة') || title.includes('كيمياء') || title.includes('تحولات')) return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1000&auto=format&fit=crop';
-    if(title.includes('ميكانيك') || title.includes('حركة')) return 'https://images.unsplash.com/photo-1537495329792-41ae41ad3bf0?q=80&w=1000&auto=format&fit=crop';
-    if(title.includes('ضوء') || title.includes('بصريات') || title.includes('الضوئية')) return 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop';
-    if(title.includes('طاقة') || title.includes('عمل')) return 'https://images.unsplash.com/photo-1473649085228-583485e6e4d7?q=80&w=1000&auto=format&fit=crop';
-    if(title.includes('مغناطيس') || title.includes('كهرومغناطيسية')) return 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=1000&auto=format&fit=crop';
-    if(title.includes('شهادتك') || title.includes('شهادات')) return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
+// دالة لجلب خلفيات الصور بناءً على الـ ID الدقيق للوحدة والمستوى
+const getBranchImage = (branchId, title) => {
     
-    // الصورة الافتراضية لأي وحدة أخرى
+    // ==========================================
+    // 🏫 الطور المتوسط
+    // ==========================================
+    
+    // --- السنة الأولى متوسط ---
+    if(branchId === 'm1_b1') return 'https://images.unsplash.com/photo-1493612276216-ee3925520721?q=80&w=1000&auto=format&fit=crop'; // دارة كهربائية بسيطة ومصباح
+    if(branchId === 'm1_b2') return 'https://images.unsplash.com/photo-1544473244-f6895e69ad8b?q=80&w=1000&auto=format&fit=crop'; // حالات المادة (جليد، ماء)
+    if(branchId === 'm1_b3') return 'https://images.unsplash.com/photo-1501166222995-bb3b2fa7aca8?q=80&w=1000&auto=format&fit=crop'; // الظل والضوء
+
+    // --- السنة الثانية متوسط ---
+    if(branchId === 'm2_b1') return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1000&auto=format&fit=crop'; // حبيبات وجزيئات ومختبر
+    if(branchId === 'm2_b2') return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000&auto=format&fit=crop'; // نقل الحركة والمسننات (ميكانيك)
+    if(branchId === 'm2_b3') return 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=1000&auto=format&fit=crop'; // مغناطيس وحقل مغناطيسي
+
+    // --- السنة الثالثة متوسط ---
+    if(branchId === 'm3_b1') return 'https://images.unsplash.com/photo-1603126859544-0b73df780b6d?q=80&w=1000&auto=format&fit=crop'; // التفاعل الكيميائي
+    if(branchId === 'm3_b2') return 'https://images.unsplash.com/photo-1473649085228-583485e6e4d7?q=80&w=1000&auto=format&fit=crop'; // السلاسل الطاقوية (طاقة رياح وشمسية)
+    if(branchId === 'm3_b3') return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'; // التيار الكهربائي المستمر
+    if(branchId === 'm3_b4') return 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1000&auto=format&fit=crop'; // المرايا والعدسات (بصريات)
+
+    // --- السنة الرابعة متوسط ---
+    if(branchId === 'm4_b1') return 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop'; // التيار المتناوب (راسم الاهتزاز)
+    if(branchId === 'm4_b2') return 'https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=1000&auto=format&fit=crop'; // الشوارد والمحاليل
+    if(branchId === 'm4_b3') return 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?q=80&w=1000&auto=format&fit=crop'; // دافعة أرخميدس وتوازن جسم
+    if(branchId === 'm4_b4') return 'https://images.unsplash.com/photo-1478144596228-51829eebc3f8?q=80&w=1000&auto=format&fit=crop'; // الأمن البصري ومجال الرؤية
+    if(branchId === 'm4_b5') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop'; // شهادة BEM
+
+    // ==========================================
+    // 🎓 الطور الثانوي
+    // ==========================================
+
+    // --- أولى ثانوي ---
+    if(branchId === 'h1_b1') return 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop'; // بنية الأفراد والجدول الدوري
+    if(branchId === 'h1_b2') return 'https://images.unsplash.com/photo-1537495329792-41ae41ad3bf0?q=80&w=1000&auto=format&fit=crop'; // القوة والحركات (مسارات)
+
+    // --- ثانية ثانوي ---
+    if(branchId === 'h2_b1') return 'https://images.unsplash.com/photo-1528642474498-1af0c17fd8c3?q=80&w=1000&auto=format&fit=crop'; // طاقة داخلية وديناميكا حرارية
+    if(branchId === 'h2_b2') return 'https://images.unsplash.com/photo-1518861961448-7098e9fc7eec?q=80&w=1000&auto=format&fit=crop'; // العمل والطاقة الحركية الكامنة
+
+    // --- ثالثة ثانوي (البكالوريا) ---
+    if(branchId === 'h3_b1') return 'https://images.unsplash.com/photo-1579389083078-4e7018379f7e?q=80&w=1000&auto=format&fit=crop'; // تطور جملة (معايرة أحماض وأسس)
+    if(branchId === 'h3_b2') return 'https://images.unsplash.com/photo-1536697246787-1f7ae568d89a?q=80&w=1000&auto=format&fit=crop'; // التحولات النووية (مفاعل أو إشعاع)
+    if(branchId === 'h3_b3') return 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=1000&auto=format&fit=crop'; // الظواهر الكهربائية (وشيعة ومكثفة)
+
+    // --- الصور الافتراضية للفصول وغيرها ---
+    if(title && (title.includes('الفصل') || title.includes('فصل'))) return 'https://images.unsplash.com/photo-1455734729978-db1ae3368e1f?q=80&w=1000&auto=format&fit=crop'; 
+    
+    // الصورة الافتراضية
     return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop'; 
 };
+
 
 const getBranchIcon = (title) => {
     if(title.includes('شهادتك') || title.includes('شهادات') || title.includes('تجريبية')) return '<i class="ph-fill ph-certificate"></i>';
@@ -2267,8 +2307,8 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                             html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="relative p-6 md:p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center justify-center gap-4 text-center overflow-hidden group min-h-[220px] border border-white/10">
                             
                             <!-- صورة الخلفية مع تأثير التقريب -->
-                            <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${getBranchImage(branch.title)}');"></div>
-                            
+                            <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${getBranchImage(branch.id, branch.title)}');"></div>
+
                             <!-- الطبقة الزجاجية المظلمة (السر لبروز النص) -->
                             <div class="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-900/30 z-0 group-hover:via-slate-900/70 transition-colors duration-500"></div>
 
