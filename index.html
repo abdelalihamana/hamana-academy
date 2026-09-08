@@ -301,32 +301,50 @@
                 </div>
 
 
-            <!-- البطاقات التوضيحية (الدمج بين العلم واللعب) -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    
-                    <!-- البطاقة 1: العلم (أزرق كهربائي) -->
-                    <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/50 dark:border-slate-700 shadow-xl hover:-translate-y-2 transition-transform text-center">
-                        <div class="w-16 h-16 mx-auto bg-[#1868ae] text-white rounded-2xl flex items-center justify-center text-4xl mb-5 shadow-lg shadow-[#1868ae]/30"><i class="ph-fill ph-atom"></i></div>
-                        <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-3">محتوى علمي دقيق</h3>
-                        <p class="text-slate-500 dark:text-slate-400 font-bold text-base leading-relaxed">دروس، ملخصات، ومواضيع شاملة تغطي مرحلتي التعليم المتوسط والثانوي وفق المنهاج الرسمي.</p>
-                    </div>
-                    
-                    <!-- البطاقة 2: التلعيب (أخضر زيتوني) -->
-                    <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/50 dark:border-slate-700 shadow-xl hover:-translate-y-2 transition-transform text-center">
-                        <div class="w-16 h-16 mx-auto bg-[#556B2F] text-white rounded-2xl flex items-center justify-center text-4xl mb-5 shadow-lg shadow-[#556B2F]/30"><i class="ph-fill ph-trophy"></i></div>
-                        <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-3">تحدَّ أصدقاءك</h3>
-                        <p class="text-slate-500 dark:text-slate-400 font-bold text-base leading-relaxed">اجمع نقاط الخبرة (XP)، حافظ على شعلة الحماس يومياً، وتصدر لوحة الشرف الخاصة بمستواك.</p>
-                    </div>
-                    
-                    <!-- البطاقة 3: التركيز والتواصل (أحمر قرمزي) -->
-                    <div class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white/50 dark:border-slate-700 shadow-xl hover:-translate-y-2 transition-transform text-center">
-                        <div class="w-16 h-16 mx-auto bg-[#8B0000] text-white rounded-2xl flex items-center justify-center text-4xl mb-5 shadow-lg shadow-[#8B0000]/30"><i class="ph-fill ph-timer"></i></div>
-                        <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-3">بيئة دراسة مركزة</h3>
-                        <p class="text-slate-500 dark:text-slate-400 font-bold text-base leading-relaxed">تواصل مباشر مع الأستاذ، إشعارات حية، ومؤقت "بومودورو" مدمج لتنظيم وقت تركيزك وراحتك.</p>
+                              <!-- البطاقات التوضيحية (النسخة السينمائية الملونة) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-right">
+                        
+                        <!-- البطاقة 1: العلم -->
+                        <div class="relative overflow-hidden group p-8 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-white/10 min-h-[280px] flex flex-col justify-end text-right">
+                            <!-- صورة الخلفية -->
+                            <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop');"></div>
+                            <!-- الطبقة الزجاجية المظلمة -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/70 to-slate-900/40 z-0 group-hover:via-slate-900/80 transition-colors duration-500"></div>
+                            
+                            <!-- المحتوى -->
+                            <div class="relative z-10">
+                                <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-2xl flex items-center justify-center text-4xl mb-5 shadow-inner group-hover:-translate-y-2 transition-transform duration-500"><i class="ph-fill ph-atom"></i></div>
+                                <h3 class="text-2xl font-black text-white mb-3 drop-shadow-md">محتوى علمي دقيق</h3>
+                                <p class="text-slate-200 font-bold text-base leading-relaxed drop-shadow-sm">دروس، ملخصات، ومواضيع شاملة تغطي مرحلتي التعليم المتوسط والثانوي وفق المنهاج الرسمي.</p>
+                            </div>
+                        </div>
+
+                        <!-- البطاقة 2: التلعيب -->
+                        <div class="relative overflow-hidden group p-8 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-white/10 min-h-[280px] flex flex-col justify-end text-right">
+                            <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1000&auto=format&fit=crop');"></div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/70 to-slate-900/40 z-0 group-hover:via-slate-900/80 transition-colors duration-500"></div>
+                            
+                            <div class="relative z-10">
+                                <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-2xl flex items-center justify-center text-4xl mb-5 shadow-inner group-hover:-translate-y-2 transition-transform duration-500"><i class="ph-fill ph-trophy"></i></div>
+                                <h3 class="text-2xl font-black text-white mb-3 drop-shadow-md">تحدَّ أصدقاءك</h3>
+                                <p class="text-slate-200 font-bold text-base leading-relaxed drop-shadow-sm">اجمع نقاط الخبرة (XP)، حافظ على شعلة الحماس يومياً، وتصدر لوحة الشرف الخاصة بمستواك.</p>
+                            </div>
+                        </div>
+
+                        <!-- البطاقة 3: التركيز والتواصل -->
+                        <div class="relative overflow-hidden group p-8 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-white/10 min-h-[280px] flex flex-col justify-end text-right">
+                            <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1000&auto=format&fit=crop');"></div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/70 to-slate-900/40 z-0 group-hover:via-slate-900/80 transition-colors duration-500"></div>
+                            
+                            <div class="relative z-10">
+                                <div class="w-16 h-16 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-2xl flex items-center justify-center text-4xl mb-5 shadow-inner group-hover:-translate-y-2 transition-transform duration-500"><i class="ph-fill ph-timer"></i></div>
+                                <h3 class="text-2xl font-black text-white mb-3 drop-shadow-md">بيئة دراسة مركزة</h3>
+                                <p class="text-slate-200 font-bold text-base leading-relaxed drop-shadow-sm">تواصل مباشر مع الأستاذ، إشعارات حية، ومؤقت "بومودورو" مدمج لتنظيم وقت تركيزك وراحتك.</p>
+                            </div>
+                        </div>
+
                     </div>
 
-                </div>
-            </div>
         </div>
         </div>
         <!-- ===================================== -->
