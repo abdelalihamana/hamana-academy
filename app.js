@@ -1793,7 +1793,9 @@ window.markStudentNotificationsAsRead = () => {
 };
 
 // --- 1. الدالة السحرية لتوجيه التلميذ نحو الدرس ---
-              window.goToUpdate = (branchTitle, updateId) => {
+window.goToUpdate = (branchTitle, updateId, updateTitle) => {
+    if (window.currentUserRecord) {
+        let hiddenUpdates = JSON.parse(localStorage.getItem(`seen_updates_${window.currentUserRecord.username}`)) || [];
         if (!hiddenUpdates.includes(updateId)) {
             hiddenUpdates.push(updateId);
             localStorage.setItem(`seen_updates_${window.currentUserRecord.username}`, JSON.stringify(hiddenUpdates));
