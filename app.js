@@ -1114,11 +1114,27 @@ window.returnToAdmin = () => {
 window.logout = async () => {
     if (typeof closeSettings === 'function') closeSettings();
     if(await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
+        
+        // 1. إيقاف جميع مستمعات قاعدة البيانات (Listeners) أولاً لتفادي خطأ الصلاحيات
+        if(unsubscribeProgram) { unsubscribeProgram(); unsubscribeProgram = null; }
+        if(unsubscribeUsers) { unsubscribeUsers(); unsubscribeUsers = null; }
+        if(unsubscribeStudentData) { unsubscribeStudentData(); unsubscribeStudentData = null; }
+        if(unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
+        if(unsubscribeChatMeta) { unsubscribeChatMeta(); unsubscribeChatMeta = null; }
+        if(window.unsubscribeResetRequests) { window.unsubscribeResetRequests(); window.unsubscribeResetRequests = null; }
+        if(window.unsubscribePendingUsers) { window.unsubscribePendingUsers(); window.unsubscribePendingUsers = null; }
+
+        if(pomodoroInterval) clearInterval(pomodoroInterval);
+        if (typeof closeChat === 'function') closeChat();
+
+        // 2. الآن نقوم بتسجيل الخروج من فايربيز
         try {
             await signOut(auth);
         } catch(e) { console.error("Logout error", e); }
         
-        window.currentUserRecord = null; window.originalAdminRecord = null;
+        // 3. تصفير البيانات المحلية
+        window.currentUserRecord = null; 
+        window.originalAdminRecord = null;
         if(document.getElementById('password')) document.getElementById('password').value = '';
         
         document.getElementById('return-admin-btn').classList.add('hidden');
@@ -1128,18 +1144,10 @@ window.logout = async () => {
         document.getElementById('student-logout-btn').classList.remove('hidden');
         document.getElementById('student-notif-btn').classList.remove('hidden');
 
-        if(unsubscribeProgram) unsubscribeProgram();
-        if(unsubscribeUsers) unsubscribeUsers();
-        if(unsubscribeStudentData) unsubscribeStudentData();
-        if(unsubscribeChat) unsubscribeChat();
-        if(unsubscribeChatMeta) unsubscribeChatMeta();
-        if(pomodoroInterval) clearInterval(pomodoroInterval);
-        if (typeof closeChat === 'function') closeChat();
         switchScreen('auth-screen');
         document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
     }
 };
-
 window.openSettings = () => {
     document.getElementById('settings-username').value = window.currentUserRecord.username.replace(/_/g, ' ');
     const passInput = document.getElementById('settings-current-password');
