@@ -536,7 +536,7 @@ window.toggleAuthMode = () => {
             window.isRegistering = !window.isRegistering;
             
             const titleEl = document.getElementById('auth-title');
-            if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
+            if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة للعلوم الفيزيائية";
             
             const btnEl = document.getElementById('auth-action-btn');
             if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
