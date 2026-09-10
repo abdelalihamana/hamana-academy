@@ -2226,37 +2226,6 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
         }
         html += `</div>`;
 
-        const getAdminBg = (id, title) => {
-            if(id === 'part_middle') return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
-            if(id === 'part_high') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
-            if(id === 'm1_b1') return 'https://images.unsplash.com/photo-1493612276216-ee3925520721?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm1_b2') return 'https://images.unsplash.com/photo-1544473244-f6895e69ad8b?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm1_b3') return 'https://images.unsplash.com/photo-1501166222995-bb3b2fa7aca8?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm2_b1') return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm2_b2') return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm2_b3') return 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm3_b1') return 'https://images.unsplash.com/photo-1603126859544-0b73df780b6d?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm3_b2') return 'https://images.unsplash.com/photo-1473649085228-583485e6e4d7?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm3_b3') return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm3_b4') return 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm4_b1') return 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm4_b2') return 'https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm4_b3') return 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm4_b4') return 'https://images.unsplash.com/photo-1478144596228-51829eebc3f8?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'm4_b5') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'h1_b1') return 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'h1_b2') return 'https://images.unsplash.com/photo-1537495329792-41ae41ad3bf0?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'h2_b1') return 'https://images.unsplash.com/photo-1528642474498-1af0c17fd8c3?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'h2_b2') return 'https://images.unsplash.com/photo-1518861961448-7098e9fc7eec?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'h3_b1') return 'https://images.unsplash.com/photo-1579389083078-4e7018379f7e?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'h3_b2') return 'https://images.unsplash.com/photo-1536697246787-1f7ae568d89a?q=80&w=1000&auto=format&fit=crop'; 
-            if(id === 'h3_b3') return 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=1000&auto=format&fit=crop'; 
-            if(title && title.includes('متوسط')) return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
-            if(title && title.includes('ثانوي')) return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
-            if(title && title.includes('الفصل')) return 'https://images.unsplash.com/photo-1455734729978-db1ae3368e1f?q=80&w=1000&auto=format&fit=crop';
-            return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop'; 
-        };
-
            if (window.adminContentStep === 'parts') {
             html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[fadeInTab_0.3s_ease]">`;
             sections.forEach((part) => {
