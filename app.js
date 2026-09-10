@@ -39,12 +39,24 @@ window.currentLiveUrl = "";
 window.currentEditParams = null; 
 window.highlightedLessonTitle = null; 
 
-window.adminContentStep = 'parts'; 
-window.adminActivePart = null;
-window.adminActiveYear = {}; 
-window.adminActiveBranch = {}; 
-window.studentViewMode = 'grid'; 
-window.studentActiveBranchTab = null;
+// --- نظام الذاكرة الذكية المدمج (الاسترجاع) ---
+window.adminContentStep = sessionStorage.getItem('adminContentStep') || 'parts'; 
+window.adminActivePart = sessionStorage.getItem('adminActivePart') || null;
+window.adminActiveYear = JSON.parse(sessionStorage.getItem('adminActiveYear')) || {}; 
+window.adminActiveBranch = JSON.parse(sessionStorage.getItem('adminActiveBranch')) || {}; 
+window.studentViewMode = sessionStorage.getItem('studentViewMode') || 'grid'; 
+window.studentActiveBranchTab = sessionStorage.getItem('studentActiveBranchTab') || null;
+
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        let savedSection = sessionStorage.getItem('activeAdminSection');
+        if (savedSection && typeof window.openAdminSection === 'function' && window.currentUserRecord && window.currentUserRecord.role === 'admin') {
+            window.openAdminSection(savedSection);
+        }
+    }, 1500);
+});
+// ----------------------------------------------
+
 window.adminMainFilter = 'all'; 
 window.adminSubFilter = 'all'; 
 window.adminUsersList = [];
@@ -124,7 +136,7 @@ window.updatePomodoroUI = () => {
     if (btn) {
         if (isPomodoroRunning) {
             btn.innerHTML = '<i class="ph-fill ph-pause"></i>';
-            btn.className = "w-12 h-12 bg-amber-400 text-slate-900 hover:bg-amber-500 rounded-xl text-xl transition shadow-sm flex items-center justify-center shrink-0";
+            btn.className = "w-12 h-12 bg-amber-400 text-slate-900 hover:bg-amber-50 rounded-xl text-xl transition shadow-sm flex items-center justify-center shrink-0";
         } else {
             btn.innerHTML = '<i class="ph-fill ph-play"></i>';
             btn.className = "w-12 h-12 bg-white text-blue-700 hover:bg-blue-50 rounded-xl text-xl transition shadow-sm flex items-center justify-center shrink-0";
@@ -384,8 +396,8 @@ const checkAndUpdateStreak = async (userRef, userData) => {
     if (streakEl) streakEl.innerText = currentStreak;
 };
 
-// --- دالة فتح أقسام الإدارة (تم إصلاح خطأ ظهور المحتوى تحت الجدول) ---
 window.openAdminSection = (section) => {
+    sessionStorage.setItem('activeAdminSection', section); // حفظ الذاكرة
     document.getElementById('admin-dashboard-grid').classList.add('hidden');
     if (section === 'accounts') {
         document.getElementById('admin-content-section').classList.add('hidden');
@@ -421,6 +433,12 @@ window.toggleDarkMode = () => {
 };
 
 const getBranchImage = (branchId, title) => {
+    if(!branchId) return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop';
+    
+    // إضافة صور الأطوار الرئيسية (لتوحيد الدالة)
+    if(branchId === 'part_middle') return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
+    if(branchId === 'part_high') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
+
     if(branchId === 'm1_b1') return 'https://images.unsplash.com/photo-1493612276216-ee3925520721?q=80&w=1000&auto=format&fit=crop'; 
     if(branchId === 'm1_b2') return 'https://images.unsplash.com/photo-1544473244-f6895e69ad8b?q=80&w=1000&auto=format&fit=crop'; 
     if(branchId === 'm1_b3') return 'https://images.unsplash.com/photo-1501166222995-bb3b2fa7aca8?q=80&w=1000&auto=format&fit=crop'; 
@@ -450,16 +468,16 @@ const getBranchImage = (branchId, title) => {
     if(branchId === 'h3_b2') return 'https://images.unsplash.com/photo-1536697246787-1f7ae568d89a?q=80&w=1000&auto=format&fit=crop'; 
     if(branchId === 'h3_b3') return 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=1000&auto=format&fit=crop'; 
 
-    // صورة الفصل الأول (لكل المستويات)
     if(branchId.endsWith('_s1')) return 'https://i.ibb.co/V07SqjTB/1.jpg'; 
-    
-    // صورة الفصل الثاني (لكل المستويات)
     if(branchId.endsWith('_s2')) return 'https://i.ibb.co/6R6mrnFF/2.jpg'; 
-    
-    // صورة الفصل الثالث (لكل المستويات)
     if(branchId.endsWith('_s3')) return 'https://i.ibb.co/ch83MR70/3.jpg'; 
     
-    };
+    if(title && title.includes('متوسط')) return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
+    if(title && title.includes('ثانوي')) return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
+    if(title && title.includes('الفصل')) return 'https://images.unsplash.com/photo-1455734729978-db1ae3368e1f?q=80&w=1000&auto=format&fit=crop';
+    
+    return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop';
+};
 
 
 const getBranchIcon = (title) => {
@@ -657,7 +675,6 @@ window.verifyAdminCode = async () => {
     btn.disabled = false; btn.innerHTML = originalHTML;
 };
 
-// --- إصلاح منع الإدارة من طلب كلمة المرور ---
 window.requestPasswordReset = async () => {
     const usernameInput = document.getElementById('login-username').value.trim();
     if (!usernameInput) return showToast("يرجى كتابة الاسم واللقب أولاً في حقل الدخول لطلب استرجاع كلمة المرور", "error");
@@ -1359,7 +1376,6 @@ window.loadLeaderboard = async () => {
      if(!window.currentUserRecord || window.currentUserRecord.role === 'admin') return;
      
      try {
-         // التعديل: استخدام orderBy لترتيب النقاط، و limit(10) لجلب 10 فقط بدلا من 50 لتوفير القراءات
          const q = query(usersCol, where('level', '==', window.currentUserRecord.level), where('approved', '==', true), orderBy('xp', 'desc'), limit(10));
          const snap = await getDocs(q);
          window.allStudentsProgress = [];
@@ -1382,7 +1398,6 @@ const renderLeaderboard = () => {
     const container = document.getElementById('leaderboard-container');
     container.innerHTML = '';
     
-    // لم نعد بحاجة لاستخدام slice(0,10) لأننا جلبنا 10 فقط من القاعدة الأساسية
     let levelMates = window.allStudentsProgress.sort((a, b) => b.xp - a.xp);
     
     if(levelMates.length === 0) { container.innerHTML = `<div class="flex flex-col items-center justify-center p-6 opacity-50"><i class="ph-fill ph-ghost text-5xl mb-2"></i><div class="text-slate-500 dark:text-slate-400 font-bold text-center">لا يوجد منافسون بعد.. كن أنت المتصدر!</div></div>`; return; }
@@ -2195,6 +2210,19 @@ const getEmptyStateHTML = (title) => `<div class="flex flex-col items-center jus
 window.renderProgramUI = (sections, containerId, isAdmin) => {
     if(!sections) return; 
     window.currentSections = sections; 
+    
+    // --- حفظ الذاكرة المدمج ---
+    if (isAdmin) {
+        sessionStorage.setItem('adminContentStep', window.adminContentStep || 'parts');
+        if (window.adminActivePart) sessionStorage.setItem('adminActivePart', window.adminActivePart);
+        sessionStorage.setItem('adminActiveYear', JSON.stringify(window.adminActiveYear || {}));
+        sessionStorage.setItem('adminActiveBranch', JSON.stringify(window.adminActiveBranch || {}));
+    } else {
+        sessionStorage.setItem('studentViewMode', window.studentViewMode || 'grid');
+        if (window.studentActiveBranchTab) sessionStorage.setItem('studentActiveBranchTab', window.studentActiveBranchTab);
+    }
+    // --------------------------
+
     let html = '';
     
     if (isAdmin) {
@@ -2226,11 +2254,10 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
         }
         html += `</div>`;
 
-           if (window.adminContentStep === 'parts') {
+        if (window.adminContentStep === 'parts') {
             html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-[fadeInTab_0.3s_ease]">`;
             sections.forEach((part) => {
-                // استخدام صور افتراضية للطورين
-                let bgImage = part.id === 'part_middle' ? 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop' : 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
+                let bgImage = getBranchImage(part.id);
                 html += `<button onclick="window.adminActivePart='${part.id}'; window.adminContentStep='years'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-8 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[220px] flex flex-col items-center justify-center text-center">
                     <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
                     <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
@@ -2245,8 +2272,7 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
             let part = sections.find(p => p.id === window.adminActivePart);
             html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-[fadeInTab_0.3s_ease]">`;
             part.years.forEach((year) => {
-                // استخدام صور افتراضية للسنوات
-                let bgImage = part.id === 'part_middle' ? 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop' : 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
+                let bgImage = getBranchImage(part.id);
                 html += `<button onclick="window.adminActiveYear['${part.id}']='${year.id}'; window.adminContentStep='branches'; window.renderProgramUI(window.currentSections, 'admin-program-view', true);" class="relative overflow-hidden group p-6 rounded-[2rem] shadow-xl hover:-translate-y-2 transition-all duration-500 border border-slate-200 dark:border-slate-700 min-h-[180px] flex flex-col items-center justify-center text-center">
                     <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${bgImage}');"></div>
                     <div class="absolute inset-0 bg-slate-900/80 group-hover:bg-slate-900/60 transition-colors duration-500 z-0"></div>
@@ -2262,13 +2288,9 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
             let year = part.years.find(y => y.id === window.adminActiveYear[part.id]);
             html += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-[fadeInTab_0.3s_ease]">`;
             year.branches.forEach((branch) => {
-                
-                // 🚀 السر هنا: نجعل واجهة الأستاذ تستخدم نفس دالة التلميذ لكي تتطابق الصور 100%
                 let bgImage = getBranchImage(branch.id, branch.title);
-                // 1. التعرف على بطاقات الفصول
                 let isTerm = branch.id.endsWith('_s1') || branch.id.endsWith('_s2') || branch.id.endsWith('_s3');
                 
-                // 2. إخفاء النص وإزالة الطبقة السوداء للفصول فقط
                 let overlay = isTerm ? 'bg-slate-900/10 group-hover:bg-slate-900/0' : 'bg-slate-900/80 group-hover:bg-slate-900/60';
                 let titleHtml = isTerm ? '' : `<h3 class="text-3xl md:text-4xl font-black text-white drop-shadow-lg leading-snug group-hover:scale-105 transition-transform duration-500">${branch.title}</h3>`;
 
@@ -2345,27 +2367,21 @@ window.renderProgramUI = (sections, containerId, isAdmin) => {
                         });
                         let unitProg = branchLinksTotal === 0 ? 0 : Math.round((branchLinksClicked / branchLinksTotal) * 100);
                         
-                        // 1. التعرف على بطاقات الفصول
                         let isTerm = branch.id.endsWith('_s1') || branch.id.endsWith('_s2') || branch.id.endsWith('_s3');
                         
-                        // 2. إخفاء النص وإضاءة الصورة (مع ترك تدرج بسيط في الأسفل فقط ليظهر شريط التقدم)
                         let overlay = isTerm ? 'bg-gradient-to-t from-slate-900/90 via-slate-900/10 to-transparent' : 'bg-gradient-to-t from-slate-900/95 via-slate-900/60 to-slate-900/30 group-hover:via-slate-900/70';
                         let titleHtml = isTerm ? '' : `<h3 class="text-3xl md:text-4xl font-black drop-shadow-lg leading-tight text-white relative z-10 transition-transform duration-500 group-hover:scale-105 px-2">${branch.title}</h3>`;
 
                         html += `<button onclick="window.studentActiveBranchTab='${branch.id}'; window.studentViewMode='details'; window.renderProgramUI(window.currentSections, 'student-program-view', false);" class="relative p-6 md:p-8 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all duration-500 flex flex-col items-center justify-center gap-4 text-center overflow-hidden group min-h-[220px] border border-white/10">
                             
-                            <!-- صورة الخلفية مع تأثير التقريب -->
                             <div class="absolute inset-0 bg-cover bg-center z-0 transition-transform duration-700 group-hover:scale-110" style="background-image: url('${getBranchImage(branch.id, branch.title)}');"></div>
 
-                            <!-- الطبقة الزجاجية -->
                             <div class="absolute inset-0 ${overlay} z-0 transition-colors duration-500"></div>
 
                             ${unitProg === 100 && branchLinksTotal > 0 ? '<div class="absolute top-4 right-4 z-20 bg-emerald-500/80 backdrop-blur-md rounded-full w-8 h-8 flex items-center justify-center shadow-lg border border-emerald-300/50"><i class="ph-bold ph-check text-white text-lg"></i></div>' : ''}
                             
-                            <!-- محتوى البطاقة -->
                             ${titleHtml}
                             
-                            <!-- شريط التقدم -->
                             <div class="w-full mt-auto pt-4 text-white relative z-10 opacity-90 group-hover:opacity-100 transition-opacity">
                                 <div class="flex justify-between text-xs font-black mb-2 px-1 text-slate-200"><span>التقدم</span><span>${unitProg}%</span></div>
                                 <div class="w-full bg-slate-900/80 rounded-full h-2.5 shadow-inner overflow-hidden border border-white/10">
@@ -2528,54 +2544,3 @@ window.deleteStudentBtn = async (username) => {
         }
     }
 };
-// ==========================================
-// 🧠 نظام الذاكرة الذكية (حفظ مكان المستخدم بعد التحديث)
-// ==========================================
-
-// 1. استرجاع الذاكرة فوراً لتخطي الواجهة الرئيسية
-if(sessionStorage.getItem('adminContentStep')) window.adminContentStep = sessionStorage.getItem('adminContentStep');
-if(sessionStorage.getItem('adminActivePart')) window.adminActivePart = sessionStorage.getItem('adminActivePart');
-if(sessionStorage.getItem('adminActiveYear')) window.adminActiveYear = JSON.parse(sessionStorage.getItem('adminActiveYear'));
-if(sessionStorage.getItem('adminActiveBranch')) window.adminActiveBranch = JSON.parse(sessionStorage.getItem('adminActiveBranch'));
-
-if(sessionStorage.getItem('studentViewMode')) window.studentViewMode = sessionStorage.getItem('studentViewMode');
-if(sessionStorage.getItem('studentActiveBranchTab')) window.studentActiveBranchTab = sessionStorage.getItem('studentActiveBranchTab');
-
-// 2. اعتراض دالة الرسم الأصلية لحفظ المكان مع كل نقرة
-if (typeof window.renderProgramUI === 'function') {
-    const _originalRenderProgramUI = window.renderProgramUI;
-    window.renderProgramUI = (sections, containerId, isAdmin) => {
-        // حفظ المكان قبل الرسم
-        if (isAdmin) {
-            sessionStorage.setItem('adminContentStep', window.adminContentStep || 'parts');
-            if (window.adminActivePart) sessionStorage.setItem('adminActivePart', window.adminActivePart);
-            sessionStorage.setItem('adminActiveYear', JSON.stringify(window.adminActiveYear || {}));
-            sessionStorage.setItem('adminActiveBranch', JSON.stringify(window.adminActiveBranch || {}));
-        } else {
-            sessionStorage.setItem('studentViewMode', window.studentViewMode || 'grid');
-            if (window.studentActiveBranchTab) sessionStorage.setItem('studentActiveBranchTab', window.studentActiveBranchTab);
-        }
-        
-        // تنفيذ الدالة الأصلية
-        _originalRenderProgramUI(sections, containerId, isAdmin);
-    };
-}
-
-// 3. حفظ القسم النشط للأستاذ (هل هو في قسم المحتوى أم قسم التلاميذ؟)
-if (typeof window.openAdminSection === 'function') {
-    const _originalOpenAdminSection = window.openAdminSection;
-    window.openAdminSection = (sectionId) => {
-        sessionStorage.setItem('activeAdminSection', sectionId);
-        _originalOpenAdminSection(sectionId);
-    };
-}
-
-// 4. دالة استرجاع سريعة للقسم النشط بعد تحميل الصفحة
-window.addEventListener('load', () => {
-    setTimeout(() => {
-        let savedSection = sessionStorage.getItem('activeAdminSection');
-        if (savedSection && typeof window.openAdminSection === 'function' && window.currentUserRecord && window.currentUserRecord.role === 'admin') {
-            window.openAdminSection(savedSection);
-        }
-    }, 1500); // ننتظر قليلاً حتى تكتمل المصادقة مع فايربيز
-});
