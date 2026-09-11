@@ -1207,35 +1207,33 @@ window.returnToAdmin = () => {
 };
 
 window.logout = async () => {
-    console.log("جاري محاولة تسجيل الخروج..."); 
-    
-    // 🛡️ حماية دوال الإغلاق
-    try { if(typeof window.closeSettings === 'function') window.closeSettings(); } catch(e) {}
-    try { if(typeof window.closeChat === 'function') window.closeChat(); } catch(e) {}
+    // 1. حماية دوال الإغلاق وإغلاق أي نوافذ مفتوحة أولاً لمنع التداخل
+    try { if(typeof window.closeSettings === 'function') window.closeSettings(true); } catch(e) {}
+    try { if(typeof window.closeChat === 'function') window.closeChat(true); } catch(e) {}
 
-    let userConfirmed = false;
-    try {
-        userConfirmed = await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟");
-    } catch(e) {
-        console.error("خطأ في نافذة التأكيد:", e);
-        userConfirmed = true; // الخروج فوراً كإجراء احترازي
-    }
+    // 2. إيقاف الشاشة وإظهار نافذة التأكيد (وانتظار رد المستخدم)
+    const isConfirmed = await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟");
 
-    if(userConfirmed) {
-        // 🧹 تنظيف الذاكرة الذكية بالكامل
+    // 3. إذا ضغط المستخدم على "نعم"، يتم تنفيذ الخروج
+    if (isConfirmed) {
+        showToast("جاري تسجيل الخروج...", "success");
+
+        // تنظيف الذاكرة المؤقتة لحماية بيانات الحساب
         try { sessionStorage.clear(); } catch(e) {}
         
+        // إيقاف المستمعين (Listeners) لتوفير طاقة الهاتف والإنترنت
         try {
-            if(typeof unsubscribeProgram === 'function') unsubscribeProgram();
-            if(typeof unsubscribeUsers === 'function') unsubscribeUsers();
-            if(typeof unsubscribeStudentData === 'function') unsubscribeStudentData();
-            if(typeof unsubscribeChat === 'function') unsubscribeChat();
-            if(typeof unsubscribeChatMeta === 'function') unsubscribeChatMeta();
-            if(typeof window.unsubscribeResetRequests === 'function') window.unsubscribeResetRequests();
-            if(typeof window.unsubscribePendingUsers === 'function') window.unsubscribePendingUsers();
+            if(typeof unsubscribeProgram === 'function' && unsubscribeProgram) unsubscribeProgram();
+            if(typeof unsubscribeUsers === 'function' && unsubscribeUsers) unsubscribeUsers();
+            if(typeof unsubscribeStudentData === 'function' && unsubscribeStudentData) unsubscribeStudentData();
+            if(typeof unsubscribeChat === 'function' && unsubscribeChat) unsubscribeChat();
+            if(typeof unsubscribeChatMeta === 'function' && unsubscribeChatMeta) unsubscribeChatMeta();
+            if(typeof window.unsubscribeResetRequests === 'function' && window.unsubscribeResetRequests) window.unsubscribeResetRequests();
+            if(typeof window.unsubscribePendingUsers === 'function' && window.unsubscribePendingUsers) window.unsubscribePendingUsers();
             if(typeof pomodoroInterval !== 'undefined' && pomodoroInterval) clearInterval(pomodoroInterval);
-        } catch(e) { console.warn("خطأ في تنظيف الروابط:", e); }
+        } catch(e) { console.warn("تجاهل أخطاء إغلاق الروابط"); }
         
+        // تسجيل الخروج الفعلي من قاعدة بيانات فايربيز
         try {
             await signOut(auth);
         } catch(e) { console.error("Firebase logout error:", e); }
@@ -1243,6 +1241,7 @@ window.logout = async () => {
         window.currentUserRecord = null; 
         window.originalAdminRecord = null;
         
+        // مسح كلمة المرور من الحقول وإعادة الأزرار لحالتها الأصلية
         try {
             const passEl = document.getElementById('password');
             if (passEl) passEl.value = '';
@@ -1264,8 +1263,8 @@ window.logout = async () => {
             if (authScreen) authScreen.classList.remove('blur-sm', 'pointer-events-none');
         } catch(e) {}
 
+        // الانتقال لصفحة التسجيل
         try { switchScreen('auth-screen'); } catch(e) {}
-        try { history.replaceState(null, "", " "); } catch(e) {}
     }
 };
 window.openSettings = () => {
@@ -2004,7 +2003,7 @@ window.openChat = async (targetUser) => {
             chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md"><p class="text-[14px] whitespace-pre-wrap break-words ${textColor}" dir="auto">${escapeHtml(m.text)}</p></div>`;
         });
         
-     const msgBox = document.getElementById('chat-messages');
+       const msgBox = document.getElementById('chat-messages');
         msgBox.innerHTML = chatHtml || `<div class="h-full flex flex-col items-center justify-center opacity-50"><i class="ph-fill ph-hand-waving text-6xl text-slate-400 mb-3"></i><div class="text-center text-slate-500 font-bold bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-sm">أهلاً بك! يمكنك المراسلة هنا.</div></div>`;
         msgBox.scrollTop = msgBox.scrollHeight;
         if (window.activeChatUser) setDoc(doc(db, chatsPath, chatRoomId), { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
