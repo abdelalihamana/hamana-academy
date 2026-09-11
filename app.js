@@ -71,33 +71,30 @@ window.adminCurrentPage = 1;
 window.adminPageCursors = [];
 window.adminLastVisible = null;
 window.adminFirstVisible = null;
-let lastRenderState = null; // متغير لحفظ آخر حالة تم رسمها ومنع التكرار
+let lastRenderState = null; 
 
 // ==========================================
 // 🔙 نظام التنقل الذكي بزر العودة للهاتف (History API)
 // ==========================================
 window.addEventListener('popstate', (event) => {
     const state = event.state;
-    
-    // 1. إغلاق النوافذ المنبثقة إذا كانت مفتوحة عند ضغط زر العودة
     let modalClosed = false;
     const modals = [
         { id: 'embed-modal', closeFn: window.closeEmbedModal },
         { id: 'chat-modal', closeFn: window.closeChat },
-        { id: 'settings-modal', closeFn: window.closeSettings }
+        { id: 'settings-modal', closeFn: window.closeSettings },
+        { id: 'confirm-modal', closeFn: (val) => { if(window.closeConfirm) window.closeConfirm(false); } }
     ];
     
     modals.forEach(m => {
         const el = document.getElementById(m.id);
         if (el && el.classList.contains('flex')) {
-            m.closeFn(true); // نمرر true لنخبر الدالة أنها من زر العودة (لكي لا تعود مرتين)
+            m.closeFn(true);
             modalClosed = true;
         }
     });
-    // إذا كان الحدث مجرد إغلاق نافذة، نتوقف هنا لكي لا نغير الشاشة التي تحتها
     if (modalClosed) return; 
 
-    // 2. إذا لم تكن هناك حالة مسجلة
     if (!state) {
         if (window.currentUserRecord) {
             history.replaceState({ screen: window.currentUserRecord.role === 'admin' ? 'admin-screen' : 'app-screen' }, "");
@@ -105,22 +102,19 @@ window.addEventListener('popstate', (event) => {
         return;
     }
 
-    // 3. منع العودة لصفحة تسجيل الدخول إذا كان المستخدم مسجلاً
     if ((state.screen === 'landing-screen' || state.screen === 'auth-screen') && window.currentUserRecord) {
         history.pushState({ screen: window.currentUserRecord.role === 'admin' ? 'admin-screen' : 'app-screen' }, "");
         return;
     }
 
-    // 4. التنقل بين الشاشات الرئيسية
     if (state.screen) {
-        switchScreen(state.screen, false); // false = لا تقم بتسجيل هذه الحركة في التاريخ لأننا نعود أصلاً
+        switchScreen(state.screen, false); 
     }
     
     if (state.screen === 'auth-screen' && state.isRegistering !== undefined) {
         if (window.isRegistering !== state.isRegistering) window.toggleAuthMode(false);
     }
 
-    // 5. التراجع داخل واجهات الأستاذ
     if (state.screen === 'admin-screen') {
         if (state.section === 'accounts') window.openAdminSection('accounts', false);
         else if (state.section === 'dashboard') window.returnToAdminDashboard(false);
@@ -140,7 +134,6 @@ window.addEventListener('popstate', (event) => {
         }
     }
 
-    // 6. التراجع داخل واجهات التلميذ
     if (state.screen === 'app-screen') {
         if (state.studentMode) {
             window.studentViewMode = state.studentMode;
@@ -149,6 +142,7 @@ window.addEventListener('popstate', (event) => {
         }
     }
 });
+
 let pomodoroTime = 45 * 60; 
 let pomodoroInterval = null;
 let isPomodoroRunning = false;
@@ -324,7 +318,6 @@ window.openEmbedModal = (url) => {
         dlBtn.classList.remove('flex');
     }
 
-    // تسجيل حالة فتح النافذة لزر العودة
     history.pushState({ ...history.state, modalOpen: 'embed-modal' }, "");
 
     modal.classList.remove('hidden');
@@ -335,16 +328,18 @@ window.openEmbedModal = (url) => {
 window.closeEmbedModal = (isFromPopState = false) => {
     const modal = document.getElementById('embed-modal');
     const iframe = document.getElementById('embed-iframe');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-    iframe.src = ''; 
+    if(modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+    if(iframe) iframe.src = ''; 
     document.body.style.overflow = ''; 
     
-    // إذا أغلقها المستخدم بالزر (X)، نقوم بالعودة في التاريخ برمجياً
     if (!isFromPopState && history.state && history.state.modalOpen === 'embed-modal') {
         history.back();
     }
 };
+
 window.updateLiveStreamUI = (url, target = 'all') => {
     const studentBanner = document.getElementById('student-live-banner');
     const adminStatus = document.getElementById('admin-live-status-text');
@@ -480,10 +475,37 @@ const checkAndUpdateStreak = async (userRef, userData) => {
     if (streakEl) streakEl.innerText = currentStreak;
 };
 
+// ==========================================
+// 🛡️ دالة نافذة التأكيد (المفقودة سابقاً)
+// ==========================================
+window.closeConfirm = null;
+const confirmAction = (msg) => {
+    return new Promise((resolve) => {
+        const msgEl = document.getElementById('confirm-message');
+        if (msgEl) msgEl.innerText = msg;
+        
+        const modal = document.getElementById('confirm-modal');
+        if (!modal) {
+            // كاحتياط لو لم تكن النافذة موجودة في الـ HTML
+            resolve(window.confirm(msg));
+            return;
+        }
+        
+        modal.classList.remove('hidden'); 
+        modal.classList.add('flex');
+        history.pushState({ ...history.state, modalOpen: 'confirm-modal' }, "");
+        
+        window.closeConfirm = (isConfirmed) => {
+            modal.classList.add('hidden'); 
+            modal.classList.remove('flex');
+            resolve(isConfirmed);
+        };
+    });
+};
+
 window.openAdminSection = (section, pushHistory = true) => {
     document.getElementById('admin-dashboard-grid').classList.add('hidden');
     
-    // تسجيل التنقل في السجل
     if (pushHistory) history.pushState({ screen: 'admin-screen', section: section }, "");
 
     if (section === 'accounts') {
@@ -512,9 +534,9 @@ window.returnToAdminDashboard = (pushHistory = true) => {
     document.getElementById('admin-dashboard-grid').classList.remove('hidden');
     window.adminContentStep = 'parts';
     
-    // تسجيل العودة للوحة في السجل
     if (pushHistory) history.pushState({ screen: 'admin-screen', section: 'dashboard' }, "");
 };
+
 window.toggleDarkMode = () => {
     document.documentElement.classList.toggle('dark');
     const isDark = document.documentElement.classList.contains('dark');
@@ -524,7 +546,6 @@ window.toggleDarkMode = () => {
 const getBranchImage = (branchId, title) => {
     if(!branchId) return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop';
     
-    // إضافة صور الأطوار الرئيسية (لتوحيد الدالة)
     if(branchId === 'part_middle') return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
     if(branchId === 'part_high') return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
 
@@ -567,7 +588,6 @@ const getBranchImage = (branchId, title) => {
     
     return 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?q=80&w=1000&auto=format&fit=crop';
 };
-
 
 const getBranchIcon = (title) => {
     if(title.includes('شهادتك') || title.includes('شهادات') || title.includes('تجريبية')) return '<i class="ph-fill ph-certificate"></i>';
@@ -614,7 +634,6 @@ const switchScreen = (screenId, pushHistory = true) => {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
     
-    // إضافة التنقل إلى السجل (History)
     if (pushHistory) {
         if (!history.state) history.replaceState({ screen: screenId }, "");
         else if (history.state.screen !== screenId) history.pushState({ screen: screenId }, "");
@@ -632,57 +651,52 @@ window.openExistingAccount = () => {
 };
 
 window.toggleAuthMode = (pushHistory = true) => {
-            window.isRegistering = !window.isRegistering;
-            
-            if (pushHistory && history.state) {
-                history.pushState({ screen: 'auth-screen', isRegistering: window.isRegistering }, "");
-            }
-            const titleEl = document.getElementById('auth-title');
-            if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
-            
-            const btnEl = document.getElementById('auth-action-btn');
-            if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
-            
-            const switchEl = document.getElementById('switch-mode-text');
-            if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
-            
-            const authScreen = document.getElementById('auth-screen');
-            
-            const loginNameCont = document.getElementById('login-name-container');
-            const regNamesCont = document.getElementById('register-names-container');
-            const regParentPhoneCont = document.getElementById('register-parent-phone-container');
-            const levelSelect = document.getElementById('user-level'); 
-            const levelIcon = document.getElementById('level-icon');
-            const forgotPassCont = document.getElementById('forgot-password-container');
-            
-            if(window.isRegistering) {
-                if(authScreen) {
-                    authScreen.classList.remove('max-w-md');
-                    authScreen.classList.add('max-w-2xl', 'transition-all', 'duration-500'); 
-                }
-                
-                if(loginNameCont) loginNameCont.classList.add('hidden');
-                if(regNamesCont) { regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex'); }
-                if(regParentPhoneCont) { regParentPhoneCont.classList.remove('hidden'); regParentPhoneCont.classList.add('flex'); }
-                
-                if(levelSelect) levelSelect.classList.remove('hidden'); 
-                if(levelIcon) levelIcon.classList.remove('hidden');
-                if(forgotPassCont) forgotPassCont.classList.add('hidden');
-            } else {
-                if(authScreen) {
-                    authScreen.classList.remove('max-w-2xl');
-                    authScreen.classList.add('max-w-md');
-                }
-                
-                if(loginNameCont) loginNameCont.classList.remove('hidden');
-                if(regNamesCont) { regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex'); }
-                if(regParentPhoneCont) { regParentPhoneCont.classList.add('hidden'); regParentPhoneCont.classList.remove('flex'); }
-                
-                if(levelSelect) levelSelect.classList.add('hidden'); 
-                if(levelIcon) levelIcon.classList.add('hidden');
-                if(forgotPassCont) forgotPassCont.classList.remove('hidden');
-            }
-        };
+    window.isRegistering = !window.isRegistering;
+    
+    if (pushHistory && history.state) {
+        history.pushState({ screen: 'auth-screen', isRegistering: window.isRegistering }, "");
+    }
+    const titleEl = document.getElementById('auth-title');
+    if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
+    
+    const btnEl = document.getElementById('auth-action-btn');
+    if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
+    
+    const switchEl = document.getElementById('switch-mode-text');
+    if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
+    
+    const authScreen = document.getElementById('auth-screen');
+    const loginNameCont = document.getElementById('login-name-container');
+    const regNamesCont = document.getElementById('register-names-container');
+    const regParentPhoneCont = document.getElementById('register-parent-phone-container');
+    const levelSelect = document.getElementById('user-level'); 
+    const levelIcon = document.getElementById('level-icon');
+    const forgotPassCont = document.getElementById('forgot-password-container');
+    
+    if(window.isRegistering) {
+        if(authScreen) {
+            authScreen.classList.remove('max-w-md');
+            authScreen.classList.add('max-w-2xl', 'transition-all', 'duration-500'); 
+        }
+        if(loginNameCont) loginNameCont.classList.add('hidden');
+        if(regNamesCont) { regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex'); }
+        if(regParentPhoneCont) { regParentPhoneCont.classList.remove('hidden'); regParentPhoneCont.classList.add('flex'); }
+        if(levelSelect) levelSelect.classList.remove('hidden'); 
+        if(levelIcon) levelIcon.classList.remove('hidden');
+        if(forgotPassCont) forgotPassCont.classList.add('hidden');
+    } else {
+        if(authScreen) {
+            authScreen.classList.remove('max-w-2xl');
+            authScreen.classList.add('max-w-md');
+        }
+        if(loginNameCont) loginNameCont.classList.remove('hidden');
+        if(regNamesCont) { regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex'); }
+        if(regParentPhoneCont) { regParentPhoneCont.classList.add('hidden'); regParentPhoneCont.classList.remove('flex'); }
+        if(levelSelect) levelSelect.classList.add('hidden'); 
+        if(levelIcon) levelIcon.classList.add('hidden');
+        if(forgotPassCont) forgotPassCont.classList.remove('hidden');
+    }
+};
 
 window.togglePasswordVisibility = () => {
     const passInput = document.getElementById('password');
@@ -692,13 +706,11 @@ window.togglePasswordVisibility = () => {
         if (passInput.type === 'password') {
             passInput.type = 'text';
             toggleIcon.classList.remove('ph-eye-slash');
-            toggleIcon.classList.add('ph-eye');
-            toggleIcon.classList.add('text-blue-500');
+            toggleIcon.classList.add('ph-eye', 'text-blue-500');
         } else {
             passInput.type = 'password';
-            toggleIcon.classList.remove('ph-eye');
+            toggleIcon.classList.remove('ph-eye', 'text-blue-500');
             toggleIcon.classList.add('ph-eye-slash');
-            toggleIcon.classList.remove('text-blue-500');
         }
     }
 };
@@ -822,7 +834,6 @@ window.handleAuth = async () => {
     if (!isAuthReady) return showToast("يتم الاتصال بالسحابة... يرجى الانتظار", "error");
     
     let rawName = "";
-    
     if (window.isRegistering) {
         const fNameEl = document.getElementById('reg-firstname');
         const lNameEl = document.getElementById('reg-lastname');
@@ -830,7 +841,6 @@ window.handleAuth = async () => {
         
         const fName = fNameEl.value.trim();
         const lName = lNameEl.value.trim();
-        
         if (fName && lName) {
             rawName = `${fName} ${lName}`.toLowerCase();
         } else {
@@ -851,7 +861,6 @@ window.handleAuth = async () => {
     const phoneNumber = document.getElementById('phone-number')?.value.trim() || "";
 
     if (!rawName || !password) return showToast("يرجى ملء جميع البيانات المطلوبة", "error");
-    
     if (password.length < 6) return showToast('عذراً، كلمة المرور يجب أن تتكون من 6 "أرقام أو أحرف أو مزيج بينهما" على الأقل', "error");
 
     if (window.isRegistering) {
@@ -871,7 +880,6 @@ window.handleAuth = async () => {
     try {
         if (window.isRegistering) {
             await createUserWithEmailAndPassword(auth, pseudoEmail, password);
-            
             await setDoc(userRef, { 
                 role: 'student', 
                 approved: false, 
@@ -884,14 +892,12 @@ window.handleAuth = async () => {
                 xp: 0, 
                 lastLoginDate: ''
             });
-            
             document.getElementById('registration-success-modal').classList.remove('hidden');
             document.getElementById('registration-success-modal').classList.add('flex');
             if(document.getElementById('reg-firstname')) document.getElementById('reg-firstname').value = ''; 
             if(document.getElementById('reg-lastname')) document.getElementById('reg-lastname').value = ''; 
             if(document.getElementById('password')) document.getElementById('password').value = '';
             await signOut(auth); 
-            
         } else {
             if (username === 'admin') {
                 try {
@@ -1206,22 +1212,21 @@ window.returnToAdmin = () => {
     showToast("تمت العودة لمتابعة التلاميذ بنجاح");
 };
 
+// ==========================================
+// 🚪 دالة تسجيل الخروج المحسنة مع نافذة التأكيد
+// ==========================================
 window.logout = async () => {
-    // 1. حماية دوال الإغلاق وإغلاق أي نوافذ مفتوحة أولاً لمنع التداخل
     try { if(typeof window.closeSettings === 'function') window.closeSettings(true); } catch(e) {}
     try { if(typeof window.closeChat === 'function') window.closeChat(true); } catch(e) {}
 
-    // 2. إيقاف الشاشة وإظهار نافذة التأكيد (وانتظار رد المستخدم)
+    // إظهار نافذة التأكيد الذكية الانتظارية
     const isConfirmed = await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟");
 
-    // 3. إذا ضغط المستخدم على "نعم"، يتم تنفيذ الخروج
     if (isConfirmed) {
         showToast("جاري تسجيل الخروج...", "success");
 
-        // تنظيف الذاكرة المؤقتة لحماية بيانات الحساب
         try { sessionStorage.clear(); } catch(e) {}
         
-        // إيقاف المستمعين (Listeners) لتوفير طاقة الهاتف والإنترنت
         try {
             if(typeof unsubscribeProgram === 'function' && unsubscribeProgram) unsubscribeProgram();
             if(typeof unsubscribeUsers === 'function' && unsubscribeUsers) unsubscribeUsers();
@@ -1231,9 +1236,8 @@ window.logout = async () => {
             if(typeof window.unsubscribeResetRequests === 'function' && window.unsubscribeResetRequests) window.unsubscribeResetRequests();
             if(typeof window.unsubscribePendingUsers === 'function' && window.unsubscribePendingUsers) window.unsubscribePendingUsers();
             if(typeof pomodoroInterval !== 'undefined' && pomodoroInterval) clearInterval(pomodoroInterval);
-        } catch(e) { console.warn("تجاهل أخطاء إغلاق الروابط"); }
+        } catch(e) {}
         
-        // تسجيل الخروج الفعلي من قاعدة بيانات فايربيز
         try {
             await signOut(auth);
         } catch(e) { console.error("Firebase logout error:", e); }
@@ -1241,7 +1245,6 @@ window.logout = async () => {
         window.currentUserRecord = null; 
         window.originalAdminRecord = null;
         
-        // مسح كلمة المرور من الحقول وإعادة الأزرار لحالتها الأصلية
         try {
             const passEl = document.getElementById('password');
             if (passEl) passEl.value = '';
@@ -1263,10 +1266,10 @@ window.logout = async () => {
             if (authScreen) authScreen.classList.remove('blur-sm', 'pointer-events-none');
         } catch(e) {}
 
-        // الانتقال لصفحة التسجيل
         try { switchScreen('auth-screen'); } catch(e) {}
     }
 };
+
 window.openSettings = () => {
     document.getElementById('settings-username').value = window.currentUserRecord.username.replace(/_/g, ' ');
     const passInput = document.getElementById('settings-current-password');
@@ -1281,16 +1284,16 @@ window.openSettings = () => {
         phoneInput.value = window.currentUserRecord.phoneNumber || '';
     }
 
-  const modal = document.getElementById('settings-modal'); const content = document.getElementById('settings-content');
-    modal.classList.remove('hidden'); modal.classList.add('flex');
-    setTimeout(() => { content.classList.remove('scale-95'); content.classList.add('scale-100'); }, 10);
+    const modal = document.getElementById('settings-modal'); 
+    const content = document.getElementById('settings-content');
+    if(modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+    setTimeout(() => { if(content) { content.classList.remove('scale-95'); content.classList.add('scale-100'); } }, 10);
 };
 
 window.closeSettings = (isFromPopState = false) => {
     const modal = document.getElementById('settings-modal'); 
     const content = document.getElementById('settings-content');
     
-    // 🛡️ التأكد من وجود العنصر قبل تعديله لمنع توقف الكود
     if (content) {
         content.classList.remove('scale-100'); 
         content.classList.add('scale-95');
@@ -1508,9 +1511,6 @@ window.loadLeaderboard = async () => {
          renderLeaderboard();
      } catch(e) { 
          console.error("Error loading leaderboard", e); 
-         if (e.message && e.message.includes("index")) {
-             console.warn("⚠️ تنبيه للأستاذ: يرجى الضغط على الرابط الموجود في الخطأ أعلاه لإنشاء الفهرس (Index) في فايربيز لكي تعمل لوحة الشرف.");
-         }
      }
 };
 
@@ -1968,7 +1968,6 @@ window.openChat = async (targetUser) => {
     let displayTarget = window.currentUserRecord.role === 'admin' ? targetUser.replace(/_/g, ' ') : "الأستاذ";
     document.getElementById('chat-target-name').innerText = displayTarget;
     
-    // تسجيل النافذة في سجل الهاتف
     history.pushState({ ...history.state, modalOpen: 'chat-modal' }, "");
 
     const modal = document.getElementById('chat-modal');
@@ -2003,9 +2002,11 @@ window.openChat = async (targetUser) => {
             chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md"><p class="text-[14px] whitespace-pre-wrap break-words ${textColor}" dir="auto">${escapeHtml(m.text)}</p></div>`;
         });
         
-       const msgBox = document.getElementById('chat-messages');
-        msgBox.innerHTML = chatHtml || `<div class="h-full flex flex-col items-center justify-center opacity-50"><i class="ph-fill ph-hand-waving text-6xl text-slate-400 mb-3"></i><div class="text-center text-slate-500 font-bold bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-sm">أهلاً بك! يمكنك المراسلة هنا.</div></div>`;
-        msgBox.scrollTop = msgBox.scrollHeight;
+        const msgBox = document.getElementById('chat-messages');
+        if(msgBox) {
+            msgBox.innerHTML = chatHtml || `<div class="h-full flex flex-col items-center justify-center opacity-50"><i class="ph-fill ph-hand-waving text-6xl text-slate-400 mb-3"></i><div class="text-center text-slate-500 font-bold bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-sm">أهلاً بك! يمكنك المراسلة هنا.</div></div>`;
+            msgBox.scrollTop = msgBox.scrollHeight;
+        }
         if (window.activeChatUser) setDoc(doc(db, chatsPath, chatRoomId), { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
     }, e => { console.error("Chat Error", e); });
 };
@@ -2021,6 +2022,7 @@ window.closeChat = (isFromPopState = false) => {
     
     if (!isFromPopState && history.state && history.state.modalOpen === 'chat-modal') history.back();
 };
+
 window.sendChatMessage = async () => {
     let inputEl = document.getElementById('chat-input'); let text = inputEl.value.trim();
     if(!text) return; 
@@ -2033,13 +2035,12 @@ window.sendChatMessage = async () => {
         let chatDocRef = doc(db, chatsPath, chatRoomId); let messagesRef = collection(db, chatsPath, chatRoomId, 'messages');
         await setDoc(doc(messagesRef, Date.now().toString()), { sender: window.currentUserRecord.role, text: text, timestamp: Date.now() });
         await setDoc(chatDocRef, { [window.currentUserRecord.role === 'admin' ? 'unreadStudent' : 'unreadAdmin']: increment(1) }, { merge: true });
-        inputEl.value = ''; setTimeout(() => { const msgBox = document.getElementById('chat-messages'); msgBox.scrollTop = msgBox.scrollHeight; }, 100);
+        inputEl.value = ''; setTimeout(() => { const msgBox = document.getElementById('chat-messages'); if(msgBox) msgBox.scrollTop = msgBox.scrollHeight; }, 100);
     } catch(e) { console.error(e); showToast("فشل الإرسال. تأكد من اتصالك بالإنترنت", "error"); }
     btn.disabled = false; btn.innerHTML = origHtml;
 };
 
-window.markStudentNotificationsAsRead = () => {
-};
+window.markStudentNotificationsAsRead = () => {};
 
 window.goToUpdate = (branchTitle, updateId, updateTitle) => {
     if (window.currentUserRecord) {
@@ -2082,7 +2083,6 @@ window.goToUpdate = (branchTitle, updateId, updateTitle) => {
 
 window.renderStudentNotifications = (myUpdates, hiddenUpdates) => {
     let notifHtml = '';
-    
     let visibleUpdates = myUpdates.filter(u => !hiddenUpdates.includes(u.id));
     let sortedUpdates = [...visibleUpdates].sort((a, b) => b.timestamp - a.timestamp);
 
@@ -2339,11 +2339,11 @@ window.saveEditedLink = async () => {
 };
 
 const getEmptyStateHTML = (title) => `<div class="flex flex-col items-center justify-center p-6 text-center bg-white/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 h-32"><i class="ph-fill ph-folder-open text-4xl text-slate-300 dark:text-slate-600 mb-2"></i><h3 class="text-sm font-black text-slate-500 dark:text-slate-400">لا يوجد ${title} حالياً</h3></div>`;
+
 window.renderProgramUI = (sections, containerId, isAdmin, pushHistory = true) => {
     if(!sections) return; 
     window.currentSections = sections; 
     
-    // --- حفظ الحالة لزر العودة الذكي ---
     if (pushHistory) {
         if (isAdmin) {
             let currentState = `admin_${window.adminContentStep}_${window.adminActivePart}_${window.adminActiveYear[window.adminActivePart] || ''}_${window.adminActiveBranch[window.adminActiveYear[window.adminActivePart]] || ''}`;
@@ -2636,15 +2636,11 @@ window.upgradeStudentLevel = async (username, currentLevel) => {
     }
 
     const upgradeInfo = levelProgression[currentLevel];
-    
-    if (!upgradeInfo) {
-        return showToast("مستوى غير معروف", "error");
-    }
+    if (!upgradeInfo) return showToast("مستوى غير معروف", "error");
 
     const studentName = username.replace(/_/g, ' ');
 
     if (await confirmAction(`🎓 هل أنت متأكد من ترقية (${studentName}) إلى [ ${upgradeInfo.name} ]؟\n\n⚠️ تحذير: سيتم تفريغ مساحة التخزين الخاصة به بالكامل (حذف تقدم الدروس، نقاط XP، الإشعارات، والدردشات القديمة) ليبدأ عاماً جديداً بصفحة بيضاء.`)) {
-        
         showToast("جاري الترقية وتنظيف بيانات الحساب... يرجى الانتظار", "success");
 
         try {
@@ -2662,20 +2658,13 @@ window.upgradeStudentLevel = async (username, currentLevel) => {
                 const messagesRef = collection(db, chatsPath, username, 'messages');
                 const q = query(messagesRef, limit(100)); 
                 const querySnapshot = await getDocs(q);
-                querySnapshot.forEach(async (d) => {
-                    await deleteDoc(d.ref);
-                });
+                querySnapshot.forEach(async (d) => { await deleteDoc(d.ref); });
                 await setDoc(doc(db, chatsPath, username), { unreadAdmin: 0, unreadStudent: 0 }, { merge: true });
-            } catch(chatError) {
-                console.warn("حدث خطأ في مسح المحادثات:", chatError);
-            }
+            } catch(chatError) {}
             
             showToast(`تمت ترقية ${studentName} إلى ${upgradeInfo.name} وتنظيف المساحة بنجاح! 🚀`, "success");
-            
             if (typeof loadAdminPage === 'function') loadAdminPage('init');
-            
         } catch (error) {
-            console.error("Upgrade error:", error);
             showToast("حدث خطأ أثناء ترقية التلميذ", "error");
         }
     }
