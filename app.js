@@ -1207,9 +1207,19 @@ window.returnToAdmin = () => {
 };
 
 window.logout = async () => {
-    if (typeof closeSettings === 'function') closeSettings();
+    // 🛡️ حماية الكود: التأكد أن النافذة موجودة فعلاً قبل محاولة إغلاقها
+    try {
+        const settingsModal = document.getElementById('settings-modal');
+        if (settingsModal && !settingsModal.classList.contains('hidden') && typeof closeSettings === 'function') {
+            closeSettings();
+        }
+    } catch(e) {}
+
     if(await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
         
+        // 🧹 تنظيف الذاكرة الذكية (هام جداً لكي لا تتداخل حسابات التلاميذ)
+        sessionStorage.clear();
+
         if(unsubscribeProgram) { unsubscribeProgram(); unsubscribeProgram = null; }
         if(unsubscribeUsers) { unsubscribeUsers(); unsubscribeUsers = null; }
         if(unsubscribeStudentData) { unsubscribeStudentData(); unsubscribeStudentData = null; }
@@ -1219,7 +1229,14 @@ window.logout = async () => {
         if(window.unsubscribePendingUsers) { window.unsubscribePendingUsers(); window.unsubscribePendingUsers = null; }
 
         if(pomodoroInterval) clearInterval(pomodoroInterval);
-        if (typeof closeChat === 'function') closeChat();
+        
+        // 🛡️ حماية كود إغلاق الدردشة
+        try {
+            const chatModal = document.getElementById('chat-modal');
+            if (chatModal && !chatModal.classList.contains('hidden') && typeof closeChat === 'function') {
+                closeChat();
+            }
+        } catch(e) {}
 
         try {
             await signOut(auth);
@@ -1229,15 +1246,21 @@ window.logout = async () => {
         window.originalAdminRecord = null;
         if(document.getElementById('password')) document.getElementById('password').value = '';
         
-        document.getElementById('return-admin-btn').classList.add('hidden');
-        document.getElementById('student-settings-btn').classList.remove('hidden');
-        document.getElementById('student-chat-btn').classList.remove('hidden');
-        document.getElementById('student-dark-btn').classList.remove('hidden');
-        document.getElementById('student-logout-btn').classList.remove('hidden');
-        document.getElementById('student-notif-btn').classList.remove('hidden');
+        const returnAdminBtn = document.getElementById('return-admin-btn');
+        if(returnAdminBtn) returnAdminBtn.classList.add('hidden');
+        
+        const idsToShow = ['student-settings-btn', 'student-chat-btn', 'student-dark-btn', 'student-logout-btn', 'student-notif-btn'];
+        idsToShow.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('hidden');
+        });
 
         switchScreen('auth-screen');
-        document.getElementById('auth-screen').classList.remove('blur-sm', 'pointer-events-none');
+        const authScreen = document.getElementById('auth-screen');
+        if(authScreen) authScreen.classList.remove('blur-sm', 'pointer-events-none');
+        
+        // تنظيف مسار الهاتف (History)
+        history.replaceState({ screen: 'auth-screen' }, "");
     }
 };
 window.openSettings = () => {
@@ -1254,19 +1277,23 @@ window.openSettings = () => {
         phoneInput.value = window.currentUserRecord.phoneNumber || '';
     }
 
-const modal = document.getElementById('settings-modal'); const content = document.getElementById('settings-content');
-    
-    // تسجيل النافذة في سجل الهاتف
-    history.pushState({ ...history.state, modalOpen: 'settings-modal' }, "");
-
+    const modal = document.getElementById('settings-modal'); const content = document.getElementById('settings-content');
     modal.classList.remove('hidden'); modal.classList.add('flex');
     setTimeout(() => { content.classList.remove('scale-95'); content.classList.add('scale-100'); }, 10);
 };
 
 window.closeSettings = (isFromPopState = false) => {
-    const modal = document.getElementById('settings-modal'); const content = document.getElementById('settings-content');
-    content.classList.remove('scale-100'); content.classList.add('scale-95');
-    setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+    const modal = document.getElementById('settings-modal'); 
+    const content = document.getElementById('settings-content');
+    
+    // 🛡️ التأكد من وجود العنصر قبل تعديله لمنع توقف الكود
+    if (content) {
+        content.classList.remove('scale-100'); 
+        content.classList.add('scale-95');
+    }
+    if (modal) {
+        setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+    }
     
     if (!isFromPopState && history.state && history.state.modalOpen === 'settings-modal') history.back();
 };
@@ -1972,7 +1999,7 @@ window.openChat = async (targetUser) => {
             chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md"><p class="text-[14px] whitespace-pre-wrap break-words ${textColor}" dir="auto">${escapeHtml(m.text)}</p></div>`;
         });
         
-                const msgBox = document.getElementById('chat-messages');
+     const msgBox = document.getElementById('chat-messages');
         msgBox.innerHTML = chatHtml || `<div class="h-full flex flex-col items-center justify-center opacity-50"><i class="ph-fill ph-hand-waving text-6xl text-slate-400 mb-3"></i><div class="text-center text-slate-500 font-bold bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-sm">أهلاً بك! يمكنك المراسلة هنا.</div></div>`;
         msgBox.scrollTop = msgBox.scrollHeight;
         if (window.activeChatUser) setDoc(doc(db, chatsPath, chatRoomId), { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
@@ -1980,8 +2007,11 @@ window.openChat = async (targetUser) => {
 };
 
 window.closeChat = (isFromPopState = false) => { 
-    document.getElementById('chat-modal').classList.add('hidden'); 
-    document.getElementById('chat-modal').classList.remove('flex'); 
+    const modal = document.getElementById('chat-modal');
+    if (modal) {
+        modal.classList.add('hidden'); 
+        modal.classList.remove('flex'); 
+    }
     if(unsubscribeChat) unsubscribeChat(); 
     window.activeChatUser = null; 
     
