@@ -71,7 +71,84 @@ window.adminCurrentPage = 1;
 window.adminPageCursors = [];
 window.adminLastVisible = null;
 window.adminFirstVisible = null;
+let lastRenderState = null; // متغير لحفظ آخر حالة تم رسمها ومنع التكرار
 
+// ==========================================
+// 🔙 نظام التنقل الذكي بزر العودة للهاتف (History API)
+// ==========================================
+window.addEventListener('popstate', (event) => {
+    const state = event.state;
+    
+    // 1. إغلاق النوافذ المنبثقة إذا كانت مفتوحة عند ضغط زر العودة
+    let modalClosed = false;
+    const modals = [
+        { id: 'embed-modal', closeFn: window.closeEmbedModal },
+        { id: 'chat-modal', closeFn: window.closeChat },
+        { id: 'settings-modal', closeFn: window.closeSettings }
+    ];
+    
+    modals.forEach(m => {
+        const el = document.getElementById(m.id);
+        if (el && el.classList.contains('flex')) {
+            m.closeFn(true); // نمرر true لنخبر الدالة أنها من زر العودة (لكي لا تعود مرتين)
+            modalClosed = true;
+        }
+    });
+    // إذا كان الحدث مجرد إغلاق نافذة، نتوقف هنا لكي لا نغير الشاشة التي تحتها
+    if (modalClosed) return; 
+
+    // 2. إذا لم تكن هناك حالة مسجلة
+    if (!state) {
+        if (window.currentUserRecord) {
+            history.replaceState({ screen: window.currentUserRecord.role === 'admin' ? 'admin-screen' : 'app-screen' }, "");
+        }
+        return;
+    }
+
+    // 3. منع العودة لصفحة تسجيل الدخول إذا كان المستخدم مسجلاً
+    if ((state.screen === 'landing-screen' || state.screen === 'auth-screen') && window.currentUserRecord) {
+        history.pushState({ screen: window.currentUserRecord.role === 'admin' ? 'admin-screen' : 'app-screen' }, "");
+        return;
+    }
+
+    // 4. التنقل بين الشاشات الرئيسية
+    if (state.screen) {
+        switchScreen(state.screen, false); // false = لا تقم بتسجيل هذه الحركة في التاريخ لأننا نعود أصلاً
+    }
+    
+    if (state.screen === 'auth-screen' && state.isRegistering !== undefined) {
+        if (window.isRegistering !== state.isRegistering) window.toggleAuthMode(false);
+    }
+
+    // 5. التراجع داخل واجهات الأستاذ
+    if (state.screen === 'admin-screen') {
+        if (state.section === 'accounts') window.openAdminSection('accounts', false);
+        else if (state.section === 'dashboard') window.returnToAdminDashboard(false);
+        else if (state.section === 'content') {
+            document.getElementById('admin-accounts-section').classList.add('hidden');
+            document.getElementById('admin-accounts-section').classList.remove('flex');
+            document.getElementById('admin-content-section').classList.remove('hidden');
+            document.getElementById('admin-content-section').classList.add('block');
+            document.getElementById('admin-dashboard-grid').classList.add('hidden');
+            
+            if (state.adminStep) window.adminContentStep = state.adminStep;
+            if (state.adminActivePart) window.adminActivePart = state.adminActivePart;
+            if (state.adminActiveYear) window.adminActiveYear = state.adminActiveYear;
+            if (state.adminActiveBranch) window.adminActiveBranch = state.adminActiveBranch;
+            
+            window.renderProgramUI(window.currentSections, 'admin-program-view', true, false);
+        }
+    }
+
+    // 6. التراجع داخل واجهات التلميذ
+    if (state.screen === 'app-screen') {
+        if (state.studentMode) {
+            window.studentViewMode = state.studentMode;
+            if (state.studentActiveBranchTab) window.studentActiveBranchTab = state.studentActiveBranchTab;
+            window.renderProgramUI(window.currentSections, 'student-program-view', false, false);
+        }
+    }
+});
 let pomodoroTime = 45 * 60; 
 let pomodoroInterval = null;
 let isPomodoroRunning = false;
@@ -247,20 +324,27 @@ window.openEmbedModal = (url) => {
         dlBtn.classList.remove('flex');
     }
 
+    // تسجيل حالة فتح النافذة لزر العودة
+    history.pushState({ ...history.state, modalOpen: 'embed-modal' }, "");
+
     modal.classList.remove('hidden');
     modal.classList.add('flex');
     document.body.style.overflow = 'hidden'; 
 };
 
-window.closeEmbedModal = () => {
+window.closeEmbedModal = (isFromPopState = false) => {
     const modal = document.getElementById('embed-modal');
     const iframe = document.getElementById('embed-iframe');
     modal.classList.add('hidden');
     modal.classList.remove('flex');
     iframe.src = ''; 
     document.body.style.overflow = ''; 
+    
+    // إذا أغلقها المستخدم بالزر (X)، نقوم بالعودة في التاريخ برمجياً
+    if (!isFromPopState && history.state && history.state.modalOpen === 'embed-modal') {
+        history.back();
+    }
 };
-
 window.updateLiveStreamUI = (url, target = 'all') => {
     const studentBanner = document.getElementById('student-live-banner');
     const adminStatus = document.getElementById('admin-live-status-text');
@@ -396,9 +480,12 @@ const checkAndUpdateStreak = async (userRef, userData) => {
     if (streakEl) streakEl.innerText = currentStreak;
 };
 
-window.openAdminSection = (section) => {
-    sessionStorage.setItem('activeAdminSection', section); // حفظ الذاكرة
+window.openAdminSection = (section, pushHistory = true) => {
     document.getElementById('admin-dashboard-grid').classList.add('hidden');
+    
+    // تسجيل التنقل في السجل
+    if (pushHistory) history.pushState({ screen: 'admin-screen', section: section }, "");
+
     if (section === 'accounts') {
         document.getElementById('admin-content-section').classList.add('hidden');
         document.getElementById('admin-content-section').classList.remove('block');
@@ -417,15 +504,17 @@ window.openAdminSection = (section) => {
     }
 };
 
-window.returnToAdminDashboard = () => {
+window.returnToAdminDashboard = (pushHistory = true) => {
     document.getElementById('admin-accounts-section').classList.add('hidden');
     document.getElementById('admin-accounts-section').classList.remove('flex');
     document.getElementById('admin-content-section').classList.add('hidden');
     document.getElementById('admin-content-section').classList.remove('block');
     document.getElementById('admin-dashboard-grid').classList.remove('hidden');
     window.adminContentStep = 'parts';
+    
+    // تسجيل العودة للوحة في السجل
+    if (pushHistory) history.pushState({ screen: 'admin-screen', section: 'dashboard' }, "");
 };
-
 window.toggleDarkMode = () => {
     document.documentElement.classList.toggle('dark');
     const isDark = document.documentElement.classList.contains('dark');
@@ -515,44 +604,39 @@ window.fireConfetti = () => {
     }());
 };
 
-window.closeConfirm = null;
-const confirmAction = (msg) => {
-    return new Promise((resolve) => {
-        document.getElementById('confirm-message').innerText = msg;
-        const modal = document.getElementById('confirm-modal');
-        modal.classList.remove('hidden'); modal.classList.add('flex');
-        
-        window.closeConfirm = (isConfirmed) => {
-            modal.classList.add('hidden'); modal.classList.remove('flex');
-            resolve(isConfirmed);
-        };
-    });
-};
-
 window.closeRegModal = () => {
     document.getElementById('registration-success-modal').classList.add('hidden');
     document.getElementById('registration-success-modal').classList.remove('flex');
-    window.toggleAuthMode();
+    window.toggleAuthMode(true);
 };
 
-const switchScreen = (screenId) => {
+const switchScreen = (screenId, pushHistory = true) => {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
+    
+    // إضافة التنقل إلى السجل (History)
+    if (pushHistory) {
+        if (!history.state) history.replaceState({ screen: screenId }, "");
+        else if (history.state.screen !== screenId) history.pushState({ screen: screenId }, "");
+    }
 };
 
 window.startNewJourney = () => {
-    if (!window.isRegistering) window.toggleAuthMode();
+    if (!window.isRegistering) window.toggleAuthMode(true);
     switchScreen('auth-screen');
 };
 
 window.openExistingAccount = () => {
-    if (window.isRegistering) window.toggleAuthMode();
+    if (window.isRegistering) window.toggleAuthMode(true);
     switchScreen('auth-screen');
 };
 
-window.toggleAuthMode = () => {
+window.toggleAuthMode = (pushHistory = true) => {
             window.isRegistering = !window.isRegistering;
             
+            if (pushHistory && history.state) {
+                history.pushState({ screen: 'auth-screen', isRegistering: window.isRegistering }, "");
+            }
             const titleEl = document.getElementById('auth-title');
             if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
             
@@ -1170,15 +1254,21 @@ window.openSettings = () => {
         phoneInput.value = window.currentUserRecord.phoneNumber || '';
     }
 
-    const modal = document.getElementById('settings-modal'); const content = document.getElementById('settings-content');
+const modal = document.getElementById('settings-modal'); const content = document.getElementById('settings-content');
+    
+    // تسجيل النافذة في سجل الهاتف
+    history.pushState({ ...history.state, modalOpen: 'settings-modal' }, "");
+
     modal.classList.remove('hidden'); modal.classList.add('flex');
     setTimeout(() => { content.classList.remove('scale-95'); content.classList.add('scale-100'); }, 10);
 };
 
-window.closeSettings = () => {
+window.closeSettings = (isFromPopState = false) => {
     const modal = document.getElementById('settings-modal'); const content = document.getElementById('settings-content');
     content.classList.remove('scale-100'); content.classList.add('scale-95');
     setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); }, 300);
+    
+    if (!isFromPopState && history.state && history.state.modalOpen === 'settings-modal') history.back();
 };
 
 window.saveSettingsData = async () => {
@@ -1847,6 +1937,9 @@ window.openChat = async (targetUser) => {
     let displayTarget = window.currentUserRecord.role === 'admin' ? targetUser.replace(/_/g, ' ') : "الأستاذ";
     document.getElementById('chat-target-name').innerText = displayTarget;
     
+    // تسجيل النافذة في سجل الهاتف
+    history.pushState({ ...history.state, modalOpen: 'chat-modal' }, "");
+
     const modal = document.getElementById('chat-modal');
     modal.classList.remove('hidden'); modal.classList.add('flex');
     
@@ -1879,15 +1972,21 @@ window.openChat = async (targetUser) => {
             chatHtml += `<div class="chat-bubble ${bubbleClass} ${alignment} shadow-sm transition hover:shadow-md"><p class="text-[14px] whitespace-pre-wrap break-words ${textColor}" dir="auto">${escapeHtml(m.text)}</p></div>`;
         });
         
-        const msgBox = document.getElementById('chat-messages');
+                const msgBox = document.getElementById('chat-messages');
         msgBox.innerHTML = chatHtml || `<div class="h-full flex flex-col items-center justify-center opacity-50"><i class="ph-fill ph-hand-waving text-6xl text-slate-400 mb-3"></i><div class="text-center text-slate-500 font-bold bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm text-sm">أهلاً بك! يمكنك المراسلة هنا.</div></div>`;
         msgBox.scrollTop = msgBox.scrollHeight;
         if (window.activeChatUser) setDoc(doc(db, chatsPath, chatRoomId), { [window.currentUserRecord.role === 'admin' ? 'unreadAdmin' : 'unreadStudent']: 0 }, { merge: true });
     }, e => { console.error("Chat Error", e); });
 };
 
-window.closeChat = () => { document.getElementById('chat-modal').classList.add('hidden'); document.getElementById('chat-modal').classList.remove('flex'); if(unsubscribeChat) unsubscribeChat(); window.activeChatUser = null; };
-
+window.closeChat = (isFromPopState = false) => { 
+    document.getElementById('chat-modal').classList.add('hidden'); 
+    document.getElementById('chat-modal').classList.remove('flex'); 
+    if(unsubscribeChat) unsubscribeChat(); 
+    window.activeChatUser = null; 
+    
+    if (!isFromPopState && history.state && history.state.modalOpen === 'chat-modal') history.back();
+};
 window.sendChatMessage = async () => {
     let inputEl = document.getElementById('chat-input'); let text = inputEl.value.trim();
     if(!text) return; 
@@ -2206,22 +2305,37 @@ window.saveEditedLink = async () => {
 };
 
 const getEmptyStateHTML = (title) => `<div class="flex flex-col items-center justify-center p-6 text-center bg-white/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-700 h-32"><i class="ph-fill ph-folder-open text-4xl text-slate-300 dark:text-slate-600 mb-2"></i><h3 class="text-sm font-black text-slate-500 dark:text-slate-400">لا يوجد ${title} حالياً</h3></div>`;
-
-window.renderProgramUI = (sections, containerId, isAdmin) => {
+window.renderProgramUI = (sections, containerId, isAdmin, pushHistory = true) => {
     if(!sections) return; 
     window.currentSections = sections; 
     
-    // --- حفظ الذاكرة المدمج ---
-    if (isAdmin) {
-        sessionStorage.setItem('adminContentStep', window.adminContentStep || 'parts');
-        if (window.adminActivePart) sessionStorage.setItem('adminActivePart', window.adminActivePart);
-        sessionStorage.setItem('adminActiveYear', JSON.stringify(window.adminActiveYear || {}));
-        sessionStorage.setItem('adminActiveBranch', JSON.stringify(window.adminActiveBranch || {}));
-    } else {
-        sessionStorage.setItem('studentViewMode', window.studentViewMode || 'grid');
-        if (window.studentActiveBranchTab) sessionStorage.setItem('studentActiveBranchTab', window.studentActiveBranchTab);
+    // --- حفظ الحالة لزر العودة الذكي ---
+    if (pushHistory) {
+        if (isAdmin) {
+            let currentState = `admin_${window.adminContentStep}_${window.adminActivePart}_${window.adminActiveYear[window.adminActivePart] || ''}_${window.adminActiveBranch[window.adminActiveYear[window.adminActivePart]] || ''}`;
+            if (lastRenderState !== currentState) {
+                history.pushState({ 
+                    screen: 'admin-screen', 
+                    section: 'content', 
+                    adminStep: window.adminContentStep, 
+                    adminActivePart: window.adminActivePart,
+                    adminActiveYear: JSON.parse(JSON.stringify(window.adminActiveYear || {})),
+                    adminActiveBranch: JSON.parse(JSON.stringify(window.adminActiveBranch || {}))
+                }, "");
+                lastRenderState = currentState;
+            }
+        } else {
+            let currentState = `student_${window.studentViewMode}_${window.studentActiveBranchTab}`;
+            if (lastRenderState !== currentState) {
+                 history.pushState({ 
+                     screen: 'app-screen', 
+                     studentMode: window.studentViewMode, 
+                     studentActiveBranchTab: window.studentActiveBranchTab 
+                 }, "");
+                 lastRenderState = currentState;
+            }
+        }
     }
-    // --------------------------
 
     let html = '';
     
