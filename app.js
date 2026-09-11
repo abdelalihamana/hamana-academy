@@ -1207,60 +1207,65 @@ window.returnToAdmin = () => {
 };
 
 window.logout = async () => {
-    // 🛡️ حماية الكود: التأكد أن النافذة موجودة فعلاً قبل محاولة إغلاقها
+    console.log("جاري محاولة تسجيل الخروج..."); 
+    
+    // 🛡️ حماية دوال الإغلاق
+    try { if(typeof window.closeSettings === 'function') window.closeSettings(); } catch(e) {}
+    try { if(typeof window.closeChat === 'function') window.closeChat(); } catch(e) {}
+
+    let userConfirmed = false;
     try {
-        const settingsModal = document.getElementById('settings-modal');
-        if (settingsModal && !settingsModal.classList.contains('hidden') && typeof closeSettings === 'function') {
-            closeSettings();
-        }
-    } catch(e) {}
+        userConfirmed = await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟");
+    } catch(e) {
+        console.error("خطأ في نافذة التأكيد:", e);
+        userConfirmed = true; // الخروج فوراً كإجراء احترازي
+    }
 
-    if(await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟")) {
+    if(userConfirmed) {
+        // 🧹 تنظيف الذاكرة الذكية بالكامل
+        try { sessionStorage.clear(); } catch(e) {}
         
-        // 🧹 تنظيف الذاكرة الذكية (هام جداً لكي لا تتداخل حسابات التلاميذ)
-        sessionStorage.clear();
-
-        if(unsubscribeProgram) { unsubscribeProgram(); unsubscribeProgram = null; }
-        if(unsubscribeUsers) { unsubscribeUsers(); unsubscribeUsers = null; }
-        if(unsubscribeStudentData) { unsubscribeStudentData(); unsubscribeStudentData = null; }
-        if(unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
-        if(unsubscribeChatMeta) { unsubscribeChatMeta(); unsubscribeChatMeta = null; }
-        if(window.unsubscribeResetRequests) { window.unsubscribeResetRequests(); window.unsubscribeResetRequests = null; }
-        if(window.unsubscribePendingUsers) { window.unsubscribePendingUsers(); window.unsubscribePendingUsers = null; }
-
-        if(pomodoroInterval) clearInterval(pomodoroInterval);
-        
-        // 🛡️ حماية كود إغلاق الدردشة
         try {
-            const chatModal = document.getElementById('chat-modal');
-            if (chatModal && !chatModal.classList.contains('hidden') && typeof closeChat === 'function') {
-                closeChat();
-            }
-        } catch(e) {}
-
+            if(typeof unsubscribeProgram === 'function') unsubscribeProgram();
+            if(typeof unsubscribeUsers === 'function') unsubscribeUsers();
+            if(typeof unsubscribeStudentData === 'function') unsubscribeStudentData();
+            if(typeof unsubscribeChat === 'function') unsubscribeChat();
+            if(typeof unsubscribeChatMeta === 'function') unsubscribeChatMeta();
+            if(typeof window.unsubscribeResetRequests === 'function') window.unsubscribeResetRequests();
+            if(typeof window.unsubscribePendingUsers === 'function') window.unsubscribePendingUsers();
+            if(typeof pomodoroInterval !== 'undefined' && pomodoroInterval) clearInterval(pomodoroInterval);
+        } catch(e) { console.warn("خطأ في تنظيف الروابط:", e); }
+        
         try {
             await signOut(auth);
-        } catch(e) { console.error("Logout error", e); }
+        } catch(e) { console.error("Firebase logout error:", e); }
         
         window.currentUserRecord = null; 
         window.originalAdminRecord = null;
-        if(document.getElementById('password')) document.getElementById('password').value = '';
         
-        const returnAdminBtn = document.getElementById('return-admin-btn');
-        if(returnAdminBtn) returnAdminBtn.classList.add('hidden');
-        
-        const idsToShow = ['student-settings-btn', 'student-chat-btn', 'student-dark-btn', 'student-logout-btn', 'student-notif-btn'];
-        idsToShow.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.remove('hidden');
-        });
+        try {
+            const passEl = document.getElementById('password');
+            if (passEl) passEl.value = '';
+            
+            const hideElements = ['return-admin-btn'];
+            const showElements = ['student-settings-btn', 'student-chat-btn', 'student-dark-btn', 'student-logout-btn', 'student-notif-btn'];
+            
+            hideElements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            
+            showElements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('hidden');
+            });
 
-        switchScreen('auth-screen');
-        const authScreen = document.getElementById('auth-screen');
-        if(authScreen) authScreen.classList.remove('blur-sm', 'pointer-events-none');
-        
-        // تنظيف مسار الهاتف (History)
-        history.replaceState({ screen: 'auth-screen' }, "");
+            const authScreen = document.getElementById('auth-screen');
+            if (authScreen) authScreen.classList.remove('blur-sm', 'pointer-events-none');
+        } catch(e) {}
+
+        try { switchScreen('auth-screen'); } catch(e) {}
+        try { history.replaceState(null, "", " "); } catch(e) {}
     }
 };
 window.openSettings = () => {
@@ -1277,7 +1282,7 @@ window.openSettings = () => {
         phoneInput.value = window.currentUserRecord.phoneNumber || '';
     }
 
-    const modal = document.getElementById('settings-modal'); const content = document.getElementById('settings-content');
+  const modal = document.getElementById('settings-modal'); const content = document.getElementById('settings-content');
     modal.classList.remove('hidden'); modal.classList.add('flex');
     setTimeout(() => { content.classList.remove('scale-95'); content.classList.add('scale-100'); }, 10);
 };
