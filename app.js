@@ -562,11 +562,11 @@ const getBranchImage = (branchId, title) => {
     if(branchId === 'm3_b3') return 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop'; 
     if(branchId === 'm3_b4') return 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?q=80&w=1000&auto=format&fit=crop'; 
    
-    if(branchId === 'm4_b1') return 'https://i.ibb.co/d4BLp0cm/Electric.jpg'; 
-    if(branchId === 'm4_b2') return 'https://i.ibb.co/PGSLm26M/Organic.jpg'; 
-    if(branchId === 'm4_b3') return 'https://i.ibb.co/5Wqt8xf0/Physics.jpg'; 
-    if(branchId === 'm4_b4') return 'https://i.ibb.co/hFF7hZh2/optic.jpg'; 
-    if(branchId === 'm4_b5') return 'https://i.ibb.co/WvFGN9Qw/image.jpg'; 
+    if(branchId === 'm4_b1') return 'https://i.ibb.co/hFtLXVVS/Electric-1.webp'; 
+    if(branchId === 'm4_b2') return 'https://i.ibb.co/LzDLP4fM/Organic-1.webp'; 
+    if(branchId === 'm4_b3') return 'https://i.ibb.co/JFbCRJhY/Physics-1.webp'; 
+    if(branchId === 'm4_b4') return 'https://i.ibb.co/60Ykx6mZ/optic-1.webp'; 
+    if(branchId === 'm4_b5') return 'https://i.ibb.co/XZKX5XBn/image.webp'; 
   
     if(branchId === 'h1_b1') return 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=1000&auto=format&fit=crop'; 
     if(branchId === 'h1_b2') return 'https://images.unsplash.com/photo-1537495329792-41ae41ad3bf0?q=80&w=1000&auto=format&fit=crop'; 
@@ -578,9 +578,9 @@ const getBranchImage = (branchId, title) => {
     if(branchId === 'h3_b2') return 'https://images.unsplash.com/photo-1536697246787-1f7ae568d89a?q=80&w=1000&auto=format&fit=crop'; 
     if(branchId === 'h3_b3') return 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?q=80&w=1000&auto=format&fit=crop'; 
 
-    if(branchId.endsWith('_s1')) return 'https://i.ibb.co/V07SqjTB/1.jpg'; 
-    if(branchId.endsWith('_s2')) return 'https://i.ibb.co/6R6mrnFF/2.jpg'; 
-    if(branchId.endsWith('_s3')) return 'https://i.ibb.co/ch83MR70/3.jpg'; 
+    if(branchId.endsWith('_s1')) return 'https://i.ibb.co/jvcSCBBc/1.webp'; 
+    if(branchId.endsWith('_s2')) return 'https://i.ibb.co/Wv9FJ3h1/2.webp'; 
+    if(branchId.endsWith('_s3')) return 'https://i.ibb.co/j9XxTnmK/3.webp'; 
     
     if(title && title.includes('متوسط')) return 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=1000&auto=format&fit=crop';
     if(title && title.includes('ثانوي')) return 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1000&auto=format&fit=crop';
