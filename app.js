@@ -1462,7 +1462,7 @@ window.toggleUserStatus = async (uid, isApproved, phone) => {
     } else {
         let waLink = null;
         if (phone) {
-            let waMessage = encodeURIComponent("السلام عليكم. معكم منصة المجتهد للعلوم الفيزيائية نعلمكم أنه تم قبول إبنكم على مستوى المنصة نتمنى له النجاح والتوفيق. لأي إستفسار راسلونا عبر المنصة");
+            let waMessage = encodeURIComponent("السلام عليكم. معكم أكاديمية حمانة للعلوم الفيزيائية نعلمكم أنه تم قبول إبنكم على مستوى المنصة نتمنى له النجاح والتوفيق. لأي إستفسار راسلونا عبر المنصة");
             waLink = `https://wa.me/213${phone.substring(1)}?text=${waMessage}`;
         }
         let win = null; if(waLink) win = window.open(waLink, '_blank'); 
@@ -1590,7 +1590,7 @@ const renderAdminTable = () => {
         let prog = calculateProgressXP(data.level, data, window.currentSections);
         let displayName = d.id.replace(/_/g, ' ');
         
-        let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${displayName}. نعلمكم من منصة المجتهد للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
+        let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${displayName}. نعلمكم من أكاديمية حمانة للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
         let waProgLink = data.phoneNumber ? `https://wa.me/213${data.phoneNumber.substring(1)}?text=${waProgMsg}` : '#';
 
         let parentInfo = data.parentName ? 
