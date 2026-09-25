@@ -1,91 +1,26 @@
-/* 1. استيراد خط عربي احترافي (كايرو) */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
-
-body {
-    font-family: 'Cairo', sans-serif;
-    /* خلفية متدرجة هادئة مريحة لعين التلميذ */
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    background-attachment: fixed;
-}
-
-/* في حالة تفعيل الوضع الليلي (Dark Mode) */
-html.dark body {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-}
-
-/* 2. تجميل شريط التمرير (Scrollbar) الذي طلبته في الكود */
-.custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #cbd5e1;
-    border-radius: 20px;
-}
-html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: #475569;
-}
-
-/* 3. تفعيل حركة الظهور المتدرج (Fade In) للدروس والوحدات */
-@keyframes fadeInTab {
-    0% {
-        opacity: 0;
-        transform: translateY(15px) scale(0.98);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-/* 4. تأثيرات البطاقات التفاعلية (Interactive Cards) */
-.interactive-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.interactive-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 25px -5px rgba(59, 130, 246, 0.15), 0 8px 10px -6px rgba(59, 130, 246, 0.1);
-}
-
-/* 5. شكل فقاعات الدردشة (Chat Bubbles) */
+/* ========================================= /
+/ 🌟 اللمسات والتأثيرات الإضافية لمنصة حمانة  /
+/ ========================================= *//* 1. السلوك العام والخط */html { scroll-behavior: smooth; }body { font-family: 'Tajawal', sans-serif; }/* ========================================= /
+/ 🚀 2. تحسينات صفحة تسجيل الدخول            /
+/ ========================================= *//* طفو الشعار صعوداً ونزولاً ببطء (يعطي حيوية للمنصة) */#auth-screen img {animation: floatLogo 5s ease-in-out infinite;}@keyframes floatLogo {0%, 100% { transform: translateY(0); }50% { transform: translateY(-10px); }}/* توهج حقول الإدخال وتكبيرها قليلاً عند النقر عليها للتركيز */#auth-screen input:focus {box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;transform: scale(1.02);z-index: 10;}.dark #auth-screen input:focus {box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15) !important;}/* الزر الرئيسي: تدرج لوني متحرك كالأمواج يجذب الانتباه */#auth-action-btn {background-size: 200% auto;animation: shineBtn 4s linear infinite;}@keyframes shineBtn {0% { background-position: 0% center; }50% { background-position: 100% center; }100% { background-position: 0% center; }}/* ========================================= /
+/ ⏱️ 3. تحسينات مؤقت البومودورو              /
+/ ========================================= *//* الشاشة الرقمية (تأثير إضاءة LED نيون للوقت) */#pomodoro-timer-display {text-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 0 15px rgba(255, 255, 255, 0.3);letter-spacing: 3px;}/* اهتزاز خفيف (دقات) لأيقونة الساعة بجانب عنوان المؤقت */.ph-timer {animation: tickTimer 2s ease-in-out infinite;}@keyframes tickTimer {0%, 100% { transform: rotate(0deg); }25% { transform: rotate(10deg); }75% { transform: rotate(-10deg); }}/* تأثير النبض لزر الإيقاف (يخبر التلميذ أن المؤقت شغال ويجب التركيز) */#pomodoro-toggle-btn .ph-pause {animation: heartbeat 1.5s infinite;filter: drop-shadow(0 0 4px rgba(217, 119, 6, 0.5));}@keyframes heartbeat {0% { transform: scale(1); }14% { transform: scale(1.15); }28% { transform: scale(1); }42% { transform: scale(1.15); }70% { transform: scale(1); }}/* ========================================= /
+/ 🎨 4. تحسينات الواجهة العامة (UI)          /
+/ ========================================= *//* تجميل شريط التمرير (Scrollbar) بشكل عصري */.custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }.custom-scrollbar::-webkit-scrollbar-thumb {background-color: rgba(148, 163, 184, 0.4);border-radius: 20px;}.custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: rgba(148, 163, 184, 0.7); }.dark .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(71, 85, 105, 0.6); }.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: rgba(100, 116, 139, 0.8); }/* تأثيرات البطاقات التفاعلية (Interactive Cards) */.interactive-card {transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);}.interactive-card:hover {transform: translateY(-6px);box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.15), 0 10px 10px -5px rgba(59, 130, 246, 0.05);border-color: rgba(59, 130, 246, 0.3);}.dark .interactive-card:hover {box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6);border-color: rgba(96, 165, 250, 0.2);}/* تصميم فقاعات الدردشة (Chat Bubbles) /
 .chat-bubble {
-    padding: 12px 16px;
-    border-radius: 20px;
-    max-width: 85%;
-    line-height: 1.5;
+padding: 12px 18px;
+border-radius: 24px;
+max-width: 85%;
+line-height: 1.6;
+font-weight: 700;
 }
 .chat-mine {
-    border-bottom-left-radius: 4px; /* زاوية حادة للمرسل */
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+border-bottom-left-radius: 4px; / زاوية حادة للمرسل /
+background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
 }
-html.dark .chat-mine {
-    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+.dark .chat-mine {
+background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+border-color: rgba(30, 58, 138, 0.5);
 }
 .chat-other {
-    border-bottom-right-radius: 4px; /* زاوية حادة للمستقبل */
-    background: #ffffff;
-}
-
-/* 6. تحسين شكل صناديق التحديد (Checkboxes) الخاصة بالأستاذ */
-.custom-cb {
-    width: 20px;
-    height: 20px;
-    accent-color: #3b82f6;
-    cursor: pointer;
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-/* 7. تصميم زجاجي خفيف (Glassmorphism) للنوافذ المنبثقة والإشعارات */
-.glass-panel {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-html.dark .glass-panel {
-    background: rgba(30, 41, 59, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
+border-bottom-right-radius: 4px; / زاوية حادة للمستقبل */}/* تحسين أزرار الأيقونات الدائرية (Icon Buttons) */.icon-btn {display: flex;align-items: center;justify-content: center;transition: all 0.3s ease;}.icon-btn:hover {transform: scale(1.08) rotate(3deg);}.icon-btn:active {transform: scale(0.95);}/* حركة الظهور السلسة المتدرجة للوحدات والدروس */@keyframes fadeInTab {0% { opacity: 0; transform: translateY(25px) scale(0.98); }100% { opacity: 1; transform: translateY(0) scale(1); }}.animate-\[fadeInTab_0\.3s_ease\] {animation: fadeInTab 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;}
