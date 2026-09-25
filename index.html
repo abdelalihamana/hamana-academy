@@ -355,40 +355,40 @@
                 <div class="neu-icon-wrapper text-blue-500 dark:text-blue-400 text-4xl" id="auth-main-icon">
                     <i class="ph-fill ph-lock-key"></i>
                 </div>
-                <h2 id="auth-title" class="text-3xl font-black text-slate-800 dark:text-white mb-2">Welcome</h2>
-                <p class="text-sm font-bold text-slate-500 dark:text-slate-400" id="auth-subtitle">Login to continue your journey</p>
+                <h2 id="auth-title" class="text-3xl font-black text-slate-800 dark:text-white mb-2">مرحباً بك</h2>
+                <p class="text-sm font-bold text-slate-500 dark:text-slate-400" id="auth-subtitle">سجل دخولك لمواصلة التعلم</p>
             </div>
             
             <div class="space-y-6 relative z-10">
                 <!-- حقل الدخول (الاسم واللقب معاً - يظهر فقط عند تسجيل الدخول) -->
                 <div class="relative group" id="login-name-container">
-                    <input type="text" id="login-username" aria-label="الاسم واللقب" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="Full Name">
+                    <input type="text" id="login-username" aria-label="الاسم واللقب" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="الاسم واللقب">
                 </div>
 
                 <!-- حقول التسجيل -->
                 <div class="gap-4 hidden w-full flex-col" id="register-names-container">
                     <div class="relative group">
-                        <input type="text" id="reg-firstname" aria-label="الاسم" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="First Name">
+                        <input type="text" id="reg-firstname" aria-label="الاسم" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="الاسم">
                     </div>
                     <div class="relative group">
-                        <input type="text" id="reg-lastname" aria-label="اللقب" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="Last Name">
+                        <input type="text" id="reg-lastname" aria-label="اللقب" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="اللقب">
                     </div>
                 </div>
                 
                 <!-- حقول الولي والهاتف -->
                 <div class="gap-4 hidden w-full flex-col" id="register-parent-phone-container">
                     <div class="relative group" id="parent-name-container">
-                        <input type="text" id="parent-name" aria-label="اسم ولي الأمر" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="Parent Name">
+                        <input type="text" id="parent-name" aria-label="اسم ولي الأمر" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="اسم ولي الأمر">
                     </div>
                     
                     <div class="relative group" id="phone-number-container">
-                        <input type="tel" id="phone-number" aria-label="رقم الهاتف" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base text-left tracking-widest" dir="auto" placeholder="Phone Number">
+                        <input type="tel" id="phone-number" aria-label="رقم الهاتف" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base text-left tracking-widest" dir="auto" placeholder="رقم هاتف الولي">
                     </div>
                 </div>
 
                 <div class="relative group">
                     <select id="user-level" aria-label="المستوى الدراسي" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base hidden appearance-none cursor-pointer">
-                        <option value="" disabled selected>Select Level...</option>
+                        <option value="" disabled selected>اختر المستوى الدراسي...</option>
                         <option value="m_y1">السنة الأولى متوسط</option>
                         <option value="m_y2">السنة الثانية متوسط</option>
                         <option value="m_y3">السنة الثالثة متوسط</option>
@@ -401,7 +401,7 @@
 
                 <!-- حقل كلمة المرور -->
                 <div class="relative group">
-                    <input type="password" id="password" aria-label="كلمة المرور" class="w-full px-6 pr-12 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="Password">
+                    <input type="password" id="password" aria-label="كلمة المرور" class="w-full px-6 pr-12 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="كلمة المرور">
                     <button type="button" onclick="togglePasswordVisibility()" aria-label="إظهار كلمة المرور" class="absolute inset-y-0 right-4 flex items-center text-slate-400 hover:text-blue-500 transition-colors text-xl focus:outline-none">
                         <i id="password-toggle-icon" class="ph-fill ph-eye-slash"></i>
                     </button>
@@ -409,20 +409,20 @@
 
                 
                 <div class="flex justify-between items-center mt-2" id="forgot-password-container">
-                    <div class="flex items-center gap-2 hidden"> <!-- Hidden for now to match design strictly, can enable if needed -->
+                    <div class="flex items-center gap-2 hidden"> 
                         <input type="checkbox" id="remember-me" class="custom-cb">
-                        <label for="remember-me" class="text-sm font-bold text-slate-500">Remember me</label>
+                        <label for="remember-me" class="text-sm font-bold text-slate-500">تذكرني</label>
                     </div>
-                    <button onclick="requestPasswordReset()" class="text-sm font-bold text-blue-500 hover:text-blue-600 transition ml-auto">Forgot Password?</button>
+                    <button onclick="requestPasswordReset()" class="text-sm font-bold text-blue-500 hover:text-blue-600 transition ml-auto">نسيت كلمة المرور؟</button>
                 </div>
 
-                <button id="auth-action-btn" onclick="handleAuth()" class="w-full py-4 neu-btn-primary mt-6 tracking-widest text-lg">
-                    Login
+                <button id="auth-action-btn" onclick="handleAuth()" class="w-full py-4 neu-btn-primary mt-6 tracking-widest text-lg font-black">
+                    تسجيل الدخول
                 </button>
             </div>
             
             <div class="flex items-center justify-center gap-4 mt-10 relative z-10">
-                <span class="text-sm font-bold text-slate-500" id="switch-mode-prefix">Don't have an account?</span>
+                <span class="text-sm font-bold text-slate-500" id="switch-mode-prefix">ليس لديك حساب؟</span>
                 <button onclick="toggleAuthMode()" aria-label="تبديل وضع التسجيل" class="neu-btn-icon" id="switch-mode-btn">
                     <i class="ph-bold ph-plus text-xl" id="switch-mode-icon"></i>
                 </button>
