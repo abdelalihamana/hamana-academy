@@ -672,10 +672,10 @@ window.toggleAuthMode = (pushHistory = true) => {
     const forgotPassCont = document.getElementById('forgot-password-container');
     
     if(window.isRegistering) {
-        if(titleEl) titleEl.innerText = "Create Account";
-        if(subtitleEl) subtitleEl.innerText = "Start your journey with us";
-        if(btnEl) btnEl.innerText = "CREATE ACCOUNT";
-        if(switchPrefixEl) switchPrefixEl.innerText = "Already have an account?";
+        if(titleEl) titleEl.innerText = "حساب جديد";
+        if(subtitleEl) subtitleEl.innerText = "ابدأ رحلتك التعليمية معنا";
+        if(btnEl) btnEl.innerText = "إنشاء حساب";
+        if(switchPrefixEl) switchPrefixEl.innerText = "لديك حساب بالفعل؟";
         if(switchIconEl) {
             switchIconEl.classList.remove('ph-plus');
             switchIconEl.classList.add('ph-arrow-left');
@@ -694,10 +694,10 @@ window.toggleAuthMode = (pushHistory = true) => {
         if(forgotPassCont) forgotPassCont.classList.add('hidden');
 
     } else {
-        if(titleEl) titleEl.innerText = "Welcome";
-        if(subtitleEl) subtitleEl.innerText = "Login to continue your journey";
-        if(btnEl) btnEl.innerText = "Login";
-        if(switchPrefixEl) switchPrefixEl.innerText = "Don't have an account?";
+        if(titleEl) titleEl.innerText = "مرحباً بك";
+        if(subtitleEl) subtitleEl.innerText = "سجل دخولك لمواصلة التعلم";
+        if(btnEl) btnEl.innerText = "تسجيل الدخول";
+        if(switchPrefixEl) switchPrefixEl.innerText = "ليس لديك حساب؟";
         if(switchIconEl) {
             switchIconEl.classList.remove('ph-arrow-left');
             switchIconEl.classList.add('ph-plus');
