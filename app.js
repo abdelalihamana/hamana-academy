@@ -656,48 +656,66 @@ window.toggleAuthMode = (pushHistory = true) => {
     if (pushHistory && history.state) {
         history.pushState({ screen: 'auth-screen', isRegistering: window.isRegistering }, "");
     }
+    
     const titleEl = document.getElementById('auth-title');
-    if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
-    
+    const subtitleEl = document.getElementById('auth-subtitle');
     const btnEl = document.getElementById('auth-action-btn');
-    if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
-    
-    const switchEl = document.getElementById('switch-mode-text');
-    if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
+    const switchPrefixEl = document.getElementById('switch-mode-prefix');
+    const switchIconEl = document.getElementById('switch-mode-icon');
+    const authMainIcon = document.getElementById('auth-main-icon');
     
     const authScreen = document.getElementById('auth-screen');
     const loginNameCont = document.getElementById('login-name-container');
     const regNamesCont = document.getElementById('register-names-container');
     const regParentPhoneCont = document.getElementById('register-parent-phone-container');
     const levelSelect = document.getElementById('user-level'); 
-    const levelIcon = document.getElementById('level-icon');
     const forgotPassCont = document.getElementById('forgot-password-container');
     
     if(window.isRegistering) {
+        if(titleEl) titleEl.innerText = "Create Account";
+        if(subtitleEl) subtitleEl.innerText = "Start your journey with us";
+        if(btnEl) btnEl.innerText = "CREATE ACCOUNT";
+        if(switchPrefixEl) switchPrefixEl.innerText = "Already have an account?";
+        if(switchIconEl) {
+            switchIconEl.classList.remove('ph-plus');
+            switchIconEl.classList.add('ph-arrow-left');
+        }
+        if(authMainIcon) authMainIcon.innerHTML = '<i class="ph-fill ph-user"></i>';
+
         if(authScreen) {
             authScreen.classList.remove('max-w-md');
-            authScreen.classList.add('max-w-2xl', 'transition-all', 'duration-500'); 
+            authScreen.classList.add('max-w-lg', 'transition-all', 'duration-500'); 
         }
+        
         if(loginNameCont) loginNameCont.classList.add('hidden');
         if(regNamesCont) { regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex'); }
         if(regParentPhoneCont) { regParentPhoneCont.classList.remove('hidden'); regParentPhoneCont.classList.add('flex'); }
         if(levelSelect) levelSelect.classList.remove('hidden'); 
-        if(levelIcon) levelIcon.classList.remove('hidden');
         if(forgotPassCont) forgotPassCont.classList.add('hidden');
+
     } else {
+        if(titleEl) titleEl.innerText = "Welcome";
+        if(subtitleEl) subtitleEl.innerText = "Login to continue your journey";
+        if(btnEl) btnEl.innerText = "Login";
+        if(switchPrefixEl) switchPrefixEl.innerText = "Don't have an account?";
+        if(switchIconEl) {
+            switchIconEl.classList.remove('ph-arrow-left');
+            switchIconEl.classList.add('ph-plus');
+        }
+        if(authMainIcon) authMainIcon.innerHTML = '<i class="ph-fill ph-lock-key"></i>';
+
         if(authScreen) {
-            authScreen.classList.remove('max-w-2xl');
+            authScreen.classList.remove('max-w-lg');
             authScreen.classList.add('max-w-md');
         }
+        
         if(loginNameCont) loginNameCont.classList.remove('hidden');
         if(regNamesCont) { regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex'); }
         if(regParentPhoneCont) { regParentPhoneCont.classList.add('hidden'); regParentPhoneCont.classList.remove('flex'); }
         if(levelSelect) levelSelect.classList.add('hidden'); 
-        if(levelIcon) levelIcon.classList.add('hidden');
         if(forgotPassCont) forgotPassCont.classList.remove('hidden');
     }
 };
-
 window.togglePasswordVisibility = () => {
     const passInput = document.getElementById('password');
     const toggleIcon = document.getElementById('password-toggle-icon');
