@@ -656,66 +656,48 @@ window.toggleAuthMode = (pushHistory = true) => {
     if (pushHistory && history.state) {
         history.pushState({ screen: 'auth-screen', isRegistering: window.isRegistering }, "");
     }
-    
     const titleEl = document.getElementById('auth-title');
-    const subtitleEl = document.getElementById('auth-subtitle');
+    if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
+    
     const btnEl = document.getElementById('auth-action-btn');
-    const switchPrefixEl = document.getElementById('switch-mode-prefix');
-    const switchIconEl = document.getElementById('switch-mode-icon');
-    const authMainIcon = document.getElementById('auth-main-icon');
+    if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
+    
+    const switchEl = document.getElementById('switch-mode-text');
+    if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
     
     const authScreen = document.getElementById('auth-screen');
     const loginNameCont = document.getElementById('login-name-container');
     const regNamesCont = document.getElementById('register-names-container');
     const regParentPhoneCont = document.getElementById('register-parent-phone-container');
     const levelSelect = document.getElementById('user-level'); 
+    const levelIcon = document.getElementById('level-icon');
     const forgotPassCont = document.getElementById('forgot-password-container');
     
     if(window.isRegistering) {
-        if(titleEl) titleEl.innerText = "حساب جديد";
-        if(subtitleEl) subtitleEl.innerText = "ابدأ رحلتك التعليمية معنا";
-        if(btnEl) btnEl.innerText = "إنشاء حساب";
-        if(switchPrefixEl) switchPrefixEl.innerText = "لديك حساب بالفعل؟";
-        if(switchIconEl) {
-            switchIconEl.classList.remove('ph-plus');
-            switchIconEl.classList.add('ph-arrow-left');
-        }
-        if(authMainIcon) authMainIcon.innerHTML = '<i class="ph-fill ph-user"></i>';
-
         if(authScreen) {
             authScreen.classList.remove('max-w-md');
-            authScreen.classList.add('max-w-lg', 'transition-all', 'duration-500'); 
+            authScreen.classList.add('max-w-2xl', 'transition-all', 'duration-500'); 
         }
-        
         if(loginNameCont) loginNameCont.classList.add('hidden');
         if(regNamesCont) { regNamesCont.classList.remove('hidden'); regNamesCont.classList.add('flex'); }
         if(regParentPhoneCont) { regParentPhoneCont.classList.remove('hidden'); regParentPhoneCont.classList.add('flex'); }
         if(levelSelect) levelSelect.classList.remove('hidden'); 
+        if(levelIcon) levelIcon.classList.remove('hidden');
         if(forgotPassCont) forgotPassCont.classList.add('hidden');
-
     } else {
-        if(titleEl) titleEl.innerText = "مرحباً بك";
-        if(subtitleEl) subtitleEl.innerText = "سجل دخولك لمواصلة التعلم";
-        if(btnEl) btnEl.innerText = "تسجيل الدخول";
-        if(switchPrefixEl) switchPrefixEl.innerText = "ليس لديك حساب؟";
-        if(switchIconEl) {
-            switchIconEl.classList.remove('ph-arrow-left');
-            switchIconEl.classList.add('ph-plus');
-        }
-        if(authMainIcon) authMainIcon.innerHTML = '<i class="ph-fill ph-lock-key"></i>';
-
         if(authScreen) {
-            authScreen.classList.remove('max-w-lg');
+            authScreen.classList.remove('max-w-2xl');
             authScreen.classList.add('max-w-md');
         }
-        
         if(loginNameCont) loginNameCont.classList.remove('hidden');
         if(regNamesCont) { regNamesCont.classList.add('hidden'); regNamesCont.classList.remove('flex'); }
         if(regParentPhoneCont) { regParentPhoneCont.classList.add('hidden'); regParentPhoneCont.classList.remove('flex'); }
         if(levelSelect) levelSelect.classList.add('hidden'); 
+        if(levelIcon) levelIcon.classList.add('hidden');
         if(forgotPassCont) forgotPassCont.classList.remove('hidden');
     }
 };
+
 window.togglePasswordVisibility = () => {
     const passInput = document.getElementById('password');
     const toggleIcon = document.getElementById('password-toggle-icon');
