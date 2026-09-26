@@ -21,13 +21,12 @@
    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#e0e5ec"> <!-- Updated for Neumorphism -->
+    <meta name="theme-color" content="#f8fafc">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
 
     <!-- استدعاء ملف التصميم المحلي (مهم لسرعة التطبيق) -->
     <link href="./output.css" rel="stylesheet">
-    <link href="./style.css" rel="stylesheet">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -113,6 +112,8 @@
 
     <!-- شاشة التحفيز -->
     <div id="welcome-quote-screen" class="fixed inset-0 bg-slate-900/95 backdrop-blur-2xl z-[85] flex-col items-center justify-center p-6 welcome-hidden flex">
+        <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-emerald-500/20 rounded-full blur-[80px] animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-72 h-72 bg-blue-500/20 rounded-full blur-[80px] animate-pulse" style="animation-delay: 1.5s;"></div>
         <div class="bg-white/10 backdrop-blur-3xl border border-white/20 p-8 md:p-14 rounded-[3rem] max-w-2xl w-full text-center relative z-10 shadow-[0_0_50px_-10px_rgba(0,0,0,0.5)]">
             <div class="text-7xl md:text-8xl mb-6 animate-bounce text-emerald-400"><i class="ph-fill ph-lightbulb"></i></div>
             <h2 class="text-3xl md:text-4xl font-black text-emerald-300 mb-6 tracking-wide drop-shadow-md">جرعة تحفيزية لليوم</h2>
@@ -253,12 +254,16 @@
         <!-- ===================================== -->
         <div id="landing-screen" class="screen active">
             <!-- أضفنا هذا الـ div الداخلي ليحمل خصائص التصميم ولا يمنع الإخفاء -->
-        <div class="min-h-[85vh] flex flex-col items-center justify-center relative py-10">
-            
-            <!-- محتوى الشاشة -->
-            <div class="relative z-10 text-center max-w-5xl mx-auto px-4 w-full">
-                <!-- الشعار -->
-                <div class="w-32 h-32 mx-auto mb-8 rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white dark:border-slate-700 bg-white p-1 transform transition hover:scale-105 duration-300">
+            <div class="min-h-[85vh] flex flex-col items-center justify-center relative py-10">
+                
+                <!-- فقاعات متحركة في الخلفية للجمالية -->
+                <div class="absolute top-0 left-0 w-72 h-72 bg-blue-500/20 rounded-full blur-[100px] animate-pulse pointer-events-none"></div>
+                <div class="absolute bottom-10 right-0 w-72 h-72 bg-emerald-500/20 rounded-full blur-[100px] animate-pulse pointer-events-none" style="animation-delay: 2s;"></div>
+
+                <!-- محتوى الشاشة -->
+                <div class="relative z-10 text-center max-w-5xl mx-auto px-4 w-full">
+                    <!-- الشعار -->
+                    <div class="w-32 h-32 mx-auto mb-8 rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white dark:border-slate-700 bg-white p-1 transform transition hover:scale-105 duration-300">
                         <img src="icon.png" alt="شعار المنصة" width="128" height="128" class="w-full h-full object-cover rounded-[1.6rem]">
                     </div>
                     
@@ -330,56 +335,58 @@
             </div>
         </div>
 
-        
-
         <!-- ===================================== -->
         <!-- شاشة المصادقة (Auth Screen) -->
         <!-- ===================================== -->
-        <div id="auth-screen" class="screen max-w-md mx-auto mt-8 md:mt-12 p-8 md:p-12 neu-card relative z-10">
+        <div id="auth-screen" class="screen max-w-md mx-auto mt-8 md:mt-12 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-8 md:p-12 rounded-[3rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] border border-white/60 dark:border-slate-700/60 relative overflow-hidden interactive-card">
             
             <div class="absolute top-4 left-4 z-20">
-                <button onclick="toggleDarkMode()" aria-label="تبديل الوضع الليلي" class="w-12 h-12 rounded-full text-slate-600 dark:text-amber-400 flex items-center justify-center text-2xl transition shadow-sm bg-transparent border-none focus:outline-none"><i class="ph-fill ph-moon"></i></button>
+                <button onclick="toggleDarkMode()" aria-label="تبديل الوضع الليلي" class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-amber-400 flex items-center justify-center text-2xl shadow-sm hover:scale-110 transition"><i class="ph-fill ph-moon"></i></button>
             </div>
 
-            <div class="text-center mb-8 relative z-10 pt-4 flex flex-col items-center">
-                <!-- Neumorphic Icon Wrapper replacing the image for Auth -->
-                <div class="neu-icon-wrapper text-blue-500 dark:text-blue-400 text-4xl" id="auth-main-icon">
-                    <i class="ph-fill ph-lock-key"></i>
+            <div class="text-center mb-10 relative z-10 pt-4">
+                <div class="w-36 h-36 mx-auto mb-6 rounded-[2rem] shadow-2xl overflow-hidden border-4 border-white dark:border-slate-700 bg-white p-1 transform transition hover:scale-105 duration-300">
+                    <img src="icon.png" alt="شعار المنصة" width="144" height="144" class="w-full h-full object-cover rounded-[1.7rem]">
                 </div>
-                <h2 id="auth-title" class="text-3xl font-black text-slate-800 dark:text-white mb-2">مرحباً بك</h2>
-                <p class="text-sm font-bold text-slate-500 dark:text-slate-400" id="auth-subtitle">سجل دخولك لمواصلة التعلم</p>
+                <h2 id="auth-title" class="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 drop-shadow-sm mb-3">أكاديمية حمانة</h2>
+                <div class="inline-block bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-6 py-2 rounded-full text-base font-bold border border-blue-100 dark:border-blue-800 shadow-sm tracking-wide">للعلوم الفيزيائية</div>
             </div>
             
-            <div class="space-y-6 relative z-10">
+            <div class="space-y-5 relative z-10">
                 <!-- حقل الدخول (الاسم واللقب معاً - يظهر فقط عند تسجيل الدخول) -->
                 <div class="relative group" id="login-name-container">
-                    <input type="text" id="login-username" aria-label="الاسم واللقب" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="الاسم واللقب">
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-user"></i></div>
+                    <input type="text" id="login-username" aria-label="الاسم واللقب" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="الاسم واللقب">
                 </div>
 
-                <!-- حقول التسجيل -->
-                <div class="gap-4 hidden w-full flex-col" id="register-names-container">
-                    <div class="relative group">
-                        <input type="text" id="reg-firstname" aria-label="الاسم" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="الاسم">
+                <!-- حقول التسجيل (الاسم واللقب في سطر واحد أفقي) -->
+                <div class="gap-4 hidden w-full flex-col sm:flex-row" id="register-names-container">
+                    <div class="relative group flex-1">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-xl"><i class="ph-fill ph-user"></i></div>
+                        <input type="text" id="reg-firstname" aria-label="الاسم" class="w-full pl-4 pr-11 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="الاسم">
                     </div>
-                    <div class="relative group">
-                        <input type="text" id="reg-lastname" aria-label="اللقب" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="اللقب">
+                    <div class="relative group flex-1">
+                        <input type="text" id="reg-lastname" aria-label="اللقب" class="w-full px-4 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="اللقب">
                     </div>
                 </div>
                 
-                <!-- حقول الولي والهاتف -->
-                <div class="gap-4 hidden w-full flex-col" id="register-parent-phone-container">
-                    <div class="relative group" id="parent-name-container">
-                        <input type="text" id="parent-name" aria-label="اسم ولي الأمر" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="اسم ولي الأمر">
+                <!-- حقول الولي والهاتف (في سطر واحد أفقي) -->
+                <div class="gap-4 hidden w-full flex-col sm:flex-row" id="register-parent-phone-container">
+                    <div class="relative group flex-1" id="parent-name-container">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-users-three"></i></div>
+                        <input type="text" id="parent-name" aria-label="اسم ولي الأمر" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="اسم ولي الأمر">
                     </div>
                     
-                    <div class="relative group" id="phone-number-container">
-                        <input type="tel" id="phone-number" aria-label="رقم الهاتف" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base text-left tracking-widest" dir="auto" placeholder="رقم هاتف الولي">
+                    <div class="relative group flex-1" id="phone-number-container">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl"><i class="ph-fill ph-device-mobile"></i></div>
+                        <input type="tel" id="phone-number" aria-label="رقم الهاتف" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400 text-left tracking-[0.2em]" dir="auto" placeholder="05 / 06 / 07...">
                     </div>
                 </div>
 
                 <div class="relative group">
-                    <select id="user-level" aria-label="المستوى الدراسي" class="w-full px-6 py-4 neu-input font-bold text-slate-700 dark:text-white text-base hidden appearance-none cursor-pointer">
-                        <option value="" disabled selected>اختر المستوى الدراسي...</option>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors hidden text-2xl" id="level-icon"><i class="ph-fill ph-graduation-cap"></i></div>
+                    <select id="user-level" aria-label="المستوى الدراسي" class="w-full pl-5 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all hidden font-black text-blue-700 dark:text-blue-400 text-lg appearance-none cursor-pointer">
+                        <option value="" disabled selected>اختر مستواك الدراسي بدقة...</option>
                         <option value="m_y1">السنة الأولى متوسط</option>
                         <option value="m_y2">السنة الثانية متوسط</option>
                         <option value="m_y3">السنة الثالثة متوسط</option>
@@ -390,33 +397,35 @@
                     </select>
                 </div>
 
-                <!-- حقل كلمة المرور -->
+                <!-- حقل كلمة المرور (مع زر الإظهار والإخفاء) -->
                 <div class="relative group">
-                    <input type="password" id="password" aria-label="كلمة المرور" class="w-full px-6 pr-12 py-4 neu-input font-bold text-slate-700 dark:text-white text-base" placeholder="كلمة المرور">
-                    <button type="button" onclick="togglePasswordVisibility()" aria-label="إظهار كلمة المرور" class="absolute inset-y-0 right-4 flex items-center text-slate-400 hover:text-blue-500 transition-colors text-xl focus:outline-none">
-                        <i id="password-toggle-icon" class="ph-fill ph-eye-slash"></i>
+                    <!-- أيقونة القفل (يمين) -->
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-slate-400 group-focus-within:text-blue-500 transition-colors text-2xl">
+                        <i class="ph-fill ph-lock-key"></i>
+                    </div>
+                    
+                    <!-- حقل إدخال كلمة المرور -->
+                    <!-- تمت إضافة pl-14 لكي لا يختفي النص خلف أيقونة العين -->
+                    <input type="password" id="password" aria-label="كلمة المرور" class="w-full pl-14 pr-14 py-4 rounded-2xl border-2 border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 outline-none focus:border-blue-500 transition-all font-black text-slate-700 dark:text-white text-lg placeholder-slate-400" placeholder="كلمة المرور">
+                    
+                    <!-- زر إظهار/إخفاء كلمة المرور (يسار) -->
+                    <button type="button" onclick="togglePasswordVisibility()" aria-label="إظهار كلمة المرور" class="absolute inset-y-0 left-0 flex items-center pl-5 text-slate-400 hover:text-blue-500 transition-colors text-2xl focus:outline-none">
+                        <i id="password-toggle-icon" class="ph-fill ph-eye-slash transition-transform hover:scale-110"></i>
                     </button>
                 </div>
 
                 
-                <div class="flex justify-between items-center mt-2" id="forgot-password-container">
-                    <div class="flex items-center gap-2 hidden"> 
-                        <input type="checkbox" id="remember-me" class="custom-cb">
-                        <label for="remember-me" class="text-sm font-bold text-slate-500">تذكرني</label>
-                    </div>
-                    <button onclick="requestPasswordReset()" class="text-sm font-bold text-blue-500 hover:text-blue-600 transition ml-auto">نسيت كلمة المرور؟</button>
+                <div class="text-right mt-2" id="forgot-password-container">
+                    <button onclick="requestPasswordReset()" class="text-sm font-bold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition underline decoration-1 underline-offset-2">نسيت كلمة المرور؟</button>
                 </div>
 
-                <button id="auth-action-btn" onclick="handleAuth()" class="w-full py-4 neu-btn-primary mt-6 tracking-widest text-lg font-black flex items-center justify-center gap-2">
-                    <i class="ph-bold ph-sign-in text-2xl"></i> تسجيل الدخول
+                <button id="auth-action-btn" onclick="handleAuth()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black py-5 rounded-2xl btn-modern text-2xl mt-6 shadow-xl shadow-blue-600/30 tracking-wide flex justify-center items-center gap-2">
+                    <i class="ph-bold ph-sign-in"></i> تسجيل الدخول
                 </button>
             </div>
             
-            <div class="flex items-center justify-center gap-4 mt-10 relative z-10">
-                <span class="text-sm font-bold text-slate-500" id="switch-mode-prefix">ليس لديك حساب؟</span>
-                <button onclick="toggleAuthMode()" aria-label="تبديل وضع التسجيل" class="neu-btn-icon" id="switch-mode-btn">
-                    <i class="ph-bold ph-plus text-xl" id="switch-mode-icon"></i>
-                </button>
+            <div class="text-center mt-8 relative z-10 border-t border-slate-100 dark:border-slate-700 pt-6">
+                <button onclick="toggleAuthMode()" id="switch-mode-text" class="text-slate-500 dark:text-slate-400 font-bold hover:text-blue-600 dark:hover:text-blue-400 transition underline decoration-2 underline-offset-4 decoration-slate-300 dark:decoration-slate-600 text-lg flex items-center justify-center gap-2 mx-auto"><i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد</button>
             </div>
         </div>
 
@@ -773,6 +782,12 @@
         }
     </script>
 
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(148, 163, 184, 0.3); border-radius: 20px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(71, 85, 105, 0.5); }
+    </style>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
