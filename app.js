@@ -656,17 +656,14 @@ window.toggleAuthMode = (pushHistory = true) => {
         history.pushState({ screen: 'auth-screen', isRegistering: window.isRegistering }, "");
     }
     const titleEl = document.getElementById('auth-title');
-    if(titleEl) titleEl.innerText = window.isRegistering ? "إنشاء حساب" : "مرحباً بك";
+    if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
     
     const btnEl = document.getElementById('auth-action-btn');
-    if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-user-plus text-xl"></i><span>إنشاء حساب</span>' : '<i class="ph-bold ph-sign-in text-xl"></i><span>تسجيل الدخول</span>';
+    if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
     
     const switchEl = document.getElementById('switch-mode-text');
-    if(switchEl) switchEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-arrow-right text-xl text-blue-500"></i>' : '<i class="ph-bold ph-plus text-xl text-blue-500"></i>';
+    if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
     
-    const switchPrefix = document.getElementById('switch-mode-prefix');
-    if(switchPrefix) switchPrefix.innerText = window.isRegistering ? "لديك حساب بالفعل؟" : "ليس لديك حساب؟";
-
     const authScreen = document.getElementById('auth-screen');
     const loginNameCont = document.getElementById('login-name-container');
     const regNamesCont = document.getElementById('register-names-container');
