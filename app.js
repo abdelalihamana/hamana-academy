@@ -476,7 +476,7 @@ const checkAndUpdateStreak = async (userRef, userData) => {
 };
 
 // ==========================================
-// 🛡️ دالة نافذة التأكيد (المفقودة سابقاً)
+// 🛡️ دالة نافذة التأكيد
 // ==========================================
 window.closeConfirm = null;
 const confirmAction = (msg) => {
@@ -486,7 +486,6 @@ const confirmAction = (msg) => {
         
         const modal = document.getElementById('confirm-modal');
         if (!modal) {
-            // كاحتياط لو لم تكن النافذة موجودة في الـ HTML
             resolve(window.confirm(msg));
             return;
         }
@@ -657,14 +656,17 @@ window.toggleAuthMode = (pushHistory = true) => {
         history.pushState({ screen: 'auth-screen', isRegistering: window.isRegistering }, "");
     }
     const titleEl = document.getElementById('auth-title');
-    if(titleEl) titleEl.innerText = window.isRegistering ? "حساب جديد" : "أكاديمية حمانة";
+    if(titleEl) titleEl.innerText = window.isRegistering ? "إنشاء حساب" : "مرحباً بك";
     
     const btnEl = document.getElementById('auth-action-btn');
-    if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-paper-plane-tilt"></i> إرسال الطلب' : '<i class="ph-bold ph-sign-in"></i> تسجيل الدخول';
+    if(btnEl) btnEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-user-plus text-xl"></i><span>إنشاء حساب</span>' : '<i class="ph-bold ph-sign-in text-xl"></i><span>تسجيل الدخول</span>';
     
     const switchEl = document.getElementById('switch-mode-text');
-    if(switchEl) switchEl.innerHTML = window.isRegistering ? 'لديك حساب بالفعل؟ سجل دخولك <i class="ph-bold ph-arrow-left"></i>' : '<i class="ph-fill ph-rocket-launch"></i> إنشاء حساب تلميذ جديد';
+    if(switchEl) switchEl.innerHTML = window.isRegistering ? '<i class="ph-bold ph-arrow-right text-xl text-blue-500"></i>' : '<i class="ph-bold ph-plus text-xl text-blue-500"></i>';
     
+    const switchPrefix = document.getElementById('switch-mode-prefix');
+    if(switchPrefix) switchPrefix.innerText = window.isRegistering ? "لديك حساب بالفعل؟" : "ليس لديك حساب؟";
+
     const authScreen = document.getElementById('auth-screen');
     const loginNameCont = document.getElementById('login-name-container');
     const regNamesCont = document.getElementById('register-names-container');
@@ -796,6 +798,7 @@ window.requestPasswordReset = async () => {
 
 window.resolvePasswordReset = async (username) => {
     try {
+        let safeUsername = username.replace(/'/g, "\\'");
         const userRef = doc(usersCol, username);
         const userSnap = await getDoc(userRef);
         
@@ -1216,17 +1219,21 @@ window.returnToAdmin = () => {
 // 🚪 دالة تسجيل الخروج المحسنة مع نافذة التأكيد
 // ==========================================
 window.logout = async () => {
-    try { if(typeof window.closeSettings === 'function') window.closeSettings(true); } catch(e) {}
-    try { if(typeof window.closeChat === 'function') window.closeChat(true); } catch(e) {}
-
-    // إظهار نافذة التأكيد الذكية الانتظارية
+    // 1. أولاً: نعرض نافذة التأكيد قبل أن نغلق أي شيء!
     const isConfirmed = await confirmAction("هل أنت متأكد أنك تريد تسجيل الخروج من حسابك؟");
 
+    // 2. إذا ضغط المستخدم على "تأكيد"
     if (isConfirmed) {
         showToast("جاري تسجيل الخروج...", "success");
 
+        // الآن فقط نغلق النوافذ المفتوحة
+        try { if(typeof window.closeSettings === 'function') window.closeSettings(true); } catch(e) {}
+        try { if(typeof window.closeChat === 'function') window.closeChat(true); } catch(e) {}
+
+        // تنظيف التخزين المحلي
         try { sessionStorage.clear(); } catch(e) {}
         
+        // إيقاف مستمعي قاعدة البيانات
         try {
             if(typeof unsubscribeProgram === 'function' && unsubscribeProgram) unsubscribeProgram();
             if(typeof unsubscribeUsers === 'function' && unsubscribeUsers) unsubscribeUsers();
@@ -1238,6 +1245,7 @@ window.logout = async () => {
             if(typeof pomodoroInterval !== 'undefined' && pomodoroInterval) clearInterval(pomodoroInterval);
         } catch(e) {}
         
+        // الخروج الفعلي من فايربيز
         try {
             await signOut(auth);
         } catch(e) { console.error("Firebase logout error:", e); }
@@ -1245,6 +1253,7 @@ window.logout = async () => {
         window.currentUserRecord = null; 
         window.originalAdminRecord = null;
         
+        // إعادة تهيئة الواجهة
         try {
             const passEl = document.getElementById('password');
             if (passEl) passEl.value = '';
@@ -1266,6 +1275,7 @@ window.logout = async () => {
             if (authScreen) authScreen.classList.remove('blur-sm', 'pointer-events-none');
         } catch(e) {}
 
+        // توجيه المستخدم لصفحة تسجيل الدخول
         try { switchScreen('auth-screen'); } catch(e) {}
     }
 };
@@ -1453,6 +1463,7 @@ window.filterSubStudents = (subType) => {
 window.toggleSelectAll = () => { const state = document.getElementById('select-all-cb').checked; document.querySelectorAll('.student-cb').forEach(cb => cb.checked = state); };
 
 window.toggleUserStatus = async (uid, isApproved, phone) => {
+    let safeId = uid.replace(/'/g, "\\'");
     if (isApproved) {
         if(await confirmAction("هل أنت متأكد من إلغاء تفعيل هذا الحساب؟")) {
             await updateDoc(doc(usersCol, uid), { approved: false });
@@ -1460,25 +1471,19 @@ window.toggleUserStatus = async (uid, isApproved, phone) => {
             window.loadAdminPage('init'); 
         }
     } else {
+        let waLink = null;
+        if (phone) {
+            let waMessage = encodeURIComponent("السلام عليكم. معكم أكاديمية حمانة للعلوم الفيزيائية نعلمكم أنه تم قبول إبنكم على مستوى المنصة نتمنى له النجاح والتوفيق. لأي إستفسار راسلونا عبر المنصة");
+            waLink = `https://wa.me/213${phone.substring(1)}?text=${waMessage}`;
+        }
+        let win = null; if(waLink) win = window.open(waLink, '_blank'); 
+        
         try {
-            // 1. تفعيل الحساب في السحابة أولاً لضمان عدم حدوث خطأ
             await updateDoc(doc(usersCol, uid), { approved: true });
             showToast("تم تفعيل الحساب بنجاح ✅");
             window.loadAdminPage('init'); 
-
-            // 2. بعد التفعيل الناجح، نقوم بفتح نافذة الواتساب
-            if (phone) {
-                let waMessage = encodeURIComponent("السلام عليكم. معكم أكاديمية حمانة للعلوم الفيزيائية نعلمكم أنه تم قبول إبنكم على مستوى المنصة نتمنى له النجاح والتوفيق. لأي إستفسار راسلونا عبر المنصة");
-                let waLink = `https://wa.me/213${phone.substring(1)}?text=${waMessage}`;
-                
-                // نؤخر فتح الواتساب نصف ثانية لكي يرى الأستاذ إشعار "تم التفعيل بنجاح" أولاً
-                setTimeout(() => {
-                    window.open(waLink, '_blank');
-                }, 500);
-            }
         } catch(e) {
-            console.error(e);
-            showToast("حدث خطأ أثناء التفعيل", "error");
+            if(win) win.close(); showToast("حدث خطأ أثناء التفعيل", "error");
         }
     }
 };
@@ -1595,6 +1600,7 @@ const renderAdminTable = () => {
         let levelDisplay = data.level ? (levelNames[data.level] || data.level) : "غير محدد";
         let prog = calculateProgressXP(data.level, data, window.currentSections);
         let displayName = d.id.replace(/_/g, ' ');
+        let safeId = d.id.replace(/'/g, "\\'");
         
         let waProgMsg = encodeURIComponent(`السلام عليكم ولي أمر التلميذ(ة) ${displayName}. نعلمكم من أكاديمية حمانة للعلوم الفيزيائية أن نسبة إنجاز ابنكم في الدروس هي ${prog.percent}% بمجموع نقاط ${prog.xp} XP. لأي استفسار يرجى مراسلتنا.`);
         let waProgLink = data.phoneNumber ? `https://wa.me/213${data.phoneNumber.substring(1)}?text=${waProgMsg}` : '#';
@@ -1603,7 +1609,7 @@ const renderAdminTable = () => {
             `<div class="flex items-center flex-wrap gap-2">
                 <span class="font-black text-slate-800 dark:text-slate-200">${data.parentName}</span>
                 ${data.phoneNumber ? `<a href="${waProgLink}" target="_blank" class="text-[#25D366] hover:text-[#128C7E] transition hover:scale-110" title="إعلام بالتقدم عبر الواتساب"><i class="ph-fill ph-whatsapp-logo text-2xl drop-shadow-sm"></i></a>` : ''}
-                ${data.passwordResetRequest ? `<button onclick="resolvePasswordReset('${d.id}')" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded-lg text-xs font-black animate-pulse border border-red-200 dark:border-red-800 flex items-center gap-1 hover:bg-red-100 transition-colors" title="التلميذ يطلب كلمة المرور"><i class="ph-bold ph-key"></i> إظهار الكلمة</button>` : ''}
+                ${data.passwordResetRequest ? `<button onclick="resolvePasswordReset('${safeId}')" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded-lg text-xs font-black animate-pulse border border-red-200 dark:border-red-800 flex items-center gap-1 hover:bg-red-100 transition-colors" title="التلميذ يطلب كلمة المرور"><i class="ph-bold ph-key"></i> إظهار الكلمة</button>` : ''}
             </div>` 
             : '<div class="text-sm text-slate-400 dark:text-slate-500 font-bold">غير متوفر</div>';
 
@@ -1611,8 +1617,8 @@ const renderAdminTable = () => {
         let chatBadge = unreadCount > 0 ? `<span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full animate-bounce shadow-md border border-white">${unreadCount}</span>` : '';
 
         let statusBtn = data.approved 
-            ? `<button onclick="toggleUserStatus('${d.id}', true, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:scale-105 transition" title="انقر لإلغاء التفعيل">مفعل ✅</button>`
-            : `<button onclick="toggleUserStatus('${d.id}', false, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:scale-105 transition" title="اضغط للتفعيل ومراسلة الولي">انتظار ⏳</button>`;
+            ? `<button onclick="toggleUserStatus('${safeId}', true, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:scale-105 transition" title="انقر لإلغاء التفعيل">مفعل ✅</button>`
+            : `<button onclick="toggleUserStatus('${safeId}', false, '${data.phoneNumber||''}')" aria-label="تغيير الحالة" class="px-4 py-1.5 rounded-full text-xs font-black shadow-sm bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800 hover:scale-105 transition" title="اضغط للتفعيل ومراسلة الولي">انتظار ⏳</button>`;
 
         let passDisplay = data.password ? data.password : "مفقودة ⚠";
         const badgeInfo = getStudentBadge(prog.xp);
@@ -1642,10 +1648,10 @@ const renderAdminTable = () => {
                 <td class="p-4 text-center border-b border-slate-100 dark:border-slate-700">${statusBtn}</td>
                 <td class="p-4 text-left border-b border-slate-100 dark:border-slate-700">
                     <div class="flex gap-2 justify-end">
-                        <button onclick="loginAsStudent('${d.id}')" aria-label="مراقبة حساب التلميذ" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-black hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition border border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center gap-1" title="مراقبة حساب التلميذ"><i class="ph-bold ph-sign-in"></i> دخول للحساب</button>
-                        <button onclick="openChat('${d.id}')" aria-label="مراسلة التلميذ" class="relative icon-btn w-9 h-9 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-lg shadow-sm border border-blue-200 dark:border-blue-800" title="مراسلة"><i class="ph-bold ph-chat-circle-dots"></i>${chatBadge}</button>
-                        <button onclick="upgradeStudentLevel('${d.id}', '${data.level}')" class="text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-700 p-2 rounded-lg transition" title="ترقية للعام القادم وتفريغ البيانات"><i class="ph-bold ph-trend-up text-lg"></i></button>
-                        <button onclick="deleteStudentBtn('${d.id}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 p-2 rounded-lg transition" title="حذف الحساب نهائياً"><i class="ph-bold ph-trash text-lg"></i></button>
+                        <button onclick="loginAsStudent('${safeId}')" aria-label="مراقبة حساب التلميذ" class="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1.5 rounded-lg text-xs font-black hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition border border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center gap-1" title="مراقبة حساب التلميذ"><i class="ph-bold ph-sign-in"></i> دخول للحساب</button>
+                        <button onclick="openChat('${safeId}')" aria-label="مراسلة التلميذ" class="relative icon-btn w-9 h-9 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-lg shadow-sm border border-blue-200 dark:border-blue-800" title="مراسلة"><i class="ph-bold ph-chat-circle-dots"></i>${chatBadge}</button>
+                        <button onclick="upgradeStudentLevel('${safeId}', '${data.level}')" class="text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-700 p-2 rounded-lg transition" title="ترقية للعام القادم وتفريغ البيانات"><i class="ph-bold ph-trend-up text-lg"></i></button>
+                        <button onclick="deleteStudentBtn('${safeId}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 p-2 rounded-lg transition" title="حذف الحساب نهائياً"><i class="ph-bold ph-trash text-lg"></i></button>
                     </div>
                 </td>
             </tr>`;
@@ -1748,8 +1754,9 @@ const startAdminListeners = () => {
         for (let username of Object.keys(window.adminAlerts.resets)) {
             totalUnread++;
             let studentName = username.replace(/_/g, ' ');
+            let safeUsername = username.replace(/'/g, "\\'");
             notifHtml += `
-                <button onclick="document.getElementById('admin-student-search').value='${username}'; openAdminSection('accounts');" class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition border border-red-100 dark:border-red-800/50 group text-right w-full mb-2 shadow-sm">
+                <button onclick="document.getElementById('admin-student-search').value='${safeUsername}'; openAdminSection('accounts'); window.loadAdminPage('init');" class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition border border-red-100 dark:border-red-800/50 group text-right w-full mb-2 shadow-sm">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-red-200 dark:bg-red-800 text-red-700 dark:text-red-300 flex items-center justify-center text-xl shadow-inner animate-pulse"><i class="ph-fill ph-key"></i></div>
                         <div>
@@ -1765,8 +1772,9 @@ const startAdminListeners = () => {
         for (let username of Object.keys(window.adminAlerts.pending)) {
             totalUnread++;
             let studentName = username.replace(/_/g, ' ');
+            let safeUsername = username.replace(/'/g, "\\'");
             notifHtml += `
-                <button onclick="document.getElementById('admin-student-search').value='${username}'; openAdminSection('accounts');" class="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition border border-emerald-100 dark:border-emerald-800/50 group text-right w-full mb-2 shadow-sm">
+                <button onclick="document.getElementById('admin-student-search').value='${safeUsername}'; openAdminSection('accounts'); window.loadAdminPage('init');" class="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition border border-emerald-100 dark:border-emerald-800/50 group text-right w-full mb-2 shadow-sm">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-emerald-200 dark:bg-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-xl shadow-inner animate-pulse"><i class="ph-fill ph-user-plus"></i></div>
                         <div>
@@ -1782,8 +1790,9 @@ const startAdminListeners = () => {
         for (let [username, data] of Object.entries(window.adminAlerts.chats)) {
             totalUnread += data.unreadAdmin;
             let studentName = username.replace(/_/g, ' ');
+            let safeUsername = username.replace(/'/g, "\\'");
             notifHtml += `
-                <button onclick="openChat('${username}')" class="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/40 transition border border-amber-100 dark:border-amber-800/50 group text-right w-full mb-2 shadow-sm">
+                <button onclick="openChat('${safeUsername}')" class="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/40 transition border border-amber-100 dark:border-amber-800/50 group text-right w-full mb-2 shadow-sm">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-amber-200 dark:bg-amber-800 text-amber-700 dark:text-amber-300 flex items-center justify-center text-xl shadow-inner"><i class="ph-fill ph-user"></i></div>
                         <div>
@@ -2250,6 +2259,7 @@ window.executeStudentSearch = () => {
                             found = true; 
                             let linkId = `${branch.id}_${cat}_${lIdx}`; 
                             let isRead = clickedLinks.includes(linkId);
+                            let safeUrl = lnk.url.replace(/'/g, "\\'");
 
                             html += `
                             <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition hover:shadow-md">
@@ -2262,7 +2272,7 @@ window.executeStudentSearch = () => {
                                 </div>
                                 <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
                                     ${isRead ? `<span class="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-xs font-black px-3 py-1.5 rounded-lg flex items-center gap-1"><i class="ph-bold ph-check"></i> مكتمل</span>` : ''}
-                                    <button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-black shadow-sm transition flex items-center gap-2 text-sm whitespace-nowrap">
+                                    <button onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${safeUrl}')" aria-label="مشاهدة المحتوى" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-black shadow-sm transition flex items-center gap-2 text-sm whitespace-nowrap">
                                         مشاهدة <i class="ph-bold ph-play-circle"></i>
                                     </button>
                                 </div>
@@ -2605,7 +2615,8 @@ window.renderProgramUI = (sections, containerId, isAdmin, pushHistory = true) =>
                                     btnClass = ' ring-4 ring-yellow-400 bg-yellow-50 dark:bg-yellow-900/30 shadow-lg animate-pulse z-10 scale-[1.02] border-yellow-300 ';
                                 }
 
-                                return `<button id="lesson-btn-${branch.id}-${cat}-${lIdx}" onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${lnk.url}')" aria-label="مشاهدة المحتوى" class="w-full flex items-center justify-between gap-3 p-4 rounded-2xl border transition-all duration-200 group/link relative overflow-hidden text-right mb-3 ${btnClass}">
+                                let safeUrl = lnk.url.replace(/'/g, "\\'");
+                                return `<button id="lesson-btn-${branch.id}-${cat}-${lIdx}" onclick="trackLinkClick('${branch.id}', '${cat}', ${lIdx}, '${safeUrl}')" aria-label="مشاهدة المحتوى" class="w-full flex items-center justify-between gap-3 p-4 rounded-2xl border transition-all duration-200 group/link relative overflow-hidden text-right mb-3 ${btnClass}">
                                     <div class="flex items-start sm:items-center gap-4 flex-1 w-full">
                                         <div class="w-12 h-12 flex-shrink-0 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl group-hover/link:bg-blue-600 group-hover/link:text-white transition-colors shadow-inner mt-1 sm:mt-0 border border-blue-100 dark:border-blue-800">
                                             <i class="ph-bold ph-play-circle"></i>
@@ -2645,6 +2656,7 @@ window.upgradeStudentLevel = async (username, currentLevel) => {
     if (!upgradeInfo) return showToast("مستوى غير معروف", "error");
 
     const studentName = username.replace(/_/g, ' ');
+    let safeId = username.replace(/'/g, "\\'");
 
     if (await confirmAction(`🎓 هل أنت متأكد من ترقية (${studentName}) إلى [ ${upgradeInfo.name} ]؟\n\n⚠️ تحذير: سيتم تفريغ مساحة التخزين الخاصة به بالكامل (حذف تقدم الدروس، نقاط XP، الإشعارات، والدردشات القديمة) ليبدأ عاماً جديداً بصفحة بيضاء.`)) {
         showToast("جاري الترقية وتنظيف بيانات الحساب... يرجى الانتظار", "success");
