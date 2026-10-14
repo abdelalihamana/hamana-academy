@@ -1460,19 +1460,25 @@ window.toggleUserStatus = async (uid, isApproved, phone) => {
             window.loadAdminPage('init'); 
         }
     } else {
-        let waLink = null;
-        if (phone) {
-            let waMessage = encodeURIComponent("السلام عليكم. معكم أكاديمية حمانة للعلوم الفيزيائية نعلمكم أنه تم قبول إبنكم على مستوى المنصة نتمنى له النجاح والتوفيق. لأي إستفسار راسلونا عبر المنصة");
-            waLink = `https://wa.me/213${phone.substring(1)}?text=${waMessage}`;
-        }
-        let win = null; if(waLink) win = window.open(waLink, '_blank'); 
-        
         try {
+            // 1. تفعيل الحساب في السحابة أولاً لضمان عدم حدوث خطأ
             await updateDoc(doc(usersCol, uid), { approved: true });
             showToast("تم تفعيل الحساب بنجاح ✅");
             window.loadAdminPage('init'); 
+
+            // 2. بعد التفعيل الناجح، نقوم بفتح نافذة الواتساب
+            if (phone) {
+                let waMessage = encodeURIComponent("السلام عليكم. معكم أكاديمية حمانة للعلوم الفيزيائية نعلمكم أنه تم قبول إبنكم على مستوى المنصة نتمنى له النجاح والتوفيق. لأي إستفسار راسلونا عبر المنصة");
+                let waLink = `https://wa.me/213${phone.substring(1)}?text=${waMessage}`;
+                
+                // نؤخر فتح الواتساب نصف ثانية لكي يرى الأستاذ إشعار "تم التفعيل بنجاح" أولاً
+                setTimeout(() => {
+                    window.open(waLink, '_blank');
+                }, 500);
+            }
         } catch(e) {
-            if(win) win.close(); showToast("حدث خطأ أثناء التفعيل", "error");
+            console.error(e);
+            showToast("حدث خطأ أثناء التفعيل", "error");
         }
     }
 };
@@ -1743,7 +1749,7 @@ const startAdminListeners = () => {
             totalUnread++;
             let studentName = username.replace(/_/g, ' ');
             notifHtml += `
-                <button onclick="openAdminSection('accounts'); document.getElementById('admin-student-search').value='${username}'; window.loadAdminPage('init');" class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition border border-red-100 dark:border-red-800/50 group text-right w-full mb-2 shadow-sm">
+                <button onclick="document.getElementById('admin-student-search').value='${username}'; openAdminSection('accounts');" class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/40 transition border border-red-100 dark:border-red-800/50 group text-right w-full mb-2 shadow-sm">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-red-200 dark:bg-red-800 text-red-700 dark:text-red-300 flex items-center justify-center text-xl shadow-inner animate-pulse"><i class="ph-fill ph-key"></i></div>
                         <div>
@@ -1760,7 +1766,7 @@ const startAdminListeners = () => {
             totalUnread++;
             let studentName = username.replace(/_/g, ' ');
             notifHtml += `
-                <button onclick="openAdminSection('accounts'); document.getElementById('admin-student-search').value='${username}'; window.loadAdminPage('init');" class="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition border border-emerald-100 dark:border-emerald-800/50 group text-right w-full mb-2 shadow-sm">
+                <button onclick="document.getElementById('admin-student-search').value='${username}'; openAdminSection('accounts');" class="flex items-center justify-between p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition border border-emerald-100 dark:border-emerald-800/50 group text-right w-full mb-2 shadow-sm">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-emerald-200 dark:bg-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-xl shadow-inner animate-pulse"><i class="ph-fill ph-user-plus"></i></div>
                         <div>
