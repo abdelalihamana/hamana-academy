@@ -41,7 +41,7 @@ window.enableNotifications = async () => {
             
             const token = await getToken(messaging, { 
                 // ⚠️ ضع المفتاح الطويل الذي نسخته من فايربيز هنا بين علامتي التنصيص
-                vapidKey: 'YOUR_VAPID_KEY_HERE' 
+                vapidKey: 'BFeVwyUeWeWblK96PzTYLSLzV_mHh0So_WcdUQQEQgxxSNgvJ7hDjPE9KtGX90pTG1VbHR0Vr_icqYQG8EtLi14' 
             });
             
             if (token && window.currentUserRecord) {
