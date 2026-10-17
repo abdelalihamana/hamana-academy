@@ -148,7 +148,10 @@
                     <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-2"><i class="ph-fill ph-device-mobile"></i> هاتف ولي الأمر</label>
                     <input type="tel" id="settings-new-phone" aria-label="رقم الهاتف" autocomplete="tel" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')" class="w-full px-5 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 focus:border-blue-500 outline-none font-black transition shadow-sm text-left tracking-[0.2em] text-lg text-slate-800 dark:text-white" dir="auto" placeholder="05/06/07...">
                 </div>
-
+                <!-- زر تفعيل الإشعارات الجديد -->
+                <button id="enable-notif-btn" onclick="enableNotifications()" class="w-full bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-black py-4 rounded-xl transition border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/50 shadow-sm text-xl flex items-center justify-center gap-2 mt-4">
+                    <i class="ph-bold ph-bell-ringing"></i> تفعيل إشعارات الهاتف
+                </button>
                 <button onclick="saveSettingsData()" aria-label="حفظ التغييرات" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black py-4 rounded-xl transition btn-modern mt-2 shadow-lg shadow-blue-500/30 text-xl flex items-center justify-center gap-2"><i class="ph-bold ph-floppy-disk"></i> حفظ التغييرات</button>
                                 <!-- زر تسجيل الخروج (مدمج في الإعدادات) -->
                 <button id="student-logout-btn" onclick="logout()" aria-label="تسجيل الخروج" class="w-full bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-black py-4 rounded-xl transition border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/50 shadow-sm text-xl flex items-center justify-center gap-2 mt-4"><i class="ph-bold ph-sign-out"></i> تسجيل الخروج</button>
