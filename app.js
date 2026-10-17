@@ -1,6 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment, writeBatch, query, limit, orderBy, getDocs, where, startAfter, startAt, documentId, getCountFromServer } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-messaging.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
@@ -23,36 +24,40 @@ isSupported().then((supported) => {
         messaging = getMessaging(app);
         onMessage(messaging, (payload) => {
             console.log("Message received. ", payload);
-            showToast(`🔔 ${payload.notification.title}`, "success");
+            if (typeof window.showToast === 'function') {
+                window.showToast(`🔔 ${payload.notification.title}`, "success");
+            }
         });
     }
 }).catch(err => console.error("Error checking messaging support:", err));
 
 window.enableNotifications = async () => {
-    if (!messaging) return showToast("عذراً، متصفحك أو هاتفك لا يدعم نظام الإشعارات هذا.", "error");
+    if (!messaging) return window.showToast("عذراً، متصفحك أو هاتفك لا يدعم نظام الإشعارات هذا.", "error");
 
     try {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
-            showToast("جاري ربط هاتفك بخوادم الإشعارات...", "success");
+            window.showToast("جاري ربط هاتفك بخوادم الإشعارات...", "success");
             
             const token = await getToken(messaging, { 
-                vapidKey: 'BFeVwyUeWeWblK96PzTYLSLzV_mHh0So_WcdUQQEQgxxSNgvJ7hDjPE9KtGX90pTG1VbHR0Vr_icqYQG8EtLi14' // ⚠️ ضع المفتاح الطويل الذي نسخته هنا
+                // ⚠️ ضع المفتاح الطويل الذي نسخته من فايربيز هنا بين علامتي التنصيص
+                vapidKey: 'YOUR_VAPID_KEY_HERE' 
             });
             
             if (token && window.currentUserRecord) {
-                await updateDoc(doc(usersCol, window.currentUserRecord.username), {
+                await updateDoc(doc(collection(db, 'physics_db', 'public', 'profiles'), window.currentUserRecord.username), {
                     fcmToken: token
                 });
-                showToast("تم تفعيل الإشعارات بنجاح! 🎉", "success");
-                document.getElementById('enable-notif-btn').style.display = 'none';
+                window.showToast("تم تفعيل الإشعارات بنجاح! 🎉", "success");
+                const btn = document.getElementById('enable-notif-btn');
+                if (btn) btn.style.display = 'none';
             }
         } else {
-            showToast("لقد قمت برفض صلاحية الإشعارات.", "error");
+            window.showToast("لقد قمت برفض صلاحية الإشعارات.", "error");
         }
     } catch (error) {
         console.error("Notification Error:", error);
-        showToast("حدث خطأ أثناء محاولة تفعيل الإشعارات.", "error");
+        window.showToast("حدث خطأ أثناء محاولة تفعيل الإشعارات.", "error");
     }
 };
 
