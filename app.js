@@ -16,6 +16,46 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// --- إعدادات الإشعارات (Firebase Messaging) ---
+let messaging = null;
+isSupported().then((supported) => {
+    if (supported) {
+        messaging = getMessaging(app);
+        onMessage(messaging, (payload) => {
+            console.log("Message received. ", payload);
+            showToast(`🔔 ${payload.notification.title}`, "success");
+        });
+    }
+}).catch(err => console.error("Error checking messaging support:", err));
+
+window.enableNotifications = async () => {
+    if (!messaging) return showToast("عذراً، متصفحك أو هاتفك لا يدعم نظام الإشعارات هذا.", "error");
+
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            showToast("جاري ربط هاتفك بخوادم الإشعارات...", "success");
+            
+            const token = await getToken(messaging, { 
+                vapidKey: 'BFeVwyUeWeWblK96PzTYLSLzV_mHh0So_WcdUQQEQgxxSNgvJ7hDjPE9KtGX90pTG1VbHR0Vr_icqYQG8EtLi14' // ⚠️ ضع المفتاح الطويل الذي نسخته هنا
+            });
+            
+            if (token && window.currentUserRecord) {
+                await updateDoc(doc(usersCol, window.currentUserRecord.username), {
+                    fcmToken: token
+                });
+                showToast("تم تفعيل الإشعارات بنجاح! 🎉", "success");
+                document.getElementById('enable-notif-btn').style.display = 'none';
+            }
+        } else {
+            showToast("لقد قمت برفض صلاحية الإشعارات.", "error");
+        }
+    } catch (error) {
+        console.error("Notification Error:", error);
+        showToast("حدث خطأ أثناء محاولة تفعيل الإشعارات.", "error");
+    }
+};
+
 const usersCol = collection(db, 'physics_db', 'public', 'profiles');
 const programCol = collection(db, 'physics_db', 'public', 'curriculum');
 const chatsPath = 'physics_db/public/chats';
