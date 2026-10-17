@@ -1185,6 +1185,16 @@ onAuthStateChanged(auth, async (user) => {
                         if (typeof window.initPomodoro === 'function') {
                             window.initPomodoro();
                         }
+                        
+                        // 🚀 نظام التوجيه الذكي (التقاط النقر من الإشعار)
+                        const urlParams = new URLSearchParams(window.location.search);
+                        if (urlParams.get('action') === 'chat') {
+                            setTimeout(() => {
+                                window.openChat('admin');
+                                // تنظيف الرابط بعد فتح الدردشة
+                                window.history.replaceState({}, document.title, window.location.pathname);
+                            }, 1000);
+                        }
                     }
                 } else {
                     switchScreen('landing-screen');
@@ -1463,7 +1473,9 @@ window.executeBroadcast = async () => {
                     body: JSON.stringify({
                         title: 'أكاديمية حمانة 📢',
                         body: message,
-                        tokens: fcmTokens
+                        tokens: fcmTokens,
+                        // 💡 هذا السطر يخبر الإشعار بفتح التطبيق مع أمر فتح الدردشة
+                        url: 'https://hamana-academy.vercel.app/?action=chat'
                     })
                 });
             } catch (notifError) {
