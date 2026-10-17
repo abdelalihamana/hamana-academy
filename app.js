@@ -1426,13 +1426,16 @@ window.executeBroadcast = async () => {
         const batch = writeBatch(db);
         const timestamp = Date.now();
         let count = 0;
+        let fcmTokens = []; // 🔔 مصفوفة لجمع مفاتيح الهواتف
 
         snap.forEach(user => {
             const username = user.id;
+            const data = user.data();
             const msgId = timestamp.toString() + '_' + count;
             const msgRef = doc(collection(db, chatsPath, username, 'messages'), msgId);
             const chatDocRef = doc(db, chatsPath, username);
 
+            // حفظ الإعلان في المنصة
             batch.set(msgRef, {
                 sender: 'admin',
                 text: `📢 إعلان إداري:\n\n${message}`, 
@@ -1441,10 +1444,33 @@ window.executeBroadcast = async () => {
             });
 
             batch.set(chatDocRef, { unreadStudent: increment(1) }, { merge: true });
+            
+            // 🔔 جمع المفاتيح للإشعارات المباشرة
+            if (data.fcmToken) {
+                fcmTokens.push(data.fcmToken);
+            }
             count++;
         });
 
         await batch.commit();
+
+        // 🔔 إرسال الإشعار الفعلي للهواتف!
+        if (fcmTokens.length > 0) {
+            try {
+                await fetch('/api/notify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: 'أكاديمية حمانة 📢',
+                        body: message,
+                        tokens: fcmTokens
+                    })
+                });
+            } catch (notifError) {
+                console.error('Notification Error:', notifError);
+            }
+        }
+
         showToast(`تم إرسال الإعلان إلى ${count} تلميذ بنجاح 🚀`, "success");
         window.closeBroadcastModal();
 
