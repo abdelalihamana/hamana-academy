@@ -1,8 +1,6 @@
-// استدعاء مكتبات فايربيز الخاصة بالخلفية (Background)
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
-// بيانات الاتصال بقاعدة بياناتك (أكاديمية حمانة)
 firebase.initializeApp({
     apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
     authDomain: "physique-58073.firebaseapp.com",
@@ -12,22 +10,35 @@ firebase.initializeApp({
     appId: "1:744073429659:web:0859514e70482543d13c3e"
 });
 
-// تفعيل نظام المراسلة
 const messaging = firebase.messaging();
 
-// هذه الدالة تعمل عندما يكون الموقع مغلقاً أو في الخلفية
 messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] تلقي إشعار في الخلفية ', payload);
-    
-    // شكل وتصميم الإشعار الذي سيظهر على شاشة الهاتف
     const notificationTitle = payload.notification.title;
     const notificationOptions = {
         body: payload.notification.body,
-        icon: '/icon.png', // أيقونة منصتك
-        badge: '/icon.png', // أيقونة صغيرة تظهر في شريط الإشعارات
-        dir: 'rtl' // لدعم اللغة العربية
+        icon: '/icon.png',
+        badge: '/icon.png',
+        dir: 'rtl',
+        // 💡 حفظ الرابط المخفي داخل الإشعار
+        data: {
+            url: payload.data ? payload.data.url : 'https://hamana-academy.vercel.app/'
+        }
     };
-
-    // إظهار الإشعار الفعلي
     self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+// 💡 برمجة ما يحدث عند النقر على الإشعار
+self.addEventListener('notificationclick', function(event) {
+    event.notification.close(); // إغلاق الإشعار من الشاشة
+    const urlToOpen = event.notification.data.url || 'https://hamana-academy.vercel.app/';
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+            for (let i = 0; i < windowClients.length; i++) {
+                let client = windowClients[i];
+                if (client.url === urlToOpen && 'focus' in client) return client.focus();
+            }
+            if (clients.openWindow) return clients.openWindow(urlToOpen);
+        })
+    );
 });
