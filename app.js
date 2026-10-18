@@ -34,23 +34,39 @@ isSupported().then((supported) => {
 window.enableNotifications = async () => {
     if (!messaging) return window.showToast("عذراً، متصفحك أو هاتفك لا يدعم نظام الإشعارات هذا.", "error");
 
+    const userRef = doc(usersCol, window.currentUserRecord.username);
+
+    // 💡 إذا كانت الإشعارات مفعلة بالفعل ويريد التلميذ إلغاءها
+    if (window.currentUserRecord.fcmToken) {
+        if (!await confirmAction("هل أنت متأكد من إيقاف الإشعارات على هذا الجهاز؟")) return;
+        
+        try {
+            // مسح التوكن من قاعدة البيانات ليتم استثناؤه من الإرسال
+            await updateDoc(userRef, { fcmToken: '' });
+            window.currentUserRecord.fcmToken = '';
+            window.showToast("تم إيقاف الإشعارات بنجاح 🔕", "success");
+            window.openSettings(); // تحديث شكل الزر فوراً ليصبح برتقالياً
+        } catch (error) {
+            window.showToast("حدث خطأ أثناء إيقاف الإشعارات.", "error");
+        }
+        return; // الخروج من الدالة
+    }
+
+    // 💡 إذا لم تكن مفعلة ويريد تفعيلها
     try {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
             window.showToast("جاري ربط هاتفك بخوادم الإشعارات...", "success");
             
             const token = await getToken(messaging, { 
-                // ⚠️ ضع المفتاح الطويل الذي نسخته من فايربيز هنا بين علامتي التنصيص
                 vapidKey: 'BFeVwyUeWeWblK96PzTYLSLzV_mHh0So_WcdUQQEQgxxSNgvJ7hDjPE9KtGX90pTG1VbHR0Vr_icqYQG8EtLi14' 
             });
             
             if (token && window.currentUserRecord) {
-                await updateDoc(doc(collection(db, 'physics_db', 'public', 'profiles'), window.currentUserRecord.username), {
-                    fcmToken: token
-                });
+                await updateDoc(userRef, { fcmToken: token });
+                window.currentUserRecord.fcmToken = token;
                 window.showToast("تم تفعيل الإشعارات بنجاح! 🎉", "success");
-                const btn = document.getElementById('enable-notif-btn');
-                if (btn) btn.style.display = 'none';
+                window.openSettings(); // تحديث شكل الزر فوراً ليصبح أحمراً
             }
         } else {
             window.showToast("لقد قمت برفض صلاحية الإشعارات.", "error");
@@ -1344,6 +1360,22 @@ window.openSettings = () => {
     } else {
         phoneContainer.style.display = 'block';
         phoneInput.value = window.currentUserRecord.phoneNumber || '';
+    }
+
+    // 💡 التحديث الجديد: جعل الزر تبادلياً (تفعيل / إلغاء)
+    const notifBtn = document.getElementById('enable-notif-btn');
+    if (notifBtn) {
+        if (window.currentUserRecord.fcmToken) {
+            // حالة الإلغاء (زر أحمر)
+            notifBtn.innerHTML = '<i class="ph-bold ph-bell-slash text-2xl"></i> إيقاف الإشعارات';
+            notifBtn.className = "w-full bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-black py-4 rounded-xl transition border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/50 shadow-sm text-xl flex items-center justify-center gap-2 mt-4 cursor-pointer";
+            notifBtn.disabled = false; 
+        } else {
+            // حالة التفعيل (زر برتقالي)
+            notifBtn.innerHTML = '<i class="ph-bold ph-bell-ringing text-2xl"></i> تفعيل الإشعارات';
+            notifBtn.className = "w-full bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-black py-4 rounded-xl transition border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/50 shadow-sm text-xl flex items-center justify-center gap-2 mt-4 cursor-pointer";
+            notifBtn.disabled = false;
+        }
     }
 
     const modal = document.getElementById('settings-modal'); 
