@@ -449,18 +449,21 @@ window.startLiveStream = async () => {
 
         window.showToast("تم إطلاق البث المباشر بنجاح! 🔴", "success");
 
-        const snap = await getDocs(query(usersCol, where('role', '==', 'student')));
+        // 💡 جلب التلاميذ وإرسال إشعار البث المباشر
+        const snap = await getDocs(query(collection(db, 'users'), where('role', '==', 'student')));
         let fcmTokens = [];
 
         snap.forEach(userDoc => {
             const data = userDoc.data();
             if (data.approved === true && data.fcmToken) {
-                // نرسل الإشعار إذا كان البث للجميع أو مخصصاً لمستوى التلميذ
+                // مطابقة المستوى المحدد للبث
                 if (level === 'all' || data.level === level) {
                     fcmTokens.push(data.fcmToken);
                 }
             }
         });
+
+        console.log("Tokens found for live stream:", fcmTokens.length);
 
         if (fcmTokens.length > 0) {
             await fetch('/api/notify', {
@@ -473,6 +476,9 @@ window.startLiveStream = async () => {
                     url: 'https://hamana-academy.vercel.app/' 
                 })
             });
+            window.showToast(`تم إرسال إشعار البث لـ ${fcmTokens.length} تلميذ 🚀`, "success");
+        } else {
+             window.showToast("لا يوجد تلاميذ مفعلين لإرسال إشعار البث لهم.", "error");
         }
 
     } catch (error) {
@@ -1465,7 +1471,6 @@ window.closeBroadcastModal = () => {
     document.getElementById('broadcast-modal').classList.add('hidden');
     document.getElementById('broadcast-modal').classList.remove('flex');
 };
-
 window.executeBroadcast = async () => {
     const target = document.getElementById('broadcast-target').value;
     const message = document.getElementById('broadcast-message').value.trim();
@@ -1552,6 +1557,7 @@ window.executeBroadcast = async () => {
 
     btn.disabled = false; btn.innerHTML = origHTML;
 };
+
 window.filterMainStudents = (mainType) => {
     window.adminMainFilter = mainType;
     window.adminSubFilter = 'all'; 
@@ -2437,7 +2443,7 @@ window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
     }
     sections[pIdx].years[yIdx].branches[bIdx].categories[cat].push({title, url});
 
-    let levelId = sections[pIdx].years[yIdx].id;
+    let levelId = sections[pIdx].years[yIdx].id; // مثال: y1
     let branchTitle = sections[pIdx].years[yIdx].branches[bIdx].title;
     
     let updates = window.currentUpdates || [];
@@ -2454,19 +2460,25 @@ window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
         const docRef = doc(programCol, sections[pIdx].id); 
         await updateDoc(docRef, { years: sections[pIdx].years }); 
         await updateDoc(doc(programCol, 'meta'), { latestUpdates: updates });
-        showToast("تمت الإضافة بنجاح وتنبيه التلاميذ 📚");
+        
+        showToast("تم إضافة المحتوى في قاعدة البيانات 📚");
 
+        // 💡 إرسال الإشعارات بمرونة عالية
         try {
-            const snap = await getDocs(query(usersCol, where('role', '==', 'student')));
+            const snap = await getDocs(query(collection(db, 'users'), where('role', '==', 'student')));
             let fcmTokens = [];
             
             snap.forEach(userDoc => {
                 const data = userDoc.data();
-                // الفرز برمجياً لتجنب الأخطاء
-                if (data.approved === true && data.level === levelId && data.fcmToken) {
-                    fcmTokens.push(data.fcmToken);
+                // نستخدم includes لكي يتعرف على (y1) داخل (m_y1) أو (h_y1)
+                if (data.approved === true && data.fcmToken) {
+                    if (data.level && data.level.includes(levelId)) {
+                        fcmTokens.push(data.fcmToken);
+                    }
                 }
             });
+
+            console.log("Tokens found for lesson:", fcmTokens.length); // للفحص في الكونسول
 
             if (fcmTokens.length > 0) {
                 await fetch('/api/notify', {
@@ -2479,9 +2491,13 @@ window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
                         url: 'https://hamana-academy.vercel.app/' 
                     })
                 });
+                showToast(`تم إشعار ${fcmTokens.length} تلميذ بالدرس الجديد 🚀`, "success");
+            } else {
+                showToast("لم يتم العثور على تلاميذ مفعلين في هذا المستوى لإشعارهم.", "error");
             }
         } catch (notifError) {
             console.error('Lesson Notification Error:', notifError);
+            showToast("حدث خطأ أثناء محاولة إرسال الإشعارات.", "error");
         }
 
     } catch (e) { 
