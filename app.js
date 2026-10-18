@@ -2429,10 +2429,43 @@ window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
         const docRef = doc(programCol, sections[pIdx].id); 
         await updateDoc(docRef, { years: sections[pIdx].years }); 
         await updateDoc(doc(programCol, 'meta'), { latestUpdates: updates });
-        showToast("تمت الإضافة بنجاح وتنبيه التلاميذ 📚");
+        showToast("تمت الإضافة بنجاح وتنبيه التلاميذ 📚", "success");
+
+        // 🚀 التحديث الجديد: إرسال إشعار هاتف تلقائي لتلاميذ هذا المستوى فقط
+        try {
+            // 1. جلب بيانات التلاميذ في هذا المستوى الدراسي فقط
+            const targetQuery = query(usersCol, where('role', '==', 'student'), where('approved', '==', true), where('level', '==', levelId));
+            const snap = await getDocs(targetQuery);
+            
+            let fcmTokens = [];
+            snap.forEach(userDoc => {
+                const data = userDoc.data();
+                if (data.fcmToken) {
+                    fcmTokens.push(data.fcmToken); // جمع المفاتيح
+                }
+            });
+
+            // 2. إرسال الإشعار إذا كان هناك تلاميذ لديهم هواتف مفعلة
+            if (fcmTokens.length > 0) {
+                const catName = catConfig[cat] ? catConfig[cat].title : 'محتوى'; // جلب نوع الإضافة (درس، تمرين...)
+                await fetch('/api/notify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: `أكاديمية حمانة 📚`,
+                        body: `تم إضافة ${catName} جديد: "${title}" في وحدة (${branchTitle}).`,
+                        tokens: fcmTokens,
+                        url: 'https://hamana-academy.vercel.app/'
+                    })
+                });
+            }
+        } catch (notifError) {
+            console.error('Auto Notification Error:', notifError);
+            // لا نظهر خطأ للأستاذ لأن المحتوى أضيف بنجاح، فقط فشل الإشعار
+        }
+
     } catch (e) { console.error(e); showToast("خطأ في الإضافة", "error"); }
 };
-
 window.adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
     if(await confirmAction("هل أنت متأكد من مسح هذا الرابط نهائياً؟")) {
         let sections = window.currentSections;
