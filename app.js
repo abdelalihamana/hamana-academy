@@ -432,84 +432,26 @@ window.updateLiveStreamUI = (url, target = 'all') => {
 };
 
 window.startLiveStream = async () => {
-    const level = document.getElementById('admin-live-level').value;
     const url = document.getElementById('admin-live-url').value.trim();
-    const statusText = document.getElementById('admin-live-status-text');
+    const targetSelect = document.getElementById('admin-live-level');
+    const targetLevel = targetSelect ? targetSelect.value : 'all';
 
-    if (!url) {
-        return window.showToast("يرجى إدخال رابط البث المباشر أولاً", "error");
-    }
-
+    if (!url) return showToast("يرجى إدخال رابط البث أولاً", "error");
+    if (!url.startsWith('http')) return showToast("الرابط غير صحيح، تأكد أنه يبدأ بـ http", "error");
+    
     try {
-        await setDoc(doc(db, 'program', 'live_status'), {
-            isActive: true,
-            level: level,
-            url: url,
-            timestamp: Date.now()
+        await updateDoc(doc(programCol, 'meta'), { 
+            liveStreamUrl: url,
+            liveStreamTarget: targetLevel 
         });
-
-        // 💡 تحسين واجهة الأستاذ وتفريغ الرابط
-        if(statusText) statusText.innerHTML = '<span class="text-emerald-500 font-black">🟢 البث قيد التشغيل حالياً</span>';
-        document.getElementById('admin-live-url').value = '';
-
-        // 💡 إرسال الإشعار
-        const snap = await getDocs(query(collection(db, 'users'), where('role', '==', 'student')));
-        let fcmTokens = [];
-
-        snap.forEach(userDoc => {
-            const data = userDoc.data();
-            if (data.approved === true && data.fcmToken) {
-                if (level === 'all' || data.level === level) {
-                    fcmTokens.push(data.fcmToken);
-                }
-            }
-        });
-
-        if (fcmTokens.length > 0) {
-            try {
-                await fetch('/api/notify', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: 'أكاديمية حمانة 🔴',
-                        body: 'الأستاذ في بث مباشر الآن! انقر هنا للمشاهدة والمشاركة.',
-                        tokens: fcmTokens,
-                        url: url // فتح رابط البث مباشرة عند النقر
-                    })
-                });
-                window.showToast(`تم إطلاق البث وإشعار ${fcmTokens.length} هاتف 🚀`, "success");
-            } catch (err) {
-                window.showToast("تم إطلاق البث، لكن فشل إرسال إشعار الهواتف", "warning");
-            }
-        } else {
-             window.showToast("تم إطلاق البث بنجاح! 🔴 (لا يوجد تلاميذ لديهم إشعارات مفعلة)", "success");
-        }
-
-    } catch (error) {
-        console.error("Live Stream Error:", error);
-        window.showToast("حدث خطأ أثناء إطلاق البث", "error");
+        let targetName = targetLevel === 'all' ? 'لجميع المستويات' : `لمستوى ${levelNames[targetLevel]}`;
+        showToast(`تم إطلاق البث بنجاح ${targetName}! 🔴`, "success");
+    } catch (e) {
+        console.error(e);
+        showToast("حدث خطأ أثناء إطلاق البث", "error");
     }
 };
 
-window.stopLiveStream = async () => {
-    const statusText = document.getElementById('admin-live-status-text');
-    try {
-        await setDoc(doc(db, 'program', 'live_status'), {
-            isActive: false,
-            level: 'all',
-            url: '',
-            timestamp: Date.now()
-        });
-        
-        // 💡 تحسين واجهة الأستاذ
-        if(statusText) statusText.innerHTML = '<span class="text-slate-500">🔴 لا يوجد بث حالياً</span>';
-        window.showToast("تم إنهاء البث المباشر", "success");
-        
-    } catch (error) {
-        console.error("Stop Live Error:", error);
-        window.showToast("حدث خطأ أثناء إيقاف البث", "error");
-    }
-};
 window.stopLiveStream = async () => {
     if (!window.currentLiveUrl) return;
     if(await confirmAction("هل أنت متأكد من إنهاء البث وإخفاء الزر عن التلاميذ؟")) {
@@ -1495,6 +1437,7 @@ window.closeBroadcastModal = () => {
     document.getElementById('broadcast-modal').classList.add('hidden');
     document.getElementById('broadcast-modal').classList.remove('flex');
 };
+
 window.executeBroadcast = async () => {
     const target = document.getElementById('broadcast-target').value;
     const message = document.getElementById('broadcast-message').value.trim();
@@ -1510,48 +1453,50 @@ window.executeBroadcast = async () => {
     btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-xl"></i> جاري الإرسال...';
 
     try {
-        const snap = await getDocs(query(collection(db, 'users'), where('role', '==', 'student')));
+        let targetQuery = query(usersCol, where('role', '==', 'student'), where('approved', '==', true));
+        if (target !== 'all') {
+            targetQuery = query(usersCol, where('role', '==', 'student'), where('approved', '==', true), where('level', '==', target));
+        }
+        const snap = await getDocs(targetQuery);
         
-        const batch = writeBatch(db);
-        const timestamp = Date.now();
-        let count = 0;
-        let fcmTokens = []; 
-
-        snap.forEach(user => {
-            const data = user.data();
-            const username = user.id;
-
-            if (data.approved === true) {
-                if (target === 'all' || data.level === target) {
-                    const msgId = timestamp.toString() + '_' + count;
-                    const msgRef = doc(collection(db, chatsPath, username, 'messages'), msgId);
-                    const chatDocRef = doc(db, chatsPath, username);
-
-                    batch.set(msgRef, {
-                        sender: 'admin',
-                        text: `📢 إعلان إداري:\n\n${message}`, 
-                        timestamp: timestamp + count, 
-                        isSystemMessage: true 
-                    });
-
-                    batch.set(chatDocRef, { unreadStudent: increment(1) }, { merge: true });
-                    
-                    if (data.fcmToken) {
-                        fcmTokens.push(data.fcmToken);
-                    }
-                    count++;
-                }
-            }
-        });
-
-        if (count === 0) {
+        if (snap.empty) {
             showToast("لا يوجد تلاميذ مفعلين في هذا المستوى حالياً", "error");
             btn.disabled = false; btn.innerHTML = origHTML;
             return;
         }
+        
+        const batch = writeBatch(db);
+        const timestamp = Date.now();
+        let count = 0;
+        let fcmTokens = []; // 🔔 مصفوفة لجمع مفاتيح الهواتف
+
+        snap.forEach(user => {
+            const username = user.id;
+            const data = user.data();
+            const msgId = timestamp.toString() + '_' + count;
+            const msgRef = doc(collection(db, chatsPath, username, 'messages'), msgId);
+            const chatDocRef = doc(db, chatsPath, username);
+
+            // حفظ الإعلان في المنصة
+            batch.set(msgRef, {
+                sender: 'admin',
+                text: `📢 إعلان إداري:\n\n${message}`, 
+                timestamp: timestamp + count, 
+                isSystemMessage: true 
+            });
+
+            batch.set(chatDocRef, { unreadStudent: increment(1) }, { merge: true });
+            
+            // 🔔 جمع المفاتيح للإشعارات المباشرة
+            if (data.fcmToken) {
+                fcmTokens.push(data.fcmToken);
+            }
+            count++;
+        });
 
         await batch.commit();
 
+        // 🔔 إرسال الإشعار الفعلي للهواتف!
         if (fcmTokens.length > 0) {
             try {
                 await fetch('/api/notify', {
@@ -1561,20 +1506,17 @@ window.executeBroadcast = async () => {
                         title: 'أكاديمية حمانة 📢',
                         body: message,
                         tokens: fcmTokens,
+                        // 💡 هذا السطر يخبر الإشعار بفتح التطبيق مع أمر فتح الدردشة
                         url: 'https://hamana-academy.vercel.app/?action=chat'
                     })
                 });
-                showToast(`تم إرسال الإعلان إلى ${count} تلميذ، وإشعار ${fcmTokens.length} هواتف 🚀`, "success");
             } catch (notifError) {
                 console.error('Notification Error:', notifError);
-                showToast(`تم إرسال الإعلان في الدردشة، لكن فشل إشعار الهواتف`, "warning");
             }
-        } else {
-             showToast(`تم إرسال الإعلان لـ ${count} تلميذ بالمنصة (لا يوجد أحد مفعل لإشعارات الهاتف)`, "warning");
         }
 
+        showToast(`تم إرسال الإعلان إلى ${count} تلميذ بنجاح 🚀`, "success");
         window.closeBroadcastModal();
-        document.getElementById('broadcast-message').value = '';
 
     } catch (e) {
         console.error("Broadcast Error", e);
@@ -2456,6 +2398,7 @@ window.executeStudentSearch = () => {
     if (!found) { html += `<div class="text-center p-8 opacity-60"><i class="ph-fill ph-magnifying-glass text-6xl text-slate-400 mb-3"></i><h4 class="text-lg font-bold text-slate-500">لا توجد نتائج مطابقة لبحثك في مستواك.</h4></div>`; }
     html += `</div></div>`; container.innerHTML = html;
 };
+
 window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
     let title = document.getElementById(`title_${branchId}_${cat}`).value.trim(); 
     let url = document.getElementById(`url_${branchId}_${cat}`).value.trim();
@@ -2469,7 +2412,7 @@ window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
     }
     sections[pIdx].years[yIdx].branches[bIdx].categories[cat].push({title, url});
 
-    let levelId = sections[pIdx].years[yIdx].id; // مثال: y1
+    let levelId = sections[pIdx].years[yIdx].id;
     let branchTitle = sections[pIdx].years[yIdx].branches[bIdx].title;
     
     let updates = window.currentUpdates || [];
@@ -2486,48 +2429,8 @@ window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
         const docRef = doc(programCol, sections[pIdx].id); 
         await updateDoc(docRef, { years: sections[pIdx].years }); 
         await updateDoc(doc(programCol, 'meta'), { latestUpdates: updates });
-        
-        // تفريغ الحقول بعد الإضافة لسهولة الاستخدام
-        document.getElementById(`title_${branchId}_${cat}`).value = '';
-        document.getElementById(`url_${branchId}_${cat}`).value = '';
-
-        // 💡 إرسال الإشعارات
-        const snap = await getDocs(query(collection(db, 'users'), where('role', '==', 'student')));
-        let fcmTokens = [];
-        
-        snap.forEach(userDoc => {
-            const data = userDoc.data();
-            if (data.approved === true && data.fcmToken) {
-                if (data.level && data.level.includes(levelId)) {
-                    fcmTokens.push(data.fcmToken);
-                }
-            }
-        });
-
-        if (fcmTokens.length > 0) {
-            try {
-                await fetch('/api/notify', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        title: `أكاديمية حمانة 📚`,
-                        body: `تمت إضافة محتوى جديد: ${title} (في وحدة ${branchTitle})`,
-                        tokens: fcmTokens,
-                        url: 'https://hamana-academy.vercel.app/' 
-                    })
-                });
-                showToast(`تمت الإضافة بنجاح وإشعار ${fcmTokens.length} تلميذ 🚀`, "success");
-            } catch (notifError) {
-                showToast("تمت الإضافة، ولكن تعذر إرسال الإشعارات للهواتف", "warning");
-            }
-        } else {
-            showToast("تم إضافة المحتوى بنجاح 📚 (لا يوجد تلاميذ لديهم إشعارات بهذا المستوى)", "success");
-        }
-
-    } catch (e) { 
-        console.error(e); 
-        showToast("خطأ في الإضافة", "error"); 
-    }
+        showToast("تمت الإضافة بنجاح وتنبيه التلاميذ 📚");
+    } catch (e) { console.error(e); showToast("خطأ في الإضافة", "error"); }
 };
 
 window.adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
