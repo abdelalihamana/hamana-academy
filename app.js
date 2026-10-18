@@ -446,12 +446,44 @@ window.startLiveStream = async () => {
         });
         let targetName = targetLevel === 'all' ? 'لجميع المستويات' : `لمستوى ${levelNames[targetLevel]}`;
         showToast(`تم إطلاق البث بنجاح ${targetName}! 🔴`, "success");
+
+        // 🔔 🚀 إضافة نظام إشعارات الهاتف للبث المباشر
+        try {
+            let targetQuery = query(usersCol, where('role', '==', 'student'), where('approved', '==', true));
+            if (targetLevel !== 'all') {
+                targetQuery = query(usersCol, where('role', '==', 'student'), where('approved', '==', true), where('level', '==', targetLevel));
+            }
+            const snap = await getDocs(targetQuery);
+            
+            let fcmTokens = [];
+            snap.forEach(userDoc => {
+                const data = userDoc.data();
+                if (data.fcmToken) {
+                    fcmTokens.push(data.fcmToken); 
+                }
+            });
+
+            if (fcmTokens.length > 0) {
+                await fetch('/api/notify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: `أكاديمية حمانة 🔴`,
+                        body: `بث مباشر الآن! الأستاذ بدأ بثاً ${targetName}. انقر هنا للمشاهدة والحضور.`,
+                        tokens: fcmTokens,
+                        url: 'https://hamana-academy.vercel.app/'
+                    })
+                });
+            }
+        } catch (notifError) {
+            console.error('Live Stream Notification Error:', notifError);
+        }
+
     } catch (e) {
         console.error(e);
         showToast("حدث خطأ أثناء إطلاق البث", "error");
     }
 };
-
 window.stopLiveStream = async () => {
     if (!window.currentLiveUrl) return;
     if(await confirmAction("هل أنت متأكد من إنهاء البث وإخفاء الزر عن التلاميذ؟")) {
@@ -1468,7 +1500,7 @@ window.executeBroadcast = async () => {
         const batch = writeBatch(db);
         const timestamp = Date.now();
         let count = 0;
-        let fcmTokens = []; // 🔔 مصفوفة لجمع مفاتيح الهواتف
+        let fcmTokens = []; 
 
         snap.forEach(user => {
             const username = user.id;
@@ -1477,7 +1509,6 @@ window.executeBroadcast = async () => {
             const msgRef = doc(collection(db, chatsPath, username, 'messages'), msgId);
             const chatDocRef = doc(db, chatsPath, username);
 
-            // حفظ الإعلان في المنصة
             batch.set(msgRef, {
                 sender: 'admin',
                 text: `📢 إعلان إداري:\n\n${message}`, 
@@ -1487,7 +1518,6 @@ window.executeBroadcast = async () => {
 
             batch.set(chatDocRef, { unreadStudent: increment(1) }, { merge: true });
             
-            // 🔔 جمع المفاتيح للإشعارات المباشرة
             if (data.fcmToken) {
                 fcmTokens.push(data.fcmToken);
             }
@@ -1496,7 +1526,6 @@ window.executeBroadcast = async () => {
 
         await batch.commit();
 
-        // 🔔 إرسال الإشعار الفعلي للهواتف!
         if (fcmTokens.length > 0) {
             try {
                 await fetch('/api/notify', {
@@ -1506,7 +1535,7 @@ window.executeBroadcast = async () => {
                         title: 'أكاديمية حمانة 📢',
                         body: message,
                         tokens: fcmTokens,
-                        // 💡 هذا السطر يخبر الإشعار بفتح التطبيق مع أمر فتح الدردشة
+                        // 🚀 إضافة الرابط المباشر لفتح الدردشة
                         url: 'https://hamana-academy.vercel.app/?action=chat'
                     })
                 });
@@ -2429,42 +2458,42 @@ window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
         const docRef = doc(programCol, sections[pIdx].id); 
         await updateDoc(docRef, { years: sections[pIdx].years }); 
         await updateDoc(doc(programCol, 'meta'), { latestUpdates: updates });
-        showToast("تمت الإضافة بنجاح وتنبيه التلاميذ 📚", "success");
+        showToast("تمت الإضافة بنجاح وتنبيه التلاميذ 📚");
 
-        // 🚀 التحديث الجديد: إرسال إشعار هاتف تلقائي لتلاميذ هذا المستوى فقط
+        // 🔔 🚀 نظام الإشعارات الهاتفية للمحتوى الجديد
         try {
-            // 1. جلب بيانات التلاميذ في هذا المستوى الدراسي فقط
-            const targetQuery = query(usersCol, where('role', '==', 'student'), where('approved', '==', true), where('level', '==', levelId));
+            let targetQuery = query(usersCol, where('role', '==', 'student'), where('approved', '==', true), where('level', '==', levelId));
             const snap = await getDocs(targetQuery);
-            
             let fcmTokens = [];
+            
             snap.forEach(userDoc => {
                 const data = userDoc.data();
                 if (data.fcmToken) {
-                    fcmTokens.push(data.fcmToken); // جمع المفاتيح
+                    fcmTokens.push(data.fcmToken);
                 }
             });
 
-            // 2. إرسال الإشعار إذا كان هناك تلاميذ لديهم هواتف مفعلة
             if (fcmTokens.length > 0) {
-                const catName = catConfig[cat] ? catConfig[cat].title : 'محتوى'; // جلب نوع الإضافة (درس، تمرين...)
                 await fetch('/api/notify', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         title: `أكاديمية حمانة 📚`,
-                        body: `تم إضافة ${catName} جديد: "${title}" في وحدة (${branchTitle}).`,
+                        body: `تمت إضافة محتوى جديد: ${title} (في وحدة ${branchTitle})`,
                         tokens: fcmTokens,
-                        url: 'https://hamana-academy.vercel.app/'
+                        // 🚀 الرابط المباشر للمنصة
+                        url: 'https://hamana-academy.vercel.app/' 
                     })
                 });
             }
         } catch (notifError) {
-            console.error('Auto Notification Error:', notifError);
-            // لا نظهر خطأ للأستاذ لأن المحتوى أضيف بنجاح، فقط فشل الإشعار
+            console.error('Lesson Notification Error:', notifError);
         }
 
-    } catch (e) { console.error(e); showToast("خطأ في الإضافة", "error"); }
+    } catch (e) { 
+        console.error(e); 
+        showToast("خطأ في الإضافة", "error"); 
+    }
 };
 window.adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
     if(await confirmAction("هل أنت متأكد من مسح هذا الرابط نهائياً؟")) {
