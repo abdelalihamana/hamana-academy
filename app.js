@@ -439,19 +439,64 @@ window.startLiveStream = async () => {
     if (!url) return showToast("يرجى إدخال رابط البث أولاً", "error");
     if (!url.startsWith('http')) return showToast("الرابط غير صحيح، تأكد أنه يبدأ بـ http", "error");
     
+    // إضافة تأثير التحميل للزر أثناء المعالجة
+    const btn = document.querySelector('button[onclick="startLiveStream()"]');
+    let origHTML = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> جاري الإطلاق...'; }
+
     try {
+        // 1. حفظ حالة البث في قاعدة البيانات
         await updateDoc(doc(programCol, 'meta'), { 
             liveStreamUrl: url,
             liveStreamTarget: targetLevel 
         });
+
+        // تفريغ خانة الرابط كدليل بصري على نجاح الإطلاق
+        document.getElementById('admin-live-url').value = '';
+
+        // 2. جلب التلاميذ لإرسال الإشعار (تصفية محلية آمنة)
+        const snap = await getDocs(query(usersCol, where('role', '==', 'student')));
+        let fcmTokens = [];
+        
+        snap.forEach(userDoc => {
+            const data = userDoc.data();
+            // التحقق: الحساب مفعل + لديه إشعارات الهاتف
+            if (data.approved === true && data.fcmToken) {
+                // التحقق: هل البث للجميع؟ أو لمستوى هذا التلميذ؟
+                if (targetLevel === 'all' || data.level === targetLevel) {
+                    fcmTokens.push(data.fcmToken);
+                }
+            }
+        });
+
+        // 3. إرسال الإشعار الفعلي
+        if (fcmTokens.length > 0) {
+            try {
+                await fetch('/api/notify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: 'أكاديمية حمانة 🔴',
+                        body: 'الأستاذ في بث مباشر الآن! انقر هنا للمشاهدة والمشاركة.',
+                        tokens: fcmTokens,
+                        url: 'https://hamana-academy.vercel.app/'
+                    })
+                });
+            } catch (notifError) {
+                console.error('Live Notification Error:', notifError);
+            }
+        }
+
         let targetName = targetLevel === 'all' ? 'لجميع المستويات' : `لمستوى ${levelNames[targetLevel]}`;
-        showToast(`تم إطلاق البث بنجاح ${targetName}! 🔴`, "success");
+        showToast(`تم إطلاق البث وتنبيه ${fcmTokens.length} تلميذ 🔴`, "success");
+
     } catch (e) {
         console.error(e);
         showToast("حدث خطأ أثناء إطلاق البث", "error");
     }
-};
 
+    if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
+};
 window.stopLiveStream = async () => {
     if (!window.currentLiveUrl) return;
     if(await confirmAction("هل أنت متأكد من إنهاء البث وإخفاء الزر عن التلاميذ؟")) {
