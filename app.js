@@ -2425,14 +2425,60 @@ window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
     });
     if (updates.length > 50) updates = updates.slice(updates.length - 50);
 
+    // إضافة تأثير التحميل للزر أثناء الإرسال
+    const btn = event.currentTarget || document.querySelector(`button[onclick*="adminAddLink"]`);
+    let origHTML = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-xl"></i> جاري الإضافة والنشر...'; }
+
     try {
         const docRef = doc(programCol, sections[pIdx].id); 
         await updateDoc(docRef, { years: sections[pIdx].years }); 
         await updateDoc(doc(programCol, 'meta'), { latestUpdates: updates });
-        showToast("تمت الإضافة بنجاح وتنبيه التلاميذ 📚");
-    } catch (e) { console.error(e); showToast("خطأ في الإضافة", "error"); }
-};
 
+        // تفريغ الحقول بعد الإضافة لسهولة الاستخدام
+        document.getElementById(`title_${branchId}_${cat}`).value = '';
+        document.getElementById(`url_${branchId}_${cat}`).value = '';
+
+        // 💡 جلب التلاميذ وإرسال الإشعار (تصفية محلية لتفادي أي مشاكل في الفهارس)
+        const snap = await getDocs(query(usersCol, where('role', '==', 'student')));
+        let fcmTokens = [];
+        
+        snap.forEach(userDoc => {
+            const data = userDoc.data();
+            // البحث عن تلاميذ هذا المستوى فقط، والذين لديهم حساب مفعل، وإشعاراتهم مفعلة
+            if (data.approved === true && data.level === levelId && data.fcmToken) {
+                fcmTokens.push(data.fcmToken);
+            }
+        });
+
+        if (fcmTokens.length > 0) {
+            try {
+                await fetch('/api/notify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: 'أكاديمية حمانة 📚',
+                        body: `تمت إضافة محتوى جديد: ${title}\n(في وحدة: ${branchTitle})`,
+                        tokens: fcmTokens,
+                        url: 'https://hamana-academy.vercel.app/'
+                    })
+                });
+                showToast(`تمت الإضافة بنجاح وإشعار ${fcmTokens.length} تلميذ 🚀`, "success");
+            } catch (notifError) {
+                console.error('Notification Error:', notifError);
+                showToast("تمت الإضافة بنجاح، لكن فشل إرسال إشعار الهواتف", "warning");
+            }
+        } else {
+            showToast("تمت الإضافة بنجاح 📚 (لا يوجد تلاميذ فعلوا الإشعارات بهذا المستوى)", "success");
+        }
+
+    } catch (e) { 
+        console.error(e); 
+        showToast("خطأ في الإضافة", "error"); 
+    }
+
+    if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
+};
 window.adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
     if(await confirmAction("هل أنت متأكد من مسح هذا الرابط نهائياً؟")) {
         let sections = window.currentSections;
