@@ -83,7 +83,7 @@ const chatsPath = 'physics_db/public/chats';
 
 const XP_PER_ITEM = 10;
 let isAuthReady = false;
-window.GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbybNb0NY-bSd-lbwuC-0yLeD55xcbws7_IS5O2Vc9qZge0aSDnOErkJm2eatZHY7wXJ/exec";
+window.GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7PlP7w7PrgKmKTf_mHXJAvcYQhQx6kwY0UshTo4deQHHdjHpzjmq1jtKdy2TOhxlH/exec";
 window.currentUserRecord = null;
 window.originalAdminRecord = null; 
 
