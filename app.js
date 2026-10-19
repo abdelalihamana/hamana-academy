@@ -430,7 +430,6 @@ window.updateLiveStreamUI = (url, target = 'all') => {
         if (adminSelect) adminSelect.value = "all";
     }
 };
-
 window.startLiveStream = async () => {
     const url = document.getElementById('admin-live-url').value.trim();
     const targetSelect = document.getElementById('admin-live-level');
@@ -438,38 +437,30 @@ window.startLiveStream = async () => {
 
     if (!url) return showToast("يرجى إدخال رابط البث أولاً", "error");
     if (!url.startsWith('http')) return showToast("الرابط غير صحيح، تأكد أنه يبدأ بـ http", "error");
-    
-    // إضافة تأثير التحميل للزر أثناء المعالجة
-    const btn = document.querySelector('button[onclick="startLiveStream()"]');
-    let origHTML = btn ? btn.innerHTML : '';
-    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> جاري الإطلاق...'; }
 
     try {
-        // 1. حفظ حالة البث في قاعدة البيانات
+        // 1. تحديث حالة البث في قاعدة البيانات لتظهر اللافتة الحمراء
         await updateDoc(doc(programCol, 'meta'), { 
             liveStreamUrl: url,
             liveStreamTarget: targetLevel 
         });
 
-        // تفريغ خانة الرابط كدليل بصري على نجاح الإطلاق
-        document.getElementById('admin-live-url').value = '';
-
-        // 2. جلب التلاميذ لإرسال الإشعار (تصفية محلية آمنة)
+        // 2. جلب جميع التلاميذ للتصفية المحلية المضمونة
         const snap = await getDocs(query(usersCol, where('role', '==', 'student')));
         let fcmTokens = [];
         
         snap.forEach(userDoc => {
             const data = userDoc.data();
-            // التحقق: الحساب مفعل + لديه إشعارات الهاتف
+            // يجب أن يكون التلميذ مفعلاً + يمتلك مفتاح إشعار
             if (data.approved === true && data.fcmToken) {
-                // التحقق: هل البث للجميع؟ أو لمستوى هذا التلميذ؟
+                // إذا كان البث للجميع، أو لنفس مستوى التلميذ المستهدف
                 if (targetLevel === 'all' || data.level === targetLevel) {
                     fcmTokens.push(data.fcmToken);
                 }
             }
         });
 
-        // 3. إرسال الإشعار الفعلي
+        // 3. إرسال إشعارات الهواتف
         if (fcmTokens.length > 0) {
             try {
                 await fetch('/api/notify', {
@@ -482,20 +473,19 @@ window.startLiveStream = async () => {
                         url: 'https://hamana-academy.vercel.app/'
                     })
                 });
+                showToast(`تم إطلاق البث بنجاح وإشعار ${fcmTokens.length} تلميذ 🔴`, "success");
             } catch (notifError) {
                 console.error('Live Notification Error:', notifError);
+                showToast("تم إطلاق البث، لكن فشل إرسال الإشعار للهواتف", "warning");
             }
+        } else {
+            showToast("تم إطلاق البث بنجاح 🔴 (لا يوجد تلاميذ لديهم إشعارات)", "success");
         }
-
-        let targetName = targetLevel === 'all' ? 'لجميع المستويات' : `لمستوى ${levelNames[targetLevel]}`;
-        showToast(`تم إطلاق البث وتنبيه ${fcmTokens.length} تلميذ 🔴`, "success");
 
     } catch (e) {
         console.error(e);
         showToast("حدث خطأ أثناء إطلاق البث", "error");
     }
-
-    if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
 };
 window.stopLiveStream = async () => {
     if (!window.currentLiveUrl) return;
