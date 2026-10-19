@@ -2395,10 +2395,9 @@ window.executeStudentSearch = () => {
             });
         }
     }));
-    if (!found) { html += `<div class="text-center p-8 opacity-60"><i class="ph-fill ph-magnifying-glass text-6xl text-slate-400 mb-3"></i><h4 class="text-lg font-bold text-slate-500">لا توجد نتائج مطابقة لبحثك في مستواك.</h4></div>`; }
+   if (!found) { html += `<div class="text-center p-8 opacity-60"><i class="ph-fill ph-magnifying-glass text-6xl text-slate-400 mb-3"></i><h4 class="text-lg font-bold text-slate-500">لا توجد نتائج مطابقة لبحثك في مستواك.</h4></div>`; }
     html += `</div></div>`; container.innerHTML = html;
 };
-
 window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
     let title = document.getElementById(`title_${branchId}_${cat}`).value.trim(); 
     let url = document.getElementById(`url_${branchId}_${cat}`).value.trim();
@@ -2425,34 +2424,31 @@ window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
     });
     if (updates.length > 50) updates = updates.slice(updates.length - 50);
 
-    // إضافة تأثير التحميل للزر أثناء الإرسال
-    const btn = window.event ? window.event.currentTarget : document.querySelector(`button[onclick*="adminAddLink"]`);
-    let origHTML = btn ? btn.innerHTML : '';
-    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-xl"></i> جاري الإضافة...'; }
-
     try {
+        // 1. حفظ الدرس في قاعدة البيانات أولاً
         const docRef = doc(programCol, sections[pIdx].id); 
         await updateDoc(docRef, { years: sections[pIdx].years }); 
         await updateDoc(doc(programCol, 'meta'), { latestUpdates: updates });
 
-        // تفريغ الحقول بعد الإضافة لسهولة الاستخدام
+        // تفريغ الحقول بعد الإضافة لتسهيل إضافة درس آخر
         document.getElementById(`title_${branchId}_${cat}`).value = '';
         document.getElementById(`url_${branchId}_${cat}`).value = '';
 
-        // 💡 جلب التلاميذ وإرسال الإشعار (تصفية محلية لتفادي أي مشاكل في الفهارس)
-        const snap = await getDocs(query(usersCol, where('role', '==', 'student')));
-        let fcmTokens = [];
-        
-        snap.forEach(userDoc => {
-            const data = userDoc.data();
-            // البحث عن تلاميذ هذا المستوى فقط، والذين لديهم حساب مفعل، وإشعاراتهم مفعلة
-            if (data.approved === true && data.level === levelId && data.fcmToken) {
-                fcmTokens.push(data.fcmToken);
-            }
-        });
+        // 2. إرسال الإشعارات (بطريقة آمنة تماماً تتجاوز أي مشاكل)
+        try {
+            // جلب كل التلاميذ لتجنب مشاكل الفهرسة (Indexes) في فايربيز
+            const snap = await getDocs(query(usersCol, where('role', '==', 'student')));
+            let fcmTokens = [];
+            
+            snap.forEach(userDoc => {
+                const data = userDoc.data();
+                // التصفية اليدوية: يجب أن يكون التلميذ مفعلاً + في نفس المستوى + لديه مفتاح إشعارات
+                if (data.approved === true && data.level === levelId && data.fcmToken) {
+                    fcmTokens.push(data.fcmToken);
+                }
+            });
 
-        if (fcmTokens.length > 0) {
-            try {
+            if (fcmTokens.length > 0) {
                 await fetch('/api/notify', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -2464,20 +2460,18 @@ window.adminAddLink = async (pIdx, yIdx, bIdx, cat, branchId) => {
                     })
                 });
                 showToast(`تمت الإضافة بنجاح وإشعار ${fcmTokens.length} تلميذ 🚀`, "success");
-            } catch (notifError) {
-                console.error('Notification Error:', notifError);
-                showToast("تمت الإضافة بنجاح، لكن فشل إرسال إشعار الهواتف", "warning");
+            } else {
+                showToast("تمت الإضافة بنجاح 📚 (لا يوجد تلاميذ فعلوا الإشعارات بهذا المستوى)", "success");
             }
-        } else {
-            showToast("تمت الإضافة بنجاح 📚 (لا يوجد تلاميذ فعلوا الإشعارات بهذا المستوى)", "success");
+        } catch (notifError) {
+            console.error('Notification Error:', notifError);
+            showToast("تمت الإضافة، لكن حدث خطأ في إرسال إشعار الهواتف", "warning");
         }
 
     } catch (e) { 
         console.error(e); 
-        showToast("خطأ في الإضافة", "error"); 
+        showToast("خطأ في الإضافة، تحقق من اتصالك", "error"); 
     }
-
-    if (btn) { btn.disabled = false; btn.innerHTML = origHTML; }
 };
 window.adminDeleteLink = async (pIdx, yIdx, bIdx, cat, lIdx) => {
     if(await confirmAction("هل أنت متأكد من مسح هذا الرابط نهائياً؟")) {
