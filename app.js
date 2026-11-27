@@ -2,16 +2,26 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment, writeBatch, query, limit, orderBy, getDocs, where, startAfter, startAt, documentId, getCountFromServer } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-messaging.js";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
+const firebaseConfig = isDevEnvironment
+  ? {
+      // ضع هنا بيانات firebaseConfig الخاصة بمشروع Firebase الجديد (hamana-academy-dev)
+        apiKey: "AIzaSyDKmVlPqObDsBElz2Ezbk3lsARAXkvtIIY",
+  authDomain: "academy-dev-4e9e4.firebaseapp.com",
+  projectId: "academy-dev-4e9e4",
+  storageBucket: "academy-dev-4e9e4.firebasestorage.app",
+  messagingSenderId: "604240090380",
+  appId: "1:604240090380:web:d281b9dbc40641341c6529"
+    }
+  : {
+      // اترك هنا بيانات firebaseConfig الخاصة بمشروعك الأصلي كما هي دون أي تغيير
+     apiKey: "AIzaSyDuuYHwmSW0UV1TO3gDGyETrvOimE7iGLs",
     authDomain: "physique-58073.firebaseapp.com",
     projectId: "physique-58073",
     storageBucket: "physique-58073.firebasestorage.app",
     messagingSenderId: "744073429659",
     appId: "1:744073429659:web:0859514e70482543d13c3e",
     measurementId: "G-D6BHHHVBX6"
-};
+    };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
