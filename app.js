@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, onSnapshot, updateDoc, deleteDoc, increment, writeBatch, query, limit, orderBy, getDocs, where, startAfter, startAt, documentId, getCountFromServer } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-messaging.js";
+const isDevEnvironment = window.location.hostname.includes('academy-dev-ten.vercel.app');
 const firebaseConfig = isDevEnvironment
   ? {
       // ضع هنا بيانات firebaseConfig الخاصة بمشروع Firebase الجديد (hamana-academy-dev)
